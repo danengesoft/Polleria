@@ -1,0 +1,151 @@
+{
+  "roles": {
+    "CAJERO": {
+      "navegacion": "Inicio del portal\nGESTIÓN\nCategorías\nProductos\nClientes\nPedidos\nDelivery\nComprobar conexión"
+    },
+    "REPARTIDOR": {
+      "navegacion": "Inicio del portal\nMis entregas\nComprobar conexión"
+    },
+    "CLIENTE": {
+      "pedidoPropio": true,
+      "portalInternoVisible": 0
+    },
+    "ABASTECIMIENTO": {
+      "navegacion": "Inicio del portal\nAbastecimiento\nComprobar conexión"
+    },
+    "ADMINISTRADOR": {
+      "navegacion": "Inicio del portal\nGESTIÓN\nCategorías\nProductos\nClientes\nPedidos\nDelivery\nAbastecimiento\nReportes\nComprobar conexión"
+    }
+  },
+  "flujos": {
+    "carrito": {
+      "anonimo": true,
+      "incrementar": true,
+      "decrementar": true,
+      "recarga": true
+    },
+    "productoNoDisponible": {
+      "mensaje": "Producto no disponible: 10",
+      "carritoConservado": true
+    },
+    "deliveryEfectivo": {
+      "pedidoId": 3898,
+      "creado": true,
+      "dobleClick": true,
+      "carritoVacio": true,
+      "entregaId": 263,
+      "iniciado": true,
+      "entregadoYPagado": true,
+      "clienteVeEntregado": true
+    },
+    "compra": {
+      "id": 111,
+      "total": 43.99,
+      "detalles": [
+        {
+          "nombre": "Aceite prueba integral F17",
+          "cantidad": 2.5,
+          "unidad": "L",
+          "subtotal": 30.86
+        },
+        {
+          "nombre": "Papas prueba integral F17",
+          "cantidad": 3.125,
+          "unidad": "KG",
+          "subtotal": 13.13
+        }
+      ],
+      "dobleClick": true
+    },
+    "inventario": {
+      "salida": 0.625,
+      "stockTrasSalida": 1.875,
+      "ajuste": 1.25,
+      "insuficiente": "Stock insuficiente para registrar la salida",
+      "dobleSalidaUnica": true
+    },
+    "reportes": {
+      "ventas": "Resumen de ventas\nConcepto\tVentas efectivas\tTotal vendido\tTicket promedio\nResumen\t4\tS/ 80.00\tS/ 20.00",
+      "compras": "Resumen de compras\nConcepto\tCompras\tTotal comprado\tCompra promedio\nResumen\t2\tS/ 87.98\tS/ 43.99"
+    }
+  },
+  "responsive": [
+    {
+      "pantalla": "Confirmación de entrega",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Compra con dos líneas",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Reportes",
+      "documento": 1425,
+      "viewport": 1440
+    }
+  ],
+  "sesion": {
+    "recargaProtegida": true,
+    "detalleTrasRecarga": true,
+    "logoutExigeLogin": true,
+    "trasReinicioInfraestructura": true
+  },
+  "rutasDirectas": [
+    {
+      "ruta": "/interno/productos",
+      "heading": "Productos",
+      "recarga": true
+    },
+    {
+      "ruta": "/interno/pedidos",
+      "heading": "Pedidos",
+      "recarga": true
+    },
+    {
+      "ruta": "/interno/delivery",
+      "heading": "Delivery",
+      "recarga": true
+    },
+    {
+      "ruta": "/interno/abastecimiento/compras",
+      "heading": "Compras",
+      "recarga": true
+    },
+    {
+      "ruta": "/interno/reportes",
+      "heading": "Reportes",
+      "recarga": true
+    },
+    {
+      "ruta": "/catalogo",
+      "heading": "Nuestro catálogo",
+      "recarga": true
+    },
+    {
+      "ruta": "/carrito",
+      "heading": "Tu carrito",
+      "recarga": true
+    },
+    {
+      "ruta": "/mis-pedidos",
+      "heading": "Mis pedidos",
+      "recarga": true,
+      "rol": "CLIENTE"
+    }
+  ],
+  "rutaInexistente": {
+    "redireccion": "/",
+    "encabezado": "Bienvenido a Pollería"
+  },
+  "accesibilidad": {
+    "tecladoTab": true,
+    "saltoContenido": true,
+    "dialogEntregaFocoSeguro": "Volver",
+    "labelsFormularios": true
+  },
+  "consola": {
+    "erroresYWarnings": []
+  }
+}

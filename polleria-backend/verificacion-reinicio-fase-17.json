@@ -1,0 +1,39 @@
+{
+  "realm": "polleria",
+  "enabled": true,
+  "client": {
+    "clientId": "polleria-frontend",
+    "enabled": true,
+    "publicClient": true,
+    "standardFlowEnabled": true,
+    "directAccessGrantsEnabled": false,
+    "redirectUris": [
+      "http://localhost:4200/auth/callback"
+    ],
+    "webOrigins": [
+      "http://localhost:4200"
+    ]
+  },
+  "pkce": "S256",
+  "rolesComerciales": [
+    "ABASTECIMIENTO",
+    "ADMINISTRADOR",
+    "CAJERO",
+    "CLIENTE",
+    "REPARTIDOR"
+  ],
+  "usuariosRealm": 7,
+  "actuator": {
+    "groups": [
+      "liveness",
+      "readiness"
+    ],
+    "status": "UP"
+  },
+  "angularHttp": 200,
+  "postgres": [
+    "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "2",
+    "8"
+  ]
+}

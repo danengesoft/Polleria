@@ -309,4 +309,12 @@ class PedidosIntegrationTests {
             clientes.eliminar(clienteId);productos.eliminar(productoId);categorias.eliminar(categoriaId);
         }
     }
+
+    @Test void rechazaCantidadDecimalSinTruncarlaNiCrearPedidoParcial() throws Exception {
+        long antes = jdbc.queryForObject("SELECT COUNT(*) FROM POLLERIA.PEDIDOS", Long.class);
+        mvc.perform(post("/api/v1/pedidos").contentType(MediaType.APPLICATION_JSON)
+            .content("{\"clienteId\":"+clienteId+",\"tipoPedido\":\"RECOJO\",\"metodoPago\":\"EFECTIVO\",\"detalles\":[{\"productoId\":"+productoId+",\"cantidad\":1.5},{\"productoId\":9223372036854770000,\"cantidad\":1}]}"))
+            .andExpect(status().isBadRequest());
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM POLLERIA.PEDIDOS", Long.class)).isEqualTo(antes);
+    }
 }

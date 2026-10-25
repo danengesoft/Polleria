@@ -58,6 +58,16 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.METHOD_NOT_ALLOWED, "Método HTTP no permitido para este recurso");
     }
 
+    @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> unsupportedMediaType(Exception ex) {
+        return error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Formato de contenido no soportado; utiliza application/json");
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<Map<String, Object>> notAcceptable(Exception ex) {
+        return error(HttpStatus.NOT_ACCEPTABLE, "Representación de respuesta no soportada");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> unexpected(Exception ex) {
         log.error("Error no controlado", ex);
@@ -71,6 +81,6 @@ public class GlobalExceptionHandler {
         body.put("error", status.getReasonPhrase());
         body.put("message", message);
         body.put("traceId", MDC.get("traceId"));
-        return ResponseEntity.status(status).body(body);
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

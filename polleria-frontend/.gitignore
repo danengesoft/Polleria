@@ -45,3 +45,8 @@ Thumbs.db
 
 # Salidas locales de verificación
 *.log
+
+# Secretos locales; solo la plantilla es versionable
+.env
+.env.*
+!.env.example

@@ -1,0 +1,125 @@
+{
+  "compose-dev.yml": {
+    "name": "polleria-dev",
+    "volumes": {
+      "oracle-data": "polleria-oracle-data"
+    },
+    "services": {
+      "oracle": {
+        "image": "gvenzl/oracle-free:23-slim",
+        "container": "polleria-oracle",
+        "ports": [
+          {
+            "mode": "ingress",
+            "host_ip": "127.0.0.1",
+            "target": 1521,
+            "published": "1522",
+            "protocol": "tcp"
+          }
+        ],
+        "volumes": [
+          {
+            "type": "volume",
+            "source": "oracle-data",
+            "target": "/opt/oracle/oradata",
+            "volume": {}
+          }
+        ],
+        "healthcheck": true,
+        "depends_on": []
+      }
+    }
+  },
+  "compose-keycloak.yml": {
+    "name": "polleria-identity-dev",
+    "volumes": {
+      "keycloak-postgres-data": "polleria-keycloak-postgres-data"
+    },
+    "services": {
+      "keycloak": {
+        "image": "quay.io/keycloak/keycloak:26.8.0",
+        "container": "polleria-keycloak",
+        "ports": [
+          {
+            "mode": "ingress",
+            "host_ip": "127.0.0.1",
+            "target": 8080,
+            "published": "38080",
+            "protocol": "tcp"
+          }
+        ],
+        "volumes": [
+          {
+            "type": "bind",
+            "source": "/home/systemseng/Polleria/polleria-backend/keycloak/polleria-realm.json",
+            "target": "/opt/keycloak/data/import/polleria-realm.json",
+            "read_only": true,
+            "bind": {
+              "selinux": "Z"
+            }
+          }
+        ],
+        "healthcheck": true,
+        "depends_on": [
+          "keycloak-db"
+        ]
+      },
+      "keycloak-db": {
+        "image": "postgres:17-alpine",
+        "container": "polleria-keycloak-db",
+        "ports": [
+          {
+            "mode": "ingress",
+            "host_ip": "127.0.0.1",
+            "target": 5432,
+            "published": "35432",
+            "protocol": "tcp"
+          }
+        ],
+        "volumes": [
+          {
+            "type": "volume",
+            "source": "keycloak-postgres-data",
+            "target": "/var/lib/postgresql/data",
+            "volume": {}
+          }
+        ],
+        "healthcheck": true,
+        "depends_on": []
+      }
+    }
+  },
+  "polleria-oracle": {
+    "image": "gvenzl/oracle-free:23-slim",
+    "health": "healthy",
+    "mounts": [
+      {
+        "type": "volume",
+        "name": "polleria-oracle-data",
+        "destination": "/opt/oracle/oradata"
+      }
+    ]
+  },
+  "polleria-keycloak-db": {
+    "image": "postgres:17-alpine",
+    "health": "healthy",
+    "mounts": [
+      {
+        "type": "volume",
+        "name": "polleria-keycloak-postgres-data",
+        "destination": "/var/lib/postgresql/data"
+      }
+    ]
+  },
+  "polleria-keycloak": {
+    "image": "quay.io/keycloak/keycloak:26.8.0",
+    "health": "healthy",
+    "mounts": [
+      {
+        "type": "bind",
+        "name": null,
+        "destination": "/opt/keycloak/data/import/polleria-realm.json"
+      }
+    ]
+  }
+}
