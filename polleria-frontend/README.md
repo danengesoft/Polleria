@@ -1,8 +1,8 @@
-# POLLERIA — SPA, Fase 8
+# POLLERIA — SPA, Fase 9
 
 Una sola aplicación standalone, Router con carga diferida y detección zoneless.
-Referencias LP2 S07 y S08. CRUD internos de Categoría, Producto y Cliente.
-Sin autenticación ni catálogo público completo; no incluye Pedidos frontend.
+Referencias LP2 S07, S08 y S09. CRUD internos de Categoría, Producto y Cliente,
+y formulario transaccional interno de Pedidos. Sin autenticación ni checkout público.
 
 ## Versiones y ejecución
 
@@ -46,7 +46,8 @@ src/
         ├── catalogo/
         │   ├── categoria/
         │   └── producto/
-        └── clientes/cliente/
+        ├── clientes/cliente/
+        └── pedidos/
 ```
 
 `core` contiene infraestructura global; `shared` contiene navegación efectivamente
@@ -61,6 +62,9 @@ Rutas:
 - `/interno/conexion`: diagnóstico técnico dentro del layout interno.
 - `/interno/categorias`, `/interno/productos`, `/interno/clientes`: listados.
 - Cada recurso admite `/nuevo` y `/:id/editar` dentro del layout interno.
+- `/interno/pedidos`: listado con filtros de estado y tipo en servidor.
+- `/interno/pedidos/nuevo`: creación cabecera-detalle.
+- `/interno/pedidos/:id`: consulta histórica y cambios de estado permitidos.
 - Ruta desconocida: vuelve al inicio.
 
 El componente App contiene únicamente el router-outlet superior. Cada layout tiene
@@ -86,14 +90,15 @@ reflejado por Spring y legible por CORS. Los errores muestran un mensaje recuper
 
 ## Verificaciones y avisos
 
-Ver VERIFICACION-FASE-8.md para la verificación actual y VERIFICACION-FASE-7.md
-para el historial. Build y 18 pruebas correctos (4 anteriores + 14 nuevas). Navegación real, refresco
+Ver VERIFICACION-FASE-9.md para la verificación actual y los documentos anteriores
+para el historial. Build y 31 pruebas correctos (18 anteriores + 13 nuevas). Navegación real, refresco
 directo y comunicación CORS comprobados en navegador, consola sin errores.
 Layout comprobado a 390/768/1440 px sin desbordamiento horizontal.
 Backend sin cambios: no se repitió innecesariamente su suite de 75 pruebas.
 
 `npm audit` mantiene 7 hallazgos (5 high, 2 critical), con detalle actual en
-npm-audit-fase-8.json. Omisiones dev: 2 high, en npm-audit-runtime-fase-8.json. Router señala
+npm-audit-fase-9.json. El reporte omitiendo dev de Fase 8 se conserva en
+npm-audit-runtime-fase-8.json. Router señala
 escenarios SSR (SSR está desactivado); los demás hallazgos deben revisarse antes de
 publicar. No se afirma que todos sean explotables en esta SPA ni que estén resueltos.
 Las correcciones propuestas por npm requieren versiones fuera de las fijadas LP2;
@@ -124,3 +129,31 @@ provienen del contrato seguro del backend; 500 y desconexión usan mensajes gene
 Una categoría utilizada conserva sus datos ante 409; puede editarse `activo` con PUT.
 Al guardar se vuelve al listado y se informa el resultado. Las tablas pasan a filas
 etiquetadas en pantallas pequeñas.
+
+## Pedidos transaccionales — S09
+
+PedidoService solo consume GET colección/id, POST y PATCH /{id}/estado. No hay PUT,
+DELETE ni edición libre de Pedido. Se reutilizan ClienteService y ProductoService.
+
+PedidoForm usa FormArray de líneas, autocomplete por ID, cantidades enteras positivas,
+validación de colección no vacía y bloqueo de productos duplicados. Los productos
+no disponibles no son seleccionables. Cliente usa un selector con nombre y teléfono.
+
+Subtotal y total se derivan con toSignal(valueChanges) y computed, solo como estimación.
+La confirmación Material muestra cliente, tipo, método, líneas y total informativo.
+El request se construye campo por campo: clienteId, tipoPedido, metodoPago,
+direccionEntrega, referenciaEntrega y detalles[{productoId,cantidad}]. No incluye
+precio, subtotal, total, fecha, estado, estadoPago ni el texto del autocomplete.
+
+Delivery requiere dirección. El botón explícito Usar dirección del cliente permite
+copiar dirección/referencia; cambiar cliente no sobrescribe lo escrito. No se crea
+Entrega ni se implementa despacho.
+
+La respuesta de POST se utiliza al navegar al detalle; GET confirma el recurso
+canónico, también tras refrescar. La vista usa precios históricos del PedidoResponse,
+no precios actuales de Catálogo. Las transiciones y cancelación con confirmación
+siguen la API existente. El backend sigue siendo la fuente de verdad.
+
+La verificación dejó tres pedidos de prueba y un cliente asociado como historial.
+El producto de prueba relacionado se conserva no disponible por su FK; 1/4 Pollo
+se restauró a S/20 y sigue disponible. Ver IDs y resultados en VERIFICACION-FASE-9.md.

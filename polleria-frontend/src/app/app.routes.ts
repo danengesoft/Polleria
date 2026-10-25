@@ -57,6 +57,22 @@ export const routes: Routes = [
           import('./features/clientes/cliente/cliente-form').then((m) => m.ClienteForm),
       },
       {
+        path: 'pedidos',
+        title: 'Pedidos | Pollería',
+        loadComponent: () => import('./features/pedidos/pedido-list').then((m) => m.PedidoList),
+      },
+      {
+        path: 'pedidos/nuevo',
+        title: 'Nuevo pedido | Pollería',
+        loadComponent: () => import('./features/pedidos/pedido-form').then((m) => m.PedidoForm),
+      },
+      {
+        path: 'pedidos/:id',
+        title: 'Detalle del pedido | Pollería',
+        loadComponent: () =>
+          import('./features/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),
+      },
+      {
         path: 'conexion',
         title: 'Conexión | Pollería',
         loadComponent: () => import('./core/conexion/conexion').then((m) => m.Conexion),
