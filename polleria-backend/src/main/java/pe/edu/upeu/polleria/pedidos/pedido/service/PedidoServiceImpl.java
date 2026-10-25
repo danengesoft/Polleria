@@ -3,6 +3,10 @@ package pe.edu.upeu.polleria.pedidos.pedido.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Locale;
+import org.springframework.data.domain.Sort;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +33,90 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional(readOnly = true)
     public List<PedidoResponse> listar() {
-        return pedidoRepository.findAll().stream().map(this::respuesta).toList();
+        return buscar(new PedidoFiltro(), "fecha", "DESC");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PedidoResponse> buscar(PedidoFiltro filtro, String ordenarPor, String direccion) {
+        validarFiltro(filtro);
+        if (!List.of("fecha", "total").contains(ordenarPor)) {
+            throw new InvalidRequestException("Orden permitido: fecha o total");
+        }
+        Sort.Direction sentido;
+        try {
+            sentido = Sort.Direction.valueOf(direccion.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidRequestException("Dirección de orden permitida: ASC o DESC");
+        }
+        Sort sort = Sort.by(sentido, ordenarPor).and(Sort.by(sentido, "id"));
+        return pedidoRepository.buscar(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro), sort).stream().map(this::respuesta).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PedidoResumenReporte resumen(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        PedidoAgregado agregado = pedidoRepository.agregado(filtro.getEstado(), filtro.getTipoPedido(),
+                filtro.getClienteId(), desde(filtro), hasta(filtro));
+        BigDecimal total = agregado.totalMonetario().setScale(2, RoundingMode.HALF_UP);
+        BigDecimal promedio = agregado.cantidadPedidos() == 0 ? new BigDecimal("0.00")
+                : total.divide(BigDecimal.valueOf(agregado.cantidadPedidos()), 2, RoundingMode.HALF_UP);
+        return new PedidoResumenReporte(agregado.cantidadPedidos(), total, promedio);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        return pedidoRepository.productosVendidos(filtro.getEstado(), filtro.getTipoPedido(),
+                filtro.getClienteId(), desde(filtro), hasta(filtro));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EstadoPedidoReporte> porEstado(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        EnumMap<EstadoPedido, Long> cantidades = new EnumMap<>(EstadoPedido.class);
+        pedidoRepository.porEstado(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro)).forEach(fila -> cantidades.put(fila.estado(), fila.cantidadPedidos()));
+        return Arrays.stream(EstadoPedido.values())
+                .map(estado -> new EstadoPedidoReporte(estado, cantidades.getOrDefault(estado, 0L))).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TipoPedidoReporte> porTipo(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        EnumMap<TipoPedido, Long> cantidades = new EnumMap<>(TipoPedido.class);
+        pedidoRepository.porTipo(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro)).forEach(fila -> cantidades.put(fila.tipoPedido(), fila.cantidadPedidos()));
+        return Arrays.stream(TipoPedido.values())
+                .map(tipo -> new TipoPedidoReporte(tipo, cantidades.getOrDefault(tipo, 0L))).toList();
+    }
+
+    private void validarFiltro(PedidoFiltro filtro) {
+        if (filtro.getClienteId() != null && filtro.getClienteId() <= 0) {
+            throw new InvalidRequestException("clienteId debe ser positivo");
+        }
+        if (filtro.getFechaDesde() != null && filtro.getFechaHasta() != null
+                && filtro.getFechaDesde().isAfter(filtro.getFechaHasta())) {
+            throw new InvalidRequestException("fechaDesde no puede ser posterior a fechaHasta");
+        }
+        // Oracle y el contrato ISO usan años de cuatro dígitos; además evita desbordar plusDays.
+        if ((filtro.getFechaDesde() != null && (filtro.getFechaDesde().getYear() < 1 || filtro.getFechaDesde().getYear() > 9999))
+                || (filtro.getFechaHasta() != null && (filtro.getFechaHasta().getYear() < 1 || filtro.getFechaHasta().getYear() >= 9999))) {
+            throw new InvalidRequestException("Rango de fechas fuera del intervalo admitido");
+        }
+    }
+
+    private LocalDateTime desde(PedidoFiltro filtro) {
+        return filtro.getFechaDesde() == null ? null : filtro.getFechaDesde().atStartOfDay();
+    }
+
+    private LocalDateTime hasta(PedidoFiltro filtro) {
+        return filtro.getFechaHasta() == null ? null : filtro.getFechaHasta().plusDays(1).atStartOfDay();
     }
 
     @Override

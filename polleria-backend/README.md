@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 5 (Catálogo, Clientes y Pedidos)
+# POLLERIA — backend, Fase 6 (Consultas y reportes iniciales)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -107,7 +107,7 @@ Modulith verifica Catálogo, Clientes y Pedidos. Los paquetes públicos de consu
 producto/api y cliente/api son las únicas interfaces nombradas expuestas a Pedidos.
 Las excepciones compartidas usan el paquete técnico abierto, según el patrón académico.
 
-Security, Angular, Delivery, Abastecimiento y reportes quedan fuera de esta fase.
+Security, Angular, Delivery y Abastecimiento quedan fuera de esta fase.
 Git fue inicializado manualmente por el usuario; Codex no administra commits ni remotos.
 El informe de Fase 2 conserva los nombres históricos originales.
 
@@ -217,3 +217,60 @@ la restricción solicitada de producto disponible sí se verifica.
 409: no disponible, transición conflictiva o integridad. X-Trace-ID y handler reutilizados.
 Las pruebas de rollback incluyen una petición sin transacción externa y comprueban
 conteos JDBC posteriores. Los 32 casos anteriores siguen presentes y pasan.
+
+
+## Consultas y reportes de Pedidos (S05)
+
+Sin tablas ni módulo funcional Reportes, sin Pageable ni índices nuevos.
+Las consultas usan JPQL/@Query y proyecciones tipadas dentro de PedidoRepository.
+Los reportes no cargan entidades/detalles para agregarlos en memoria.
+
+GET `/api/v1/pedidos` permite combinar:
+
+- `estado`, `tipoPedido`, `clienteId` (id positivo; si no existe, devuelve lista vacía).
+- `fechaDesde` y `fechaHasta`: días ISO `YYYY-MM-DD` de **creación del pedido**,
+  calendario de Perú, ambos inclusive. Se comparan con `>= inicio del primer día` y
+  `< inicio del día posterior al último`, incluyendo microsegundos finales sin errores.
+  Pueden enviarse por separado. Rango invertido/formato inválido: 400.
+- `ordenarPor`: solo `fecha` o `total`; `direccion`: ASC o DESC.
+  Predeterminado fecha DESC, desempate por id en el mismo sentido. Valores inválidos: 400.
+
+Ejemplo: `/api/v1/pedidos?tipoPedido=RECOJO&fechaDesde=2026-04-01&fechaHasta=2026-04-30&ordenarPor=total&direccion=DESC`.
+
+Todos los reportes aceptan los mismos cinco filtros (no parámetros de orden):
+
+- GET `/api/v1/pedidos/reportes/resumen`: cantidadPedidos, totalMonetario, ticketPromedio.
+- GET `/api/v1/pedidos/reportes/productos-mas-vendidos`: productoId, nombreProducto,
+  cantidadVendida, importeGenerado.
+- GET `/api/v1/pedidos/reportes/por-estado`: estado y cantidadPedidos para los siete
+  estados, incluidos ceros y CANCELADO.
+- GET `/api/v1/pedidos/reportes/por-tipo`: tipoPedido y cantidadPedidos para los tres
+  tipos, incluidos ceros.
+
+**Regla económica:** venta efectiva = ENTREGADO **y** PAGADO. Resumen y productos
+vendidos aplican esa condición además de los filtros. Su cantidadPedidos cuenta solo
+esas ventas, no todos los pedidos creados. Se excluyen cancelados incluso si quedaron
+pagados, anticipos sin entrega y entregas sin pago confirmado. Es un indicador de
+operaciones completadas y cobradas, no un reporte de caja ni contabilidad por devengo.
+No hay aún endpoint de confirmación de pago; hasta tener pagos registrados, un pedido
+nuevo no suma a ventas. Las pruebas usan fixtures controlados, no una API de pagos nueva.
+
+Ticket = totalMonetario / cantidadPedidos; BigDecimal, escala 2 y HALF_UP. Sin filas,
+COUNT=0 y COALESCE(SUM,0BD) devuelve cero; ticket 0.00 sin división por cero.
+
+Las agrupaciones por estado/tipo son operativas: cuentan todos los pedidos que cumplan
+filtros, incluso cancelados/no pagados. No se les aplica la regla económica.
+
+Productos se agrupan **solo por productoId**. Suman cantidad y subtotal histórico.
+Si cambió el nombre, nombreProducto muestra MIN(nombreProducto) entre los históricos
+del conjunto filtrado (según orden de Oracle): etiqueta representativa determinista,
+no nombre actual ni necesariamente el último. No divide el producto en varias filas.
+Ranking completo: cantidad DESC, importe DESC, productoId ASC, sin límite inventado.
+Nunca consulta Producto actual para reconstruir nombre o importe de una venta anterior.
+
+CORS de desarrollo sigue WebMvcConfigurer de S05, configurable con
+`polleria.cors.allowed-origins=http://localhost:4200` en perfil dev. Solo /api/**;
+métodos GET/POST/PUT/PATCH/DELETE; headers Content-Type y X-Trace-ID. Expone
+X-Trace-ID/Location. Sin credenciales ni origen comodín ni dominios de producción.
+Preflight permitido/prohibido comprobado por MockMvc y HTTP. Cuando llegue Spring
+Security, revisar la integración CORS según S11; no se incorpora seguridad ahora.

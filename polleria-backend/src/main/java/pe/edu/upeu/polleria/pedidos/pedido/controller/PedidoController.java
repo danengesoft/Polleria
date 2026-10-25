@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import pe.edu.upeu.polleria.pedidos.pedido.dto.*;
 import pe.edu.upeu.polleria.pedidos.pedido.service.PedidoService;
+import org.springdoc.core.annotations.ParameterObject;
 
 @Tag(name = "Pedidos")
 @RestController
@@ -18,9 +19,38 @@ import pe.edu.upeu.polleria.pedidos.pedido.service.PedidoService;
 public class PedidoController {
     private final PedidoService service;
 
-    @Operation(summary = "Listar pedidos con sus detalles")
+    @Operation(summary = "Consultar pedidos con filtros opcionales y orden seguro")
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> listar() { return ResponseEntity.ok(service.listar()); }
+    public ResponseEntity<List<PedidoResponse>> buscar(
+            @Valid @ModelAttribute @ParameterObject PedidoFiltro filtro,
+            @RequestParam(defaultValue = "fecha") String ordenarPor,
+            @RequestParam(defaultValue = "DESC") String direccion) {
+        return ResponseEntity.ok(service.buscar(filtro, ordenarPor, direccion));
+    }
+
+    @Operation(summary = "Ventas efectivas: pedidos ENTREGADO y PAGADO, según fecha de creación")
+    @GetMapping("/reportes/resumen")
+    public ResponseEntity<PedidoResumenReporte> resumen(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return ResponseEntity.ok(service.resumen(filtro));
+    }
+
+    @Operation(summary = "Productos vendidos de ventas efectivas; agrupados por id con nombre histórico representativo")
+    @GetMapping("/reportes/productos-mas-vendidos")
+    public ResponseEntity<List<ProductoVendidoReporte>> productosMasVendidos(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return ResponseEntity.ok(service.productosMasVendidos(filtro));
+    }
+
+    @Operation(summary = "Cantidad de pedidos por estado, incluidos cancelados; muestra ceros")
+    @GetMapping("/reportes/por-estado")
+    public ResponseEntity<List<EstadoPedidoReporte>> porEstado(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return ResponseEntity.ok(service.porEstado(filtro));
+    }
+
+    @Operation(summary = "Cantidad de pedidos por tipo; muestra ceros")
+    @GetMapping("/reportes/por-tipo")
+    public ResponseEntity<List<TipoPedidoReporte>> porTipo(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return ResponseEntity.ok(service.porTipo(filtro));
+    }
 
     @Operation(summary = "Obtener pedido histórico")
     @GetMapping("/{id}")
