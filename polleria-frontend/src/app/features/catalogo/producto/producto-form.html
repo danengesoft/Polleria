@@ -1,0 +1,70 @@
+<h1>{{ id() === null ? 'Nuevo producto' : 'Editar producto' }}</h1>
+@if (loading()) {
+  <p role="status">Cargando producto…</p>
+}
+@if (error()) {
+  <p role="alert" class="error">{{ error() }}</p>
+}
+@if (!categoriasCargadas() && !errorCategorias() && !errorCarga()) {
+  <p role="status">Cargando categorías…</p>
+}
+@if (errorCategorias()) {
+  <p class="error" role="alert">{{ errorCategorias() }}</p>
+  <button matButton (click)="cargarCategorias()">Reintentar categorías</button>
+}
+@if (categoriasCargadas() && !categorias().length) {
+  <p class="notice">
+    No hay categorías disponibles. <a routerLink="/interno/categorias/nuevo">Crear categoría</a>
+  </p>
+}
+
+@if (!loading() && !errorCarga()) {
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="resource-form">
+    <mat-form-field appearance="outline"
+      ><mat-label>Nombre</mat-label
+      ><input matInput type="text" required formControlName="nombre" maxlength="120" /><mat-error>{{
+        validacion(form.controls.nombre)
+      }}</mat-error></mat-form-field
+    >
+    <mat-form-field appearance="outline"
+      ><mat-label>Descripción</mat-label
+      ><textarea matInput formControlName="descripcion" rows="3" maxlength="500"></textarea
+      ><mat-error>{{ validacion(form.controls.descripcion) }}</mat-error></mat-form-field
+    >
+    <mat-form-field appearance="outline"
+      ><mat-label>Precio (S/)</mat-label
+      ><input matInput type="text" inputmode="decimal" formControlName="precio" /><mat-error>{{
+        validacion(form.controls.precio)
+      }}</mat-error></mat-form-field
+    >
+    <mat-form-field appearance="outline"
+      ><mat-label>Categoría</mat-label
+      ><mat-select formControlName="categoriaId"
+        ><mat-option [value]="0" disabled>Selecciona una categoría</mat-option>
+        @for (categoria of categorias(); track categoria.id) {
+          <mat-option [value]="categoria.id"
+            >{{ categoria.nombre }}{{ categoria.activo ? '' : ' (inactiva)' }}</mat-option
+          >
+        }</mat-select
+      ><mat-error>{{ validacion(form.controls.categoriaId) }}</mat-error></mat-form-field
+    >
+    <mat-form-field appearance="outline"
+      ><mat-label>URL de imagen</mat-label
+      ><input matInput type="url" formControlName="imagenUrl" maxlength="1000" /><mat-error>{{
+        validacion(form.controls.imagenUrl)
+      }}</mat-error></mat-form-field
+    >
+    <mat-checkbox formControlName="disponible">Disponible</mat-checkbox>
+    <div class="form-actions">
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="guardando() || !categoriasCargadas() || !categorias().length"
+      >
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}</button
+      ><a matButton routerLink="/interno/productos">Cancelar</a>
+    </div>
+  </form>
+} @else {
+  <a matButton routerLink="/interno/productos">Volver al listado</a>
+}

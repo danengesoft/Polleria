@@ -1,0 +1,61 @@
+<div class="page-heading">
+  <h1>Clientes</h1>
+  <a matButton="filled" routerLink="/interno/clientes/nuevo">Nuevo cliente</a>
+</div>
+
+@if (aviso()) {
+  <p role="status" class="notice">{{ aviso() }}</p>
+}
+@if (error()) {
+  <p role="alert" class="error">{{ error() }}</p>
+  <button matButton (click)="cargar()">Reintentar</button>
+}
+@if (loading()) {
+  <p role="status">Cargando clientes…</p>
+}
+@if (eliminando() !== null) {
+  <p role="status">Eliminando…</p>
+}
+<div class="table-region" [attr.aria-busy]="loading()">
+  <table class="data-table">
+    <caption class="sr-only">
+      Listado de clientes
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Nombre completo</th>
+        <th scope="col">Teléfono</th>
+        <th scope="col">Correo</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of datos(); track item.id) {
+        <tr>
+          <td data-label="Nombre completo">{{ item.nombres }} {{ item.apellidos }}</td>
+          <td data-label="Teléfono">{{ item.telefono }}</td>
+          <td data-label="Correo">{{ item.correo || '—' }}</td>
+          <td data-label="Estado">{{ item.activo ? 'Activo' : 'Inactivo' }}</td>
+          <td data-label="Acciones" class="row-actions">
+            <a matButton [routerLink]="['/interno/clientes', item.id, 'editar']">Editar</a
+            ><button
+              matButton
+              class="danger"
+              [disabled]="eliminando() !== null"
+              (click)="eliminar(item)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        @if (!loading() && !error()) {
+          <tr>
+            <td class="empty" colspan="5">No hay clientes registrados.</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
