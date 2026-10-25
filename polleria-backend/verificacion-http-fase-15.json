@@ -1,0 +1,407 @@
+{
+  "historicalInsumo": {
+    "insumoId": 84,
+    "temporaryCurrentName": "Aceite vegetal prueba F15",
+    "historicalName": "Aceite prueba F14",
+    "unchanged": true,
+    "originalNameRestored": "Aceite prueba F14"
+  },
+  "roles": {
+    "ADMINISTRADOR": {
+      "endpoints": 14,
+      "status": 200
+    },
+    "CAJERO": {
+      "endpoints": 14,
+      "status": 403
+    },
+    "ABASTECIMIENTO": {
+      "endpoints": 14,
+      "status": 403
+    },
+    "REPARTIDOR": {
+      "endpoints": 14,
+      "status": 403
+    },
+    "CLIENTE": {
+      "endpoints": 14,
+      "status": 403
+    }
+  },
+  "anonymous": {
+    "endpoints": 14,
+    "status": 401
+  },
+  "2026-10-25": {
+    "pedidos/reportes/resumen": {
+      "cantidadPedidos": 2,
+      "totalMonetario": 40.0,
+      "ticketPromedio": 20.0
+    },
+    "pedidos/reportes/ventas-por-dia": [
+      {
+        "fecha": "2026-10-25",
+        "cantidadVentas": 2,
+        "totalVentas": 40
+      }
+    ],
+    "pedidos/reportes/metodos-pago": [
+      {
+        "metodoPago": "EFECTIVO",
+        "cantidadVentas": 1,
+        "totalVentas": 20
+      },
+      {
+        "metodoPago": "YAPE",
+        "cantidadVentas": 1,
+        "totalVentas": 20
+      },
+      {
+        "metodoPago": "PLIN",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      },
+      {
+        "metodoPago": "TARJETA",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      }
+    ],
+    "pedidos/reportes/clientes": [
+      {
+        "clienteId": 676,
+        "cantidadPedidos": 2,
+        "totalComprado": 40
+      }
+    ],
+    "pedidos/reportes/productos-mas-vendidos": [
+      {
+        "productoId": 10,
+        "nombreProducto": "1/4 Pollo",
+        "cantidadVendida": 2,
+        "importeGenerado": 40
+      }
+    ],
+    "pedidos/reportes/por-estado": [
+      {
+        "estado": "PENDIENTE",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "CONFIRMADO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "EN_PREPARACION",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "LISTO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "DESPACHADO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "ENTREGADO",
+        "cantidadPedidos": 2
+      },
+      {
+        "estado": "CANCELADO",
+        "cantidadPedidos": 0
+      }
+    ],
+    "pedidos/reportes/por-tipo": [
+      {
+        "tipoPedido": "PRESENCIAL",
+        "cantidadPedidos": 0
+      },
+      {
+        "tipoPedido": "RECOJO",
+        "cantidadPedidos": 0
+      },
+      {
+        "tipoPedido": "DELIVERY",
+        "cantidadPedidos": 2
+      }
+    ],
+    "delivery/reportes/por-estado": [
+      {
+        "estado": "ASIGNADO",
+        "cantidadEntregas": 0
+      },
+      {
+        "estado": "EN_CAMINO",
+        "cantidadEntregas": 0
+      },
+      {
+        "estado": "ENTREGADO",
+        "cantidadEntregas": 2
+      },
+      {
+        "estado": "NO_ENTREGADO",
+        "cantidadEntregas": 0
+      }
+    ],
+    "delivery/reportes/resumen": {
+      "entregasAbiertas": [
+        {
+          "estado": "ASIGNADO",
+          "cantidadEntregas": 0
+        },
+        {
+          "estado": "EN_CAMINO",
+          "cantidadEntregas": 0
+        },
+        {
+          "estado": "NO_ENTREGADO",
+          "cantidadEntregas": 0
+        }
+      ],
+      "repartidoresActivos": 2
+    },
+    "abastecimiento/reportes/resumen-compras": {
+      "cantidadCompras": 1,
+      "totalComprado": 43.99,
+      "compraPromedio": 43.99
+    },
+    "abastecimiento/reportes/compras-por-proveedor": [
+      {
+        "proveedorId": 44,
+        "razonSocial": "Proveedor F14 actualizado",
+        "cantidadCompras": 1,
+        "totalComprado": 43.99
+      }
+    ],
+    "abastecimiento/reportes/insumos-comprados": [
+      {
+        "insumoId": 84,
+        "nombreInsumo": "Aceite prueba F14",
+        "unidadMedida": "L",
+        "cantidadComprada": 2.5,
+        "importeComprado": 30.86
+      },
+      {
+        "insumoId": 85,
+        "nombreInsumo": "Papas prueba F14",
+        "unidadMedida": "KG",
+        "cantidadComprada": 3.125,
+        "importeComprado": 13.13
+      }
+    ],
+    "abastecimiento/reportes/movimientos": [
+      {
+        "tipoMovimiento": "ENTRADA",
+        "cantidadMovimientos": 2
+      },
+      {
+        "tipoMovimiento": "SALIDA",
+        "cantidadMovimientos": 1
+      },
+      {
+        "tipoMovimiento": "AJUSTE",
+        "cantidadMovimientos": 1
+      }
+    ],
+    "abastecimiento/reportes/stock-actual": [
+      {
+        "id": 84,
+        "nombre": "Aceite prueba F14",
+        "unidadMedida": "L",
+        "stockActual": 1.25,
+        "activo": true
+      },
+      {
+        "id": 85,
+        "nombre": "Papas prueba F14",
+        "unidadMedida": "KG",
+        "stockActual": 3.125,
+        "activo": true
+      }
+    ]
+  },
+  "empty": {
+    "pedidos/reportes/resumen": {
+      "cantidadPedidos": 0,
+      "totalMonetario": 0.0,
+      "ticketPromedio": 0.0
+    },
+    "pedidos/reportes/ventas-por-dia": [],
+    "pedidos/reportes/metodos-pago": [
+      {
+        "metodoPago": "EFECTIVO",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      },
+      {
+        "metodoPago": "YAPE",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      },
+      {
+        "metodoPago": "PLIN",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      },
+      {
+        "metodoPago": "TARJETA",
+        "cantidadVentas": 0,
+        "totalVentas": 0.0
+      }
+    ],
+    "pedidos/reportes/clientes": [],
+    "pedidos/reportes/productos-mas-vendidos": [],
+    "pedidos/reportes/por-estado": [
+      {
+        "estado": "PENDIENTE",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "CONFIRMADO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "EN_PREPARACION",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "LISTO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "DESPACHADO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "ENTREGADO",
+        "cantidadPedidos": 0
+      },
+      {
+        "estado": "CANCELADO",
+        "cantidadPedidos": 0
+      }
+    ],
+    "pedidos/reportes/por-tipo": [
+      {
+        "tipoPedido": "PRESENCIAL",
+        "cantidadPedidos": 0
+      },
+      {
+        "tipoPedido": "RECOJO",
+        "cantidadPedidos": 0
+      },
+      {
+        "tipoPedido": "DELIVERY",
+        "cantidadPedidos": 0
+      }
+    ],
+    "delivery/reportes/por-estado": [
+      {
+        "estado": "ASIGNADO",
+        "cantidadEntregas": 0
+      },
+      {
+        "estado": "EN_CAMINO",
+        "cantidadEntregas": 0
+      },
+      {
+        "estado": "ENTREGADO",
+        "cantidadEntregas": 0
+      },
+      {
+        "estado": "NO_ENTREGADO",
+        "cantidadEntregas": 0
+      }
+    ],
+    "abastecimiento/reportes/resumen-compras": {
+      "cantidadCompras": 0,
+      "totalComprado": 0.0,
+      "compraPromedio": 0.0
+    },
+    "abastecimiento/reportes/compras-por-proveedor": [],
+    "abastecimiento/reportes/insumos-comprados": [],
+    "abastecimiento/reportes/movimientos": [
+      {
+        "tipoMovimiento": "ENTRADA",
+        "cantidadMovimientos": 0
+      },
+      {
+        "tipoMovimiento": "SALIDA",
+        "cantidadMovimientos": 0
+      },
+      {
+        "tipoMovimiento": "AJUSTE",
+        "cantidadMovimientos": 0
+      }
+    ]
+  },
+  "validation": {
+    "reverseDates": 400,
+    "top101": 400
+  },
+  "historicalProduct": {
+    "productoId": 10,
+    "temporaryCurrentPrice": 25,
+    "historicalAmount": 40,
+    "historicalQuantity": 2,
+    "unchanged": true,
+    "originalPriceRestored": 20
+  },
+  "regression": {
+    "ADMINISTRADOR": {
+      "paths": [
+        "/categorias",
+        "/productos",
+        "/clientes",
+        "/pedidos",
+        "/delivery/entregas",
+        "/abastecimiento/compras"
+      ],
+      "status": 200
+    },
+    "CAJERO": {
+      "paths": [
+        "/clientes",
+        "/pedidos",
+        "/delivery/entregas"
+      ],
+      "status": 200
+    },
+    "ABASTECIMIENTO": {
+      "paths": [
+        "/abastecimiento/insumos",
+        "/abastecimiento/proveedores",
+        "/abastecimiento/compras",
+        "/abastecimiento/movimientos"
+      ],
+      "status": 200
+    },
+    "REPARTIDOR": {
+      "paths": [
+        "/delivery/repartidores/me",
+        "/delivery/entregas/mias"
+      ],
+      "status": 200
+    },
+    "CLIENTE": {
+      "paths": [
+        "/clientes/me",
+        "/pedidos/mios"
+      ],
+      "status": 200
+    }
+  },
+  "actuator": {
+    "groups": [
+      "liveness",
+      "readiness"
+    ],
+    "status": "UP"
+  },
+  "openapi": {
+    "reportEndpoints": 14,
+    "bearer": true,
+    "title": "POLLERIA API"
+  }
+}

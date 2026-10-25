@@ -69,9 +69,14 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     @Override
     @Transactional(readOnly = true)
     public List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro) {
-        validarFiltro(filtro);
+        return productosMasVendidos(filtro, 20);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro, int top) {
+        validarFiltro(filtro); validarTop(top);
         return pedidoRepository.productosVendidos(filtro.getEstado(), filtro.getTipoPedido(),
-                filtro.getClienteId(), desde(filtro), hasta(filtro));
+            filtro.getClienteId(), desde(filtro), hasta(filtro), org.springframework.data.domain.PageRequest.of(0, top));
     }
 
     @Override
@@ -297,4 +302,30 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     private String opcional(String valor) {
         return valor == null || valor.isBlank() ? null : valor.strip();
     }
+    @Override @Transactional(readOnly = true)
+    public List<VentaDiaReporte> ventasPorDia(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        return pedidoRepository.ventasPorDia(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(), desde(filtro), hasta(filtro));
+    }
+
+    @Override @Transactional(readOnly = true)
+    public List<MetodoPagoReporte> metodosPago(PedidoFiltro filtro) {
+        validarFiltro(filtro);
+        EnumMap<MetodoPago, MetodoPagoReporte> filas = new EnumMap<>(MetodoPago.class);
+        pedidoRepository.metodosPago(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro)).forEach(fila -> filas.put(fila.metodoPago(), fila));
+        return Arrays.stream(MetodoPago.values()).map(metodo -> filas.getOrDefault(metodo,
+                new MetodoPagoReporte(metodo, 0L, new BigDecimal("0.00")))).toList();
+    }
+
+    @Override @Transactional(readOnly = true)
+    public List<ClienteCompradorReporte> clientesCompradores(PedidoFiltro filtro, int top) {
+        validarFiltro(filtro); validarTop(top);
+        return pedidoRepository.clientesCompradores(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(), desde(filtro), hasta(filtro), org.springframework.data.domain.PageRequest.of(0, top));
+    }
+
+    private void validarTop(int top) {
+        if (top < 1 || top > 100) throw new InvalidRequestException("top debe estar entre 1 y 100");
+    }
+
 }

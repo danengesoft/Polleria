@@ -412,3 +412,25 @@ Sin DELETE de Insumo/Proveedor (se desactivan), ni PUT/DELETE de Compra.
 Suite actual: 180 pruebas correctas; cinco módulos verificados sin ciclos. Ver
 `VERIFICACION-FASE-14.md` para endpoints, archivos y verificación real de Oracle/HTTP.
 No hay relación con Producto, recetas ni consumo de inventario desde Pedidos.
+
+## Reportes ampliados — Fase 15
+
+GET administrativos en `/api/v1/pedidos/reportes`, `/api/v1/delivery/reportes` y
+`/api/v1/abastecimiento/reportes`. Solo ADMINISTRADOR. Los permisos operativos
+preexistentes permanecen vigentes. Son consultas agregadas sin tablas nuevas;
+Modulith mantiene exactamente cinco módulos comerciales.
+
+Fechas opcionales `fechaDesde`/`fechaHasta` (YYYY-MM-DD), días completos del
+calendario Perú, final exclusivo al inicio del día siguiente. Rankings con
+`top=20`, entre 1 y 100, limitado en base de datos. Venta efectiva sigue siendo
+ENTREGADO + PAGADO. Se conserva el contrato resumen
+`cantidadPedidos`, `totalMonetario`, `ticketPromedio`.
+
+Delivery por estado usa fechaAsignacion vigente, reemplazada al reasignar.
+Resumen Delivery y stock son fotografías actuales sin rango. Compras por proveedor
+usa razón social vigente; detalles de Producto/Insumo conservan importes/nombres
+históricos (nombre mínimo alfabético por ID). Sin métricas de rendimiento por
+repartidor, utilidad, valorización de inventario ni suma de KG con L.
+
+198 pruebas backend correctas. Evidencias HTTP/Oracle/Keycloak y resumen técnico:
+`VERIFICACION-FASE-15.md`. No hay migración SQL de esta fase.

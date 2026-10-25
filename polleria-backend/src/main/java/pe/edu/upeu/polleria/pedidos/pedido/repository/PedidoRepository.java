@@ -56,7 +56,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         """)
     List<ProductoVendidoReporte> productosVendidos(@Param("estado") EstadoPedido estado, @Param("tipo") TipoPedido tipo,
             @Param("clienteId") Long clienteId, @Param("desde") LocalDateTime desde,
-            @Param("hasta") LocalDateTime hasta);
+            @Param("hasta") LocalDateTime hasta, org.springframework.data.domain.Pageable limite);
 
     @Query("""
         SELECT new pe.edu.upeu.polleria.pedidos.pedido.dto.EstadoPedidoReporte(p.estado, COUNT(p))
@@ -73,4 +73,16 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<TipoPedidoReporte> porTipo(@Param("estado") EstadoPedido estado, @Param("tipo") TipoPedido tipo,
             @Param("clienteId") Long clienteId, @Param("desde") LocalDateTime desde,
             @Param("hasta") LocalDateTime hasta);
+    @Query("SELECT new pe.edu.upeu.polleria.pedidos.pedido.dto.VentaDiaReporte(cast(truncate(p.fecha, day) as LocalDate), COUNT(p), SUM(p.total)) FROM Pedido p " + FILTROS + VENTA_EFECTIVA + " GROUP BY cast(truncate(p.fecha, day) as LocalDate) ORDER BY cast(truncate(p.fecha, day) as LocalDate)")
+    List<VentaDiaReporte> ventasPorDia(@Param("estado") EstadoPedido estado, @Param("tipo") TipoPedido tipo,
+        @Param("clienteId") Long clienteId, @Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta);
+
+    @Query("SELECT new pe.edu.upeu.polleria.pedidos.pedido.dto.MetodoPagoReporte(p.metodoPago, COUNT(p), SUM(p.total)) FROM Pedido p " + FILTROS + VENTA_EFECTIVA + " GROUP BY p.metodoPago ORDER BY p.metodoPago")
+    List<MetodoPagoReporte> metodosPago(@Param("estado") EstadoPedido estado, @Param("tipo") TipoPedido tipo,
+        @Param("clienteId") Long clienteId, @Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta);
+
+    @Query("SELECT new pe.edu.upeu.polleria.pedidos.pedido.dto.ClienteCompradorReporte(p.clienteId, COUNT(p), SUM(p.total)) FROM Pedido p " + FILTROS + VENTA_EFECTIVA + " GROUP BY p.clienteId ORDER BY COUNT(p) DESC, SUM(p.total) DESC, p.clienteId")
+    List<ClienteCompradorReporte> clientesCompradores(@Param("estado") EstadoPedido estado, @Param("tipo") TipoPedido tipo,
+        @Param("clienteId") Long clienteId, @Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta, org.springframework.data.domain.Pageable limite);
+
 }

@@ -36,8 +36,9 @@ public class PedidoController {
 
     @Operation(summary = "Productos vendidos de ventas efectivas; agrupados por id con nombre histórico representativo")
     @GetMapping("/reportes/productos-mas-vendidos")
-    public ResponseEntity<List<ProductoVendidoReporte>> productosMasVendidos(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
-        return ResponseEntity.ok(service.productosMasVendidos(filtro));
+    public ResponseEntity<List<ProductoVendidoReporte>> productosMasVendidos(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro,
+            @io.swagger.v3.oas.annotations.Parameter(description="Máximo de filas, entre 1 y 100") @RequestParam(defaultValue="20") int top) {
+        return ResponseEntity.ok(service.productosMasVendidos(filtro, top));
     }
 
     @Operation(summary = "Cantidad de pedidos por estado, incluidos cancelados; muestra ceros")
@@ -72,4 +73,19 @@ public class PedidoController {
     public ResponseEntity<PedidoResponse> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoPedidoRequest request) {
         return ResponseEntity.ok(service.cambiarEstado(id, request));
     }
+    @Operation(summary="Ventas efectivas por día de creación en Perú, orden ascendente") @GetMapping("/reportes/ventas-por-dia")
+    public List<VentaDiaReporte> ventasPorDia(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return service.ventasPorDia(filtro);
+    }
+
+    @Operation(summary="Ventas efectivas agrupadas por método de pago") @GetMapping("/reportes/metodos-pago")
+    public List<MetodoPagoReporte> metodosPago(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro) {
+        return service.metodosPago(filtro);
+    }
+
+    @Operation(summary="Clientes por compras efectivas; identificadores sin datos personales") @GetMapping("/reportes/clientes")
+    public List<ClienteCompradorReporte> clientesCompradores(@Valid @ModelAttribute @ParameterObject PedidoFiltro filtro, @io.swagger.v3.oas.annotations.Parameter(description="Máximo de filas entre 1 y 100") @RequestParam(defaultValue="20") int top) {
+        return service.clientesCompradores(filtro, top);
+    }
+
 }

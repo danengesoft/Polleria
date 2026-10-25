@@ -1,3 +1,5 @@
+import { EntregaEstadoReporte, DeliveryResumen } from './reporte.model';
+import { ReporteFiltro, parametrosReporte } from '../../shared/reporte-filtro';
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../core/services/api-service';
@@ -43,5 +45,14 @@ export class DeliveryService {
     return this.http.patch<Entrega>(this.url('entregas/mias/' + id + '/no-entregado'), {
       observacion,
     });
+  }
+  porEstado(f: ReporteFiltro = {}) {
+    return this.http.get<EntregaEstadoReporte[]>(
+      this.api.buildUrl('/api/v1/delivery/reportes/por-estado'),
+      { params: parametrosReporte(f) },
+    );
+  }
+  resumen() {
+    return this.http.get<DeliveryResumen>(this.api.buildUrl('/api/v1/delivery/reportes/resumen'));
   }
 }

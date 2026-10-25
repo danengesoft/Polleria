@@ -19,6 +19,12 @@ export const routes: Routes = [
     loadComponent: () => import('./core/layout/interno/interno').then((m) => m.Interno),
     children: [
       {
+        path: 'reportes',
+        canActivate: [rolGuard('ADMINISTRADOR')],
+        title: 'Reportes | Pollería',
+        loadComponent: () => import('./features/reportes/reportes').then((m) => m.Reportes),
+      },
+      {
         path: '',
         pathMatch: 'full',
         title: 'Portal interno | Pollería',

@@ -5,4 +5,5 @@ import pe.edu.upeu.polleria.delivery.repartidor.entity.Repartidor;
 public interface RepartidorRepository extends JpaRepository<Repartidor,Long> {
     Optional<Repartidor> findByKeycloakSub(String sub);
     List<Repartidor> findByActivoTrueOrderByNombreVisibleAsc();
+ long countByActivoTrue();
 }

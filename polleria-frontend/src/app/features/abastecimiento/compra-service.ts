@@ -1,3 +1,5 @@
+import { CompraResumen, ProveedorCompras, InsumoComprado } from './reporte.model';
+import { ReporteFiltro, parametrosReporte } from '../../shared/reporte-filtro';
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ApiService } from '../../core/services/api-service';
@@ -18,5 +20,23 @@ export class CompraService {
   }
   crear(r: CompraRequest) {
     return this.http.post<Compra>(this.url, r);
+  }
+  resumen(f: ReporteFiltro = {}) {
+    return this.http.get<CompraResumen>(
+      this.api.buildUrl('/api/v1/abastecimiento/reportes/resumen-compras'),
+      { params: parametrosReporte(f) },
+    );
+  }
+  porProveedor(f: ReporteFiltro = {}) {
+    return this.http.get<ProveedorCompras[]>(
+      this.api.buildUrl('/api/v1/abastecimiento/reportes/compras-por-proveedor'),
+      { params: parametrosReporte(f) },
+    );
+  }
+  insumosComprados(f: ReporteFiltro = {}) {
+    return this.http.get<InsumoComprado[]>(
+      this.api.buildUrl('/api/v1/abastecimiento/reportes/insumos-comprados'),
+      { params: parametrosReporte(f) },
+    );
   }
 }

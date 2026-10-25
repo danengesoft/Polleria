@@ -1,3 +1,5 @@
+import { MovimientoReporte } from './reporte.model';
+import { ReporteFiltro, parametrosReporte } from '../../shared/reporte-filtro';
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ApiService } from '../../core/services/api-service';
@@ -18,5 +20,11 @@ export class InventarioService {
   }
   ajuste(insumoId: number, nuevoStock: string, motivo: string) {
     return this.http.post<Movimiento>(this.url + '/ajustes', { insumoId, nuevoStock, motivo });
+  }
+  porTipo(f: ReporteFiltro = {}) {
+    return this.http.get<MovimientoReporte[]>(
+      this.api.buildUrl('/api/v1/abastecimiento/reportes/movimientos'),
+      { params: parametrosReporte(f) },
+    );
   }
 }

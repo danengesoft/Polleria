@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/clientes").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/clientes/*").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/clientes/*").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/api/v1/delivery/reportes/**", "/api/v1/abastecimiento/reportes/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/delivery/repartidores/me", "/api/v1/delivery/entregas/mias", "/api/v1/delivery/entregas/mias/*").hasRole("REPARTIDOR")
                         .requestMatchers(HttpMethod.POST, "/api/v1/delivery/repartidores/me").hasRole("REPARTIDOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/delivery/entregas/mias/*/iniciar", "/api/v1/delivery/entregas/mias/*/entregar", "/api/v1/delivery/entregas/mias/*/no-entregado").hasRole("REPARTIDOR")

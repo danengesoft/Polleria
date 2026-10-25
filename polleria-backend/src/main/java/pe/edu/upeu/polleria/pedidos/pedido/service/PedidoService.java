@@ -18,4 +18,9 @@ public interface PedidoService {
     PedidoResponse obtener(Long id);
     PedidoResponse crear(PedidoRequest request);
     PedidoResponse cambiarEstado(Long id, EstadoPedidoRequest request);
+    List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro, int top);
+    List<VentaDiaReporte> ventasPorDia(PedidoFiltro filtro);
+    List<MetodoPagoReporte> metodosPago(PedidoFiltro filtro);
+    List<ClienteCompradorReporte> clientesCompradores(PedidoFiltro filtro, int top);
+
 }

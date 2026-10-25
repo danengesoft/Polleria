@@ -115,3 +115,17 @@ Inventario consulta historial con filtros Insumo/Tipo. Salida exige cantidad pos
 más motivo. Ajuste solicita nuevo conteo físico no negativo, y el backend registra
 la diferencia. No se envían stockAnterior/stockPosterior. No hay entrada manual,
 recetas, vínculo con Producto ni descuento automático por ventas.
+
+## Reportes ampliados — Fase 15
+
+`/interno/reportes` y enlace lateral exclusivos para ADMINISTRADOR; guards y
+backend validan el rol. Composición independiente de servicios de Pedidos, Delivery,
+Compras, Inventario e Insumos. Filtros Desde/Hasta y top (1–100), tablas tipadas,
+signals y carga/error por reporte; cancela solicitudes anteriores al filtrar.
+Rango histórico se aplica a fecha de creación/asignación/registro según la sección.
+Stock y operación actual de Delivery se indican como independientes del rango.
+Importes PEN con CurrencyPipe a dos decimales; cantidades por insumo/unidad.
+Sin nuevas dependencias, gráficos externos ni cálculos de utilidad.
+
+Build y 98 pruebas correctas; responsive 390/768/1440 y login real comprobados.
+Ver `VERIFICACION-FASE-15.md` y el informe detallado del backend.

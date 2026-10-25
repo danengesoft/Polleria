@@ -9,4 +9,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
  @EntityGraph(attributePaths="insumo")
  @Query("select m from MovimientoInventario m where (:insumo is null or m.insumo.id=:insumo) and (:tipo is null or m.tipo=:tipo) and (:desde is null or m.fecha>=:desde) and (:hasta is null or m.fecha<:hasta) order by m.fecha desc,m.id desc")
  List<MovimientoInventario> buscar(@Param("insumo") Long insumo,@Param("tipo") TipoMovimiento tipo,@Param("desde") LocalDateTime desde,@Param("hasta") LocalDateTime hasta);
+ @Query("select new pe.edu.upeu.polleria.abastecimiento.inventario.dto.MovimientoTipoReporte(m.tipo,count(m)) from MovimientoInventario m where (:desde is null or m.fecha>=:desde) and (:hasta is null or m.fecha<:hasta) group by m.tipo")
+ List<pe.edu.upeu.polleria.abastecimiento.inventario.dto.MovimientoTipoReporte> porTipo(@Param("desde") LocalDateTime desde,@Param("hasta") LocalDateTime hasta);
+
 }

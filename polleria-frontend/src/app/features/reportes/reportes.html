@@ -1,0 +1,170 @@
+<h1>Reportes</h1>
+<p>
+  Consultas administrativas de los datos registrados. Las ventas efectivas son pedidos ENTREGADO y
+  PAGADO.
+</p>
+<form (ngSubmit)="aplicar()" class="filtros">
+  <label
+    >Desde<input
+      type="date"
+      name="desde"
+      [(ngModel)]="fechaDesde"
+      min="0001-01-01"
+      max="9998-12-31"
+  /></label>
+  <label
+    >Hasta<input
+      type="date"
+      name="hasta"
+      [(ngModel)]="fechaHasta"
+      min="0001-01-01"
+      max="9998-12-31"
+  /></label>
+  <label
+    >Top productos y clientes<input
+      type="number"
+      name="top"
+      [(ngModel)]="top"
+      min="1"
+      max="100"
+      required
+  /></label>
+  <button type="submit">Aplicar filtros</button>
+</form>
+@if (errorFiltro()) {
+  <p role="alert">{{ errorFiltro() }}</p>
+}
+<p role="status">Rango histórico aplicado: {{ rangoAplicado() }}</p>
+<h2>Ventas</h2>
+<p>
+  Fecha de creación del pedido en Perú. Los importes proceden del pedido y sus detalles históricos.
+</p>
+<app-reporte-tabla
+  titulo="Resumen de ventas"
+  [datos]="ventas()"
+  [columnas]="[
+    { nombre: 'Concepto' },
+    { nombre: 'Ventas efectivas' },
+    { nombre: 'Total vendido', formato: 'moneda' },
+    { nombre: 'Ticket promedio', formato: 'moneda' },
+  ]"
+  nota=""
+/>
+<app-reporte-tabla
+  titulo="Ventas por día"
+  [datos]="dias()"
+  [columnas]="[{ nombre: 'Fecha' }, { nombre: 'Ventas' }, { nombre: 'Importe', formato: 'moneda' }]"
+  nota=""
+/>
+<app-reporte-tabla
+  titulo="Métodos de pago"
+  [datos]="pagos()"
+  [columnas]="[
+    { nombre: 'Método' },
+    { nombre: 'Ventas' },
+    { nombre: 'Importe', formato: 'moneda' },
+  ]"
+  nota=""
+/>
+<app-reporte-tabla
+  titulo="Productos más vendidos"
+  [datos]="productos()"
+  [columnas]="[
+    { nombre: 'Posición' },
+    { nombre: 'Producto histórico' },
+    { nombre: 'Cantidad' },
+    { nombre: 'Importe histórico', formato: 'moneda' },
+  ]"
+  nota="Nombre mínimo alfabético histórico por producto; no utiliza el precio actual del Catálogo."
+/>
+<app-reporte-tabla
+  titulo="Clientes con más compras efectivas"
+  [datos]="clientes()"
+  [columnas]="[
+    { nombre: 'Cliente' },
+    { nombre: 'Compras' },
+    { nombre: 'Total comprado', formato: 'moneda' },
+  ]"
+  nota="Identificadores comerciales; no se consultan datos personales."
+/>
+<h2>Pedidos</h2>
+<p>Incluye todos los estados, también cancelados, dentro del rango histórico.</p>
+<app-reporte-tabla
+  titulo="Pedidos por estado"
+  [datos]="estados()"
+  [columnas]="[{ nombre: 'Estado' }, { nombre: 'Pedidos' }]"
+  nota=""
+/>
+<app-reporte-tabla
+  titulo="Pedidos por tipo"
+  [datos]="tipos()"
+  [columnas]="[{ nombre: 'Tipo' }, { nombre: 'Pedidos' }]"
+  nota=""
+/>
+<h2>Delivery</h2>
+<app-reporte-tabla
+  titulo="Entregas por estado"
+  [datos]="entregas()"
+  [columnas]="[{ nombre: 'Estado' }, { nombre: 'Entregas' }]"
+  nota="Rango por fecha de asignación vigente. Una reasignación reemplaza esa fecha; no representa rendimiento histórico del repartidor."
+/>
+<app-reporte-tabla
+  titulo="Operación actual de Delivery"
+  [datos]="operacion()"
+  [columnas]="[{ nombre: 'Concepto' }, { nombre: 'Cantidad' }]"
+  nota="Fotografía actual, independiente del rango histórico."
+/>
+<h2>Abastecimiento</h2>
+<p>
+  Compras y movimientos por fecha de registro en Perú. Las compras no representan el costo de las
+  ventas del período.
+</p>
+<app-reporte-tabla
+  titulo="Resumen de compras"
+  [datos]="compraResumen()"
+  [columnas]="[
+    { nombre: 'Concepto' },
+    { nombre: 'Compras' },
+    { nombre: 'Total comprado', formato: 'moneda' },
+    { nombre: 'Compra promedio', formato: 'moneda' },
+  ]"
+  nota=""
+/>
+<app-reporte-tabla
+  titulo="Compras por proveedor"
+  [datos]="proveedores()"
+  [columnas]="[
+    { nombre: 'Proveedor' },
+    { nombre: 'Compras' },
+    { nombre: 'Total comprado', formato: 'moneda' },
+  ]"
+  nota="Razón social vigente del proveedor."
+/>
+<app-reporte-tabla
+  titulo="Insumos comprados"
+  [datos]="comprados()"
+  [columnas]="[
+    { nombre: 'Insumo histórico' },
+    { nombre: 'Unidad' },
+    { nombre: 'Cantidad', formato: 'cantidad' },
+    { nombre: 'Importe histórico', formato: 'moneda' },
+  ]"
+  nota="Nombre mínimo alfabético y unidad del detalle histórico; cantidades separadas por insumo y unidad."
+/>
+<app-reporte-tabla
+  titulo="Movimientos por tipo"
+  [datos]="movimientos()"
+  [columnas]="[{ nombre: 'Tipo' }, { nombre: 'Movimientos' }]"
+  nota="Solo conteos; no suma cantidades físicas de unidades diferentes."
+/>
+<app-reporte-tabla
+  titulo="Stock actual"
+  [datos]="stock()"
+  [columnas]="[
+    { nombre: 'Insumo' },
+    { nombre: 'Unidad' },
+    { nombre: 'Stock actual', formato: 'cantidad' },
+    { nombre: 'Activo' },
+  ]"
+  nota="Fotografía física actual, independiente del rango histórico; sin valorización monetaria."
+/>

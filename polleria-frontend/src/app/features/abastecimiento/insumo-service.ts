@@ -1,3 +1,5 @@
+import { StockReporte } from './reporte.model';
+import { ReporteFiltro, parametrosReporte } from '../../shared/reporte-filtro';
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../core/services/api-service';
@@ -18,5 +20,10 @@ export class InsumoService {
   }
   actualizar(id: number, r: InsumoRequest) {
     return this.http.put<Insumo>(this.url + '/' + id, r);
+  }
+  stockActual() {
+    return this.http.get<StockReporte[]>(
+      this.api.buildUrl('/api/v1/abastecimiento/reportes/stock-actual'),
+    );
   }
 }

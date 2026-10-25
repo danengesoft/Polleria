@@ -255,4 +255,44 @@ class ReportesIntegrationTests {
                         .header("Access-Control-Request-Method","GET"))
                 .andExpect(status().isForbidden()).andExpect(header().doesNotExist("Access-Control-Allow-Origin"));
     }
+
+    @Test void ventasPorDiaAgrupaOrdenaYRespetaLimites() {
+        var filas=pedidos.ventasPorDia(filtro());
+        assertThat(filas).hasSize(2);
+        assertThat(filas.get(0).fecha()).isEqualTo(LocalDate.of(2026,4,5));
+        assertThat(filas.get(0).cantidadVentas()).isEqualTo(2);
+        assertThat(filas.get(0).totalVentas()).isEqualByComparingTo("65.00");
+        assertThat(filas.get(1).fecha()).isEqualTo(LocalDate.of(2026,4,6));
+        assertThat(filas.get(1).totalVentas()).isEqualByComparingTo("75.00");
+        assertThat(pedidos.ventasPorDia(dia())).hasSize(1);
+    }
+    @Test void metodoPagoCuentaSoloVentasEfectivas() {
+        em.find(Pedido.class,ultimoDelDia).setMetodoPago(MetodoPago.YAPE);em.flush();
+        var filas=pedidos.metodosPago(dia());
+        assertThat(filas).hasSize(4);
+        assertThat(filas).anySatisfy(f->{assertThat(f.metodoPago()).isEqualTo(MetodoPago.EFECTIVO);assertThat(f.cantidadVentas()).isEqualTo(1);assertThat(f.totalVentas()).isEqualByComparingTo("40");});
+        assertThat(filas).anySatisfy(f->{assertThat(f.metodoPago()).isEqualTo(MetodoPago.YAPE);assertThat(f.cantidadVentas()).isEqualTo(1);assertThat(f.totalVentas()).isEqualByComparingTo("25");});
+    }
+    @Test void rankingClientesAgrupaAConDosYBConUnaSinDatosPersonales() {
+        crear(otroClienteId,TipoPedido.RECOJO,EstadoPedido.ENTREGADO,EstadoPago.PAGADO,"2026-04-05T10:00:00",productoId,1);
+        var f=dia();f.setClienteId(null);
+        var filas=pedidos.clientesCompradores(f,10);
+        assertThat(filas).hasSize(2);
+        assertThat(filas.get(0).clienteId()).isEqualTo(clienteId);
+        assertThat(filas.get(0).cantidadPedidos()).isEqualTo(2);
+        assertThat(filas.get(0).totalComprado()).isEqualByComparingTo("65");
+        assertThat(filas.get(1).clienteId()).isEqualTo(otroClienteId);
+        assertThat(filas.get(1).cantidadPedidos()).isEqualTo(1);
+    }
+    @Test void topLimitaEnBaseDeDatosYSigueUsandoHistorico() {
+        var filas=pedidos.productosMasVendidos(dia(),1);
+        assertThat(filas).hasSize(1);assertThat(filas.getFirst().importeGenerado()).isEqualByComparingTo("65");
+        assertThat(filas.getFirst().nombreProducto()).isEqualTo("A histórico");
+        assertThatThrownBy(()->pedidos.productosMasVendidos(dia(),0)).isInstanceOf(pe.edu.upeu.polleria.exception.InvalidRequestException.class);
+        assertThatThrownBy(()->pedidos.clientesCompradores(dia(),101)).isInstanceOf(pe.edu.upeu.polleria.exception.InvalidRequestException.class);
+    }
+    @Test void nuevosReportesSinVentasDevuelvenListasVacias() {
+        var f=filtro();f.setClienteId(Long.MAX_VALUE);
+        assertThat(pedidos.ventasPorDia(f)).isEmpty();assertThat(pedidos.metodosPago(f)).hasSize(4).allSatisfy(x->{assertThat(x.cantidadVentas()).isZero();assertThat(x.totalVentas()).isEqualByComparingTo("0");});assertThat(pedidos.clientesCompradores(f,20)).isEmpty();
+    }
 }
