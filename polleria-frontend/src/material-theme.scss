@@ -1,11 +1,10 @@
 @use '@angular/material' as mat;
-
 html {
   @include mat.theme(
     (
       color: (
         theme-type: light,
-        primary: mat.$green-palette,
+        primary: mat.$orange-palette,
       ),
       typography: system-ui,
       density: 0,
@@ -13,13 +12,14 @@ html {
   );
   @include mat.theme-overrides(
     (
-      primary: #343e30,
-      on-primary: #ffffff,
-      primary-container: #e4eadf,
-      on-primary-container: #252823,
-      secondary: #56614f,
-      surface: #fafbf8,
-      surface-container: #edf0e9,
+      primary: var(--accent),
+      on-primary: var(--on-accent),
+      primary-container: var(--accent-soft),
+      on-primary-container: var(--ink),
+      secondary: var(--muted),
+      surface: var(--surface),
+      surface-container: var(--surface-soft),
+      error: var(--error),
     )
   );
 }

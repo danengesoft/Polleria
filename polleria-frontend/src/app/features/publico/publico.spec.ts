@@ -163,7 +163,7 @@ describe('Experiencia pública', () => {
     expect(c.carrito.unidades()).toBe(1);
     req.flush(pedido);
     expect(c.carrito.unidades()).toBe(0);
-    expect(nav).toHaveBeenCalledWith(['/mis-pedidos', 99]);
+    expect(nav).toHaveBeenCalledWith(['/mis-pedidos', 99], { state: { pedidoCreado: true } });
   });
   it('perfil crea campos comerciales sin sub rol o id', () => {
     const f = TestBed.createComponent(Perfil);

@@ -1,3 +1,4 @@
+import { EstadoBadge } from '../../shared/estado-badge';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -12,6 +13,7 @@ import { ESTADOS, TIPOS, EstadoPedido, TipoPedido, PedidoResponse, etiqueta } fr
 @Component({
   selector: 'app-pedido-list',
   imports: [
+    EstadoBadge,
     CurrencyPipe,
     DatePipe,
     RouterLink,

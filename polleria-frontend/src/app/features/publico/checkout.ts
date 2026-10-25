@@ -78,7 +78,7 @@ export class Checkout {
     this.api.crearPedido(r).subscribe({
       next: (p) => {
         this.carrito.vaciar();
-        void this.router.navigate(['/mis-pedidos', p.id]);
+        void this.router.navigate(['/mis-pedidos', p.id], { state: { pedidoCreado: true } });
       },
       error: (e) => {
         this.guardando.set(false);

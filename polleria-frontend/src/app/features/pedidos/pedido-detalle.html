@@ -14,44 +14,68 @@
 }
 @if (pedido(); as p) {
   <h2>Pedido #{{ p.id }}</h2>
-  <dl class="order-summary">
-    <div>
-      <dt>Cliente</dt>
-      <dd>{{ p.cliente.nombres }} {{ p.cliente.apellidos }}</dd>
-    </div>
-    <div>
-      <dt>Fecha</dt>
-      <dd>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }}</dd>
-    </div>
-    <div>
-      <dt>Tipo</dt>
-      <dd>{{ etiqueta(p.tipoPedido) }}</dd>
-    </div>
-    <div>
-      <dt>Estado</dt>
-      <dd>{{ etiqueta(p.estado) }}</dd>
-    </div>
-    <div>
-      <dt>Método de pago</dt>
-      <dd>{{ etiqueta(p.metodoPago) }}</dd>
-    </div>
-    <div>
-      <dt>Estado del pago</dt>
-      <dd>{{ etiqueta(p.estadoPago) }}</dd>
-    </div>
-    @if (p.direccionEntrega) {
-      <div>
-        <dt>Dirección de entrega</dt>
-        <dd>{{ p.direccionEntrega }}</dd>
-      </div>
-    }
-    @if (p.referenciaEntrega) {
-      <div>
-        <dt>Referencia de entrega</dt>
-        <dd>{{ p.referenciaEntrega }}</dd>
-      </div>
-    }
-  </dl>
+  <div class="detail-sections">
+    <section>
+      <h3>Pedido</h3>
+      <dl class="order-summary">
+        <div>
+          <dt>Fecha</dt>
+          <dd>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>Tipo</dt>
+          <dd>{{ etiqueta(p.tipoPedido) }}</dd>
+        </div>
+        <div>
+          <dt>Estado</dt>
+          <dd><app-estado [valor]="p.estado" /></dd>
+        </div>
+      </dl>
+    </section>
+    <section>
+      <h3>Cliente</h3>
+      <dl class="order-summary">
+        <div>
+          <dt>Nombre</dt>
+          <dd>{{ p.cliente.nombres }} {{ p.cliente.apellidos }}</dd>
+        </div>
+      </dl>
+    </section>
+    <section>
+      <h3>Entrega</h3>
+      <dl class="order-summary">
+        <div>
+          <dt>Modalidad</dt>
+          <dd>{{ etiqueta(p.tipoPedido) }}</dd>
+        </div>
+        @if (p.direccionEntrega) {
+          <div>
+            <dt>Dirección de entrega</dt>
+            <dd>{{ p.direccionEntrega }}</dd>
+          </div>
+        }
+        @if (p.referenciaEntrega) {
+          <div>
+            <dt>Referencia de entrega</dt>
+            <dd>{{ p.referenciaEntrega }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+    <section>
+      <h3>Pago</h3>
+      <dl class="order-summary">
+        <div>
+          <dt>Método de pago</dt>
+          <dd>{{ etiqueta(p.metodoPago) }}</dd>
+        </div>
+        <div>
+          <dt>Estado del pago</dt>
+          <dd><app-estado [valor]="p.estadoPago" /></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
   <h2>Productos del pedido</h2>
   <p class="muted">Precios históricos registrados por el servidor.</p>
   <table class="data-table">

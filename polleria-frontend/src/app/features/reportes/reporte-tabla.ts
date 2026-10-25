@@ -104,6 +104,7 @@ export interface TablaReporte {
         padding: 0.75rem;
         border-bottom: 1px solid var(--line);
         white-space: nowrap;
+        font-variant-numeric: tabular-nums;
       }
       th {
         background: var(--surface-soft);

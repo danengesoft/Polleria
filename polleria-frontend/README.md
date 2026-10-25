@@ -129,3 +129,23 @@ Sin nuevas dependencias, gráficos externos ni cálculos de utilidad.
 
 Build y 98 pruebas correctas; responsive 390/768/1440 y login real comprobados.
 Ver `VERIFICACION-FASE-15.md` y el informe detallado del backend.
+
+## Diseño visual y responsive — Fase 16
+
+Una SPA con dos experiencias: pública comercial e interna operativa. Tokens de
+color/espaciado en styles.css y tema Material conectado a esos mismos tokens.
+Tipografía del sistema, sin fuentes externas ni dependencias nuevas.
+
+Menús móviles con signals, aria-expanded, cierre al seleccionar/Escape y retorno
+de foco con referencias Angular. EstadoBadge y SeguimientoPedido reutilizables;
+el seguimiento de Recojo excluye Despachado. Carrito confirma su vaciado con
+MatDialog y checkout muestra confirmación de creación solo tras respuesta exitosa.
+
+Build sin warnings de presupuesto; **105 pruebas frontend correctas** (98 anteriores
+más 7 de interacción visual). Backend/configuración/contratos/permisos intactos;
+no se repitió Maven por cambios de presentación, conforme al alcance aprobado.
+Matriz mínima: 19 pantallas a 390/768/1440 sin overflow global, más formularios y
+variantes. Único pedido de prueba: #3223, Recojo/Efectivo/Pendiente, S/20.00.
+
+Ver VERIFICACION-FASE-16.md y sus evidencias JSON. npm audit conserva 5 altas y
+2 críticas conocidas; no se aplicaron fixes ni cambios de Angular. Fase 17 pendiente.

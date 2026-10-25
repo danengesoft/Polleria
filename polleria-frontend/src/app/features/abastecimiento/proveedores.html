@@ -23,14 +23,16 @@
     </div>
   </form>
 </section>
-<button (click)="cargar()" [disabled]="ocupado()">Actualizar proveedores</button>
+<button class="secondary" (click)="cargar()" [disabled]="ocupado()">Actualizar proveedores</button>
 <div class="supply-grid">
   @for (p of items(); track p.id) {
     <article class="supply-card">
       <h2>{{ p.razonSocial }}</h2>
       <p>RUC: {{ p.ruc || 'Sin RUC' }} · {{ p.activo ? 'Activo' : 'Inactivo' }}</p>
       <p>{{ p.telefono }} {{ p.correo }}</p>
-      <button (click)="editar(p)" [disabled]="ocupado()">Editar {{ p.razonSocial }}</button>
+      <button class="secondary" (click)="editar(p)" [disabled]="ocupado()">
+        Editar {{ p.razonSocial }}
+      </button>
     </article>
   } @empty {
     <p>No hay proveedores registrados.</p>

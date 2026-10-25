@@ -33,7 +33,7 @@
     </div>
   </form>
 </section>
-<button (click)="cargar()" [disabled]="ocupado()">Actualizar insumos</button>
+<button class="secondary" (click)="cargar()" [disabled]="ocupado()">Actualizar insumos</button>
 <div class="supply-grid">
   @for (i of items(); track i.id) {
     <article class="supply-card">
@@ -42,7 +42,9 @@
       <p>
         Stock actual <strong>{{ i.stockActual | number: '1.3-3' }}</strong>
       </p>
-      <button (click)="editar(i)" [disabled]="ocupado()">Editar {{ i.nombre }}</button>
+      <button class="secondary" (click)="editar(i)" [disabled]="ocupado()">
+        Editar {{ i.nombre }}
+      </button>
     </article>
   } @empty {
     <p>No hay insumos registrados.</p>

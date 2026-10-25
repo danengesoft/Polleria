@@ -47,3 +47,25 @@ p {
     width: 100%;
   }
 }
+
+.filtros {
+  background: var(--surface);
+  padding: 1.25rem;
+  gap: 1rem;
+}
+input {
+  min-height: 44px;
+}
+button {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+h2 {
+  font-size: 1.35rem;
+  padding-bottom: 0.8rem;
+}
+p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}

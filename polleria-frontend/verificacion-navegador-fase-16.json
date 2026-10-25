@@ -1,0 +1,770 @@
+{
+  "responsive": [
+    {
+      "pantalla": "Inicio público",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Inicio público",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Inicio público",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Catálogo público",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Catálogo público",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Catálogo público",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Carrito con producto",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Carrito con producto",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Carrito con producto",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Checkout Recojo",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Checkout Recojo",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Checkout Recojo",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Checkout Delivery",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Checkout Delivery",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Checkout Delivery",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Detalle pedido cliente",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Detalle pedido cliente",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Detalle pedido cliente",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Mis pedidos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Mis pedidos",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Mis pedidos",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Perfil cliente",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Perfil cliente",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Perfil cliente",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Carrito vacío",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Carrito vacío",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Carrito vacío",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Categorías",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Categorías",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Categorías",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Clientes",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Clientes",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Clientes",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Pedidos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Pedidos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Pedidos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Pedidos con datos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Pedidos con datos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Pedidos con datos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Detalle del pedido",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Detalle del pedido",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Detalle del pedido",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Detalle interno cargado",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Detalle interno cargado",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Detalle interno cargado",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Delivery",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Delivery",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Delivery",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Delivery con entregas",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Delivery con entregas",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Delivery con entregas",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Insumos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Insumos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Insumos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Insumos con stock",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Insumos con stock",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Insumos con stock",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Proveedores",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Proveedores",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Proveedores",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Proveedores con datos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Proveedores con datos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Proveedores con datos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Compras",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Compras",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Compras",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Compras con historial",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Compras con historial",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Compras con historial",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Inventario y movimientos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Inventario y movimientos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Inventario y movimientos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Inventario con movimientos",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Inventario con movimientos",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Inventario con movimientos",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Reportes",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Reportes",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Reportes",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Reportes cargados",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Reportes cargados",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Reportes cargados",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Nueva categoría",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Nueva categoría",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Nueva categoría",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Nuevo producto",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Nuevo producto",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Nuevo producto",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Formulario Producto cargado",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Formulario Producto cargado",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Formulario Producto cargado",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Nuevo cliente",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Nuevo cliente",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Nuevo cliente",
+      "documento": 1425,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Nuevo pedido",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Nuevo pedido",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Nuevo pedido",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Formulario Pedido cargado",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Formulario Pedido cargado",
+      "documento": 753,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Formulario Pedido cargado",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Productos",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Acceso denegado",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Acceso denegado",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Acceso denegado",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Reparto móvil con entrega",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Reparto móvil con entrega",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Reparto móvil con entrega",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Categorías cargadas",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Categorías cargadas",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Categorías cargadas",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Productos cargados",
+      "documento": 390,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Productos cargados",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Productos cargados",
+      "documento": 1440,
+      "viewport": 1440
+    },
+    {
+      "pantalla": "Clientes cargados",
+      "documento": 375,
+      "viewport": 390
+    },
+    {
+      "pantalla": "Clientes cargados",
+      "documento": 768,
+      "viewport": 768
+    },
+    {
+      "pantalla": "Clientes cargados",
+      "documento": 1440,
+      "viewport": 1440
+    }
+  ],
+  "roles": {
+    "CLIENTE": {
+      "portalInternoVisible": 0,
+      "perfil": true,
+      "misPedidos": true,
+      "checkout": true
+    },
+    "ADMINISTRADOR": {
+      "navegacion": "Inicio del portal\nCATÁLOGO\nCategorías\nProductos\nClientes\nPedidos\nDelivery\nAbastecimiento\nReportes\nComprobar conexión",
+      "pantallasRevisadas": true
+    },
+    "CAJERO": {
+      "navegacion": "Inicio del portal\nGESTIÓN\nCategorías\nProductos\nClientes\nPedidos\nDelivery\nComprobar conexión",
+      "nuevoProducto": 0,
+      "eliminar": 0,
+      "reportes": "Acceso denegado"
+    },
+    "REPARTIDOR": {
+      "navegacion": "Inicio del portal\nMis entregas\nComprobar conexión"
+    },
+    "ABASTECIMIENTO": {
+      "navegacion": "Inicio del portal\nAbastecimiento\nComprobar conexión",
+      "compra7Visible": true
+    }
+  },
+  "flujoPublico": {
+    "pedidoId": 3223,
+    "total": 20,
+    "tipo": "RECOJO",
+    "metodo": "EFECTIVO",
+    "estado": "PENDIENTE",
+    "confirmacionVisible": true
+  },
+  "backendModificado": false,
+  "confirmacionVaciado": true,
+  "recursoInexistente": "Pedido no encontrado",
+  "consola": [],
+  "teclado": {
+    "escapeCierra": true,
+    "focoRestaurado": true
+  },
+  "matrizMinima": [
+    {
+      "pantalla": "Inicio público",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Catálogo público",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Carrito con producto",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Checkout Recojo",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Perfil cliente",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Mis pedidos",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Detalle pedido cliente",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Categorías cargadas",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Productos cargados",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Clientes cargados",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Pedidos con datos",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Detalle interno cargado",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Delivery con entregas",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Reparto móvil con entrega",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Insumos con stock",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Proveedores con datos",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Compras con historial",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Inventario con movimientos",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    },
+    {
+      "pantalla": "Reportes cargados",
+      "390": "correcto",
+      "768": "correcto",
+      "1440": "correcto"
+    }
+  ],
+  "contrasteTokens": {
+    "textoSuperficie": 14.31,
+    "secundarioFondo": 5.43,
+    "acentoSuperficie": 7.07,
+    "textoBotonAcento": 7.07,
+    "exito": 6.33,
+    "advertencia": 6.13,
+    "error": 6.18
+  }
+}

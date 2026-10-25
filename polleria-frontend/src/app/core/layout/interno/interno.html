@@ -2,32 +2,74 @@
 <header class="site-header">
   <div class="container header-row">
     <a class="brand" routerLink="/interno">Sistema Pollería</a>
-    <app-navigation />
+    <app-navigation [interno]="true" />
   </div>
 </header>
 <div class="container internal-body">
-  <aside>
+  <aside (keydown.escape)="cerrarMenu(portalButton)">
+    <button
+      type="button"
+      class="secondary portal-toggle"
+      #portalButton
+      [attr.aria-expanded]="menuAbierto()"
+      aria-controls="portal-menu"
+      (click)="menuAbierto.set(!menuAbierto())"
+    >
+      Menú del portal
+    </button>
     <p class="eyebrow">Portal interno</p>
-    <nav aria-label="Navegación del portal">
-      <a routerLink="/interno">Inicio del portal</a>
+    <nav
+      id="portal-menu"
+      aria-label="Navegación del portal"
+      [class.abierto]="menuAbierto()"
+      (click)="menuAbierto.set(false)"
+    >
+      <a
+        routerLink="/interno"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Inicio del portal</a
+      >
       @if (auth.tieneRol('ADMINISTRADOR', 'CAJERO')) {
-        <span class="nav-section">Catálogo</span>
-        <a routerLink="/interno/categorias">Categorías</a>
-        <a routerLink="/interno/productos">Productos</a>
-        <a routerLink="/interno/clientes">Clientes</a>
-        <a routerLink="/interno/pedidos">Pedidos</a>
-        <a routerLink="/interno/delivery">Delivery</a>
+        <span class="nav-section">Gestión</span>
+        <a routerLink="/interno/categorias" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Categorías</a
+        >
+        <a routerLink="/interno/productos" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Productos</a
+        >
+        <a routerLink="/interno/clientes" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Clientes</a
+        >
+        <a routerLink="/interno/pedidos" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Pedidos</a
+        >
+        <a routerLink="/interno/delivery" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Delivery</a
+        >
       }
       @if (auth.tieneRol('REPARTIDOR')) {
-        <a routerLink="/interno/reparto">Mis entregas</a>
+        <a routerLink="/interno/reparto" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Mis entregas</a
+        >
       }
       @if (auth.tieneRol('ADMINISTRADOR', 'ABASTECIMIENTO')) {
-        <a routerLink="/interno/abastecimiento/insumos">Abastecimiento</a>
+        <a
+          routerLink="/interno/abastecimiento/insumos"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          >Abastecimiento</a
+        >
       }
       @if (auth.tieneRol('ADMINISTRADOR')) {
-        <a routerLink="/interno/reportes">Reportes</a>
+        <a routerLink="/interno/reportes" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Reportes</a
+        >
       }
-      <a routerLink="/interno/conexion">Comprobar conexión</a>
+      <a routerLink="/interno/conexion" routerLinkActive="active" ariaCurrentWhenActive="page"
+        >Comprobar conexión</a
+      >
     </nav>
   </aside>
   <main id="contenido" tabindex="-1"><router-outlet /></main>

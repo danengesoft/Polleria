@@ -1,3 +1,4 @@
+import { EstadoBadge } from '../../shared/estado-badge';
 import { Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -6,7 +7,7 @@ import { PedidoResponse, etiqueta } from '../pedidos/pedido.model';
 import { mensajeHttp } from '../../shared/http-error';
 @Component({
   selector: 'app-mis-pedidos',
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [EstadoBadge, CurrencyPipe, DatePipe, RouterLink],
   styleUrl: './publico.css',
   template: ` <h1>Mis pedidos</h1>
     <p>Consulta tus pedidos y su estado actual.</p>
@@ -19,14 +20,14 @@ import { mensajeHttp } from '../../shared/http-error';
       <p role="status">Consultando pedidos…</p>
     }
     @for (p of pedidos(); track p.id) {
-      <article class="linea">
+      <article class="linea order-history">
         <h2>
           <a [routerLink]="['/mis-pedidos', p.id]">Pedido #{{ p.id }}</a>
         </h2>
         <p>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
         <p>
-          {{ etiqueta(p.tipoPedido) }} · {{ etiqueta(p.estado) }} · Pago
-          {{ etiqueta(p.estadoPago) }}
+          {{ etiqueta(p.tipoPedido) }} <app-estado [valor]="p.estado" /> · Pago
+          <app-estado [valor]="p.estadoPago" />
         </p>
         <strong>{{ p.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</strong>
       </article>

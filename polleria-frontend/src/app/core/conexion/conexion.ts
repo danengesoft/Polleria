@@ -17,12 +17,27 @@ import { ConexionService, ResultadoConexion } from '../services/conexion-service
           <p class="success">Conexión correcta · HTTP {{ resultado()?.codigoHttp }}</p>
           <p class="trace">Trace ID: {{ resultado()?.traceId }}</p>
         } @else if (estado() === 'error') {
-          <p role="alert">No se pudo conectar con el servidor. Comprueba que el backend esté disponible.</p>
+          <p role="alert">
+            No se pudo conectar con el servidor. Comprueba que el backend esté disponible.
+          </p>
         }
       </div>
     </section>
   `,
-  styles: `.connection-result { margin-top:1.25rem; } .success { color:#285e3a; font-weight:600; } .trace { color:var(--muted); font-size:.85rem; overflow-wrap:anywhere; }`,
+  styles: `
+    .connection-result {
+      margin-top: 1.25rem;
+    }
+    .success {
+      color: var(--success);
+      font-weight: 600;
+    }
+    .trace {
+      color: var(--muted);
+      font-size: 0.85rem;
+      overflow-wrap: anywhere;
+    }
+  `,
 })
 export class Conexion {
   private readonly conexion = inject(ConexionService);
@@ -33,9 +48,15 @@ export class Conexion {
   protected comprobar() {
     this.estado.set('comprobando');
     this.resultado.set(null);
-    this.conexion.comprobar().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: resultado => { this.resultado.set(resultado); this.estado.set('correcta'); },
-      error: () => this.estado.set('error'),
-    });
+    this.conexion
+      .comprobar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resultado) => {
+          this.resultado.set(resultado);
+          this.estado.set('correcta');
+        },
+        error: () => this.estado.set('error'),
+      });
   }
 }

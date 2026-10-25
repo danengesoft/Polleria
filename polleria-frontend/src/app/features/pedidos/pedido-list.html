@@ -59,8 +59,8 @@
           <td data-label="Fecha">{{ pedido.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
           <td data-label="Cliente">{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos }}</td>
           <td data-label="Tipo">{{ etiqueta(pedido.tipoPedido) }}</td>
-          <td data-label="Estado">{{ etiqueta(pedido.estado) }}</td>
-          <td data-label="Pago">{{ etiqueta(pedido.estadoPago) }}</td>
+          <td data-label="Estado"><app-estado [valor]="pedido.estado" /></td>
+          <td data-label="Pago"><app-estado [valor]="pedido.estadoPago" /></td>
           <td data-label="Total">{{ pedido.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</td>
           <td data-label="Acciones">
             <a matButton [routerLink]="['/interno/pedidos', pedido.id]">Ver detalle</a>

@@ -19,6 +19,7 @@
         }
       </select></label
     >
+    <h3 class="purchase-heading">Detalle de compra</h3>
     <div formArrayName="detalles">
       @for (l of form.controls.detalles.controls; track l; let i = $index) {
         <fieldset [formGroupName]="i" class="purchase-line">
@@ -54,8 +55,10 @@
         </fieldset>
       }
     </div>
-    <button type="button" (click)="agregar()" [disabled]="ocupado()">Agregar insumo</button>
-    <p>Total estimado {{ total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+    <button type="button" class="secondary" (click)="agregar()" [disabled]="ocupado()">
+      Agregar insumo
+    </button>
+    <p class="total">Total estimado {{ total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
     <p>Cantidades: hasta 3 decimales. Costo unitario: hasta 4. Usa punto decimal.</p>
     @if (form.invalid && form.touched) {
       <p role="alert">
@@ -87,14 +90,16 @@
   </section>
 }
 <h2>Historial de compras</h2>
-<button (click)="cargar()" [disabled]="ocupado()">Actualizar compras</button>
+<button class="secondary" (click)="cargar()" [disabled]="ocupado()">Actualizar compras</button>
 <div class="supply-grid">
   @for (c of compras(); track c.id) {
     <article class="supply-card">
       <h3>Compra #{{ c.id }}</h3>
       <p>{{ c.proveedor.razonSocial }} · {{ c.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
       <p>{{ c.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
-      <button (click)="abrir(c.id)" [disabled]="ocupado()">Ver compra #{{ c.id }}</button>
+      <button class="secondary" (click)="abrir(c.id)" [disabled]="ocupado()">
+        Ver compra #{{ c.id }}
+      </button>
     </article>
   } @empty {
     <p>No hay compras registradas.</p>

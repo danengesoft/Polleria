@@ -1,0 +1,47 @@
+{
+  "antes": {
+    "pedidos": 8,
+    "entregas": 2,
+    "compras": 1,
+    "movimientos": 4,
+    "compra7": 43.99
+  },
+  "despues": {
+    "pedidos": 9,
+    "entregas": 2,
+    "compras": 1,
+    "movimientos": 4,
+    "compra7": 43.99,
+    "stock84": 1.25,
+    "stock85": 3.125,
+    "tablas": 12
+  },
+  "pedidoControlado": {
+    "pedidoId": 3223,
+    "tipoPedido": "RECOJO",
+    "estado": "PENDIENTE",
+    "metodoPago": "EFECTIVO",
+    "estadoPago": "PENDIENTE",
+    "total": 20,
+    "fecha": "2026-10-25 01:31:47"
+  },
+  "detalle": {
+    "productoId": 10,
+    "cantidad": 1,
+    "precioUnitario": 20,
+    "subtotal": 20
+  },
+  "actuator": {
+    "groups": [
+      "liveness",
+      "readiness"
+    ],
+    "status": "UP"
+  },
+  "openapi": "POLLERIA API",
+  "catalogoPublicoHTTP": 200,
+  "angularHTTP": 200,
+  "backendModificado": false,
+  "contratosModificados": false,
+  "dependenciasModificadas": false
+}

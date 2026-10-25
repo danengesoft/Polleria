@@ -14,13 +14,15 @@ import { mensajeHttp } from '../../shared/http-error';
   template: ` <p class="eyebrow">A tu gusto</p>
     <h1>Nuestro catálogo</h1>
     <p>Elige tus productos y prepara tu pedido. Los precios se confirman al ordenar.</p>
-    <label for="categoria">Categoría</label
-    ><select id="categoria" (change)="cargar($any($event.target).value)">
-      <option value="">Todos</option>
-      @for (c of categorias(); track c.id) {
-        <option [value]="c.id">{{ c.nombre }}</option>
-      }
-    </select>
+    <div class="catalog-filter">
+      <label for="categoria">Categoría</label
+      ><select id="categoria" (change)="cargar($any($event.target).value)">
+        <option value="">Todos</option>
+        @for (c of categorias(); track c.id) {
+          <option [value]="c.id">{{ c.nombre }}</option>
+        }
+      </select>
+    </div>
     @if (error()) {
       <p role="alert">{{ error() }}</p>
       <button (click)="cargar()">Reintentar</button>
@@ -31,27 +33,30 @@ import { mensajeHttp } from '../../shared/http-error';
     <p role="status">{{ aviso() }}</p>
     <div class="cards">
       @for (p of productos(); track p.id) {
-        <article class="card">
-          @if (imagen(p.imagenUrl)) {
+        <article class="card" [class.unavailable]="!p.disponible">
+          @if (imagen(p.imagenUrl) && !imagenesFallidas().has(p.id)) {
             <img
               [src]="imagen(p.imagenUrl)"
               [alt]="p.nombre"
               loading="lazy"
               referrerpolicy="no-referrer"
-              (error)="$any($event.target).hidden = true"
+              (error)="imagenFallida(p.id)"
             />
           } @else {
-            <div class="placeholder" aria-hidden="true">Pollería</div>
+            <div class="placeholder" aria-hidden="true">Sin imagen</div>
           }
-          <p class="eyebrow">{{ p.categoria.nombre }}</p>
-          <h2>{{ p.nombre }}</h2>
-          <p>{{ p.descripcion }}</p>
-          <strong>{{ p.precio | currency: 'PEN' : 'S/ ' : '1.2-2' }}</strong>
-          @if (p.disponible) {
-            <button (click)="agregar(p)">Agregar al carrito</button>
-          } @else {
-            <p>No disponible</p>
-          }
+          <div class="product-info">
+            <p class="eyebrow">{{ p.categoria.nombre }}</p>
+            <h2>{{ p.nombre }}</h2>
+            <p>{{ p.descripcion }}</p>
+            <strong class="price">{{ p.precio | currency: 'PEN' : 'S/ ' : '1.2-2' }}</strong>
+            @if (p.disponible) {
+              <button (click)="agregar(p)">Agregar al carrito</button>
+            } @else {
+              <p class="availability">No disponible</p>
+              <button class="secondary" disabled>Agregar al carrito</button>
+            }
+          </div>
         </article>
       } @empty {
         @if (!cargando() && !error()) {
@@ -65,6 +70,10 @@ export class CatalogoPublico {
   private readonly productosApi = inject(ProductoService);
   private readonly categoriasApi = inject(CategoriaService);
   readonly carrito = inject(CarritoService);
+  readonly imagenesFallidas = signal<Set<number>>(new Set());
+  imagenFallida(id: number) {
+    this.imagenesFallidas.update((ids) => new Set([...ids, id]));
+  }
   readonly productos = signal<Producto[]>([]);
   readonly categorias = signal<Categoria[]>([]);
   readonly error = signal('');

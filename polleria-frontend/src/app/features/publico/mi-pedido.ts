@@ -1,6 +1,8 @@
+import { SeguimientoPedido } from '../../shared/seguimiento-pedido';
+import { EstadoBadge } from '../../shared/estado-badge';
 import { Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { ClientePublicoService } from './cliente-publico-service';
@@ -21,20 +23,27 @@ import { mensajeHttp } from '../../shared/http-error';
 export class ConfirmarCancelacion {}
 @Component({
   selector: 'app-mi-pedido',
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [SeguimientoPedido, EstadoBadge, CurrencyPipe, DatePipe, RouterLink],
   styleUrl: './publico.css',
   template: ` <h1>Detalle de mi pedido</h1>
     @if (error()) {
       <p role="alert">{{ error() }}</p>
     }
     @if (pedido(); as p) {
-      <article>
+      @if (recienCreado) {
+        <section class="confirmation" role="status">
+          <h2>Pedido creado</h2>
+          <p>Tu pedido se registró correctamente. Aquí puedes consultar su estado.</p>
+        </section>
+      }
+      <article class="public-detail">
         <h2>Pedido #{{ p.id }}</h2>
         <p>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
-        <p role="status">Estado: {{ etiqueta(p.estado) }}</p>
+        <p class="order-badges">Estado: <app-estado [valor]="p.estado" /></p>
+        <app-seguimiento-pedido [estado]="p.estado" [tipo]="p.tipoPedido" />
         <p>
           {{ etiqueta(p.tipoPedido) }} · {{ etiqueta(p.metodoPago) }} · Pago
-          {{ etiqueta(p.estadoPago) }}
+          <app-estado [valor]="p.estadoPago" />
         </p>
         @if (p.tipoPedido === 'DELIVERY') {
           <p>Dirección: {{ p.direccionEntrega }}</p>
@@ -52,15 +61,24 @@ export class ConfirmarCancelacion {}
           </div>
         }
         <p class="total">Total confirmado {{ p.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
-        @if (p.estado === 'PENDIENTE' && p.estadoPago !== 'PAGADO') {
-          <button (click)="cancelar()" [disabled]="ocupado()">Cancelar pedido</button>
-        }
-        <button (click)="cargar()" [disabled]="ocupado()">Actualizar estado</button>
+        <div class="acciones">
+          @if (p.estado === 'PENDIENTE' && p.estadoPago !== 'PAGADO') {
+            <button class="destructive" (click)="cancelar()" [disabled]="ocupado()">
+              Cancelar pedido
+            </button>
+          }
+          <button class="secondary" (click)="cargar()" [disabled]="ocupado()">
+            Actualizar estado
+          </button>
+        </div>
       </article>
     }
     <a routerLink="/mis-pedidos">Volver a mis pedidos</a>`,
 })
 export class MiPedido {
+  readonly recienCreado = Boolean(
+    inject(Router).currentNavigation()?.extras.state?.['pedidoCreado'],
+  );
   private readonly api = inject(ClientePublicoService);
   private readonly dialog = inject(MatDialog);
   private readonly id = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));

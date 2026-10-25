@@ -1,80 +1,177 @@
-import { CarritoService } from '../../features/publico/carrito-service';
-import { Component, inject } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth/auth-service';
+import { CarritoService } from '../../features/publico/carrito-service';
 @Component({
   selector: 'app-navigation',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav aria-label="Navegación principal">
-      <a
-        routerLink="/"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        ariaCurrentWhenActive="page"
-        >Inicio</a
-      >
-      <a routerLink="/catalogo" routerLinkActive="active">Catálogo</a>
-      <a routerLink="/carrito" routerLinkActive="active">Carrito ({{ carrito.unidades() }})</a>
-      @if (auth.tieneRol('CLIENTE')) {
-        <a routerLink="/mis-pedidos" routerLinkActive="active">Mis pedidos</a
-        ><a routerLink="/perfil" routerLinkActive="active">Perfil</a>
-      }
-      @if (auth.usuario()) {
-        @if (auth.tieneRol('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'ABASTECIMIENTO')) {
-          <a routerLink="/interno" routerLinkActive="active">Portal interno</a>
-        }
-        <span class="identity"
-          >{{ auth.usuario()?.nombre }}<small>{{ auth.roles().join(' · ') }}</small></span
+    <nav aria-label="Navegación principal" (keydown.escape)="cerrarMenu(menuButton)">
+      @if (!interno()) {
+        <a
+          (click)="abierto.set(false)"
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          >Inicio</a
         >
-        <button type="button" (click)="auth.cerrarSesion()">Cerrar sesión</button>
+        <a
+          (click)="abierto.set(false)"
+          routerLink="/catalogo"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          >Catálogo</a
+        >
+        <a
+          class="cart-link"
+          (click)="abierto.set(false)"
+          routerLink="/carrito"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          >Carrito ({{ carrito.unidades() }})</a
+        >
       } @else {
-        <button type="button" (click)="auth.iniciarLogin('/')">Iniciar sesión</button>
+        <a (click)="abierto.set(false)" routerLink="/catalogo" class="public-link">Ver catálogo</a>
       }
+      <button
+        class="secondary menu-toggle"
+        #menuButton
+        type="button"
+        [attr.aria-expanded]="abierto()"
+        [attr.aria-controls]="interno() ? 'sesion-interna' : 'sesion-publica'"
+        (click)="abierto.set(!abierto())"
+      >
+        Menú
+      </button>
+      <div
+        class="nav-extra"
+        [class.abierto]="abierto()"
+        [id]="interno() ? 'sesion-interna' : 'sesion-publica'"
+        (click)="abierto.set(false)"
+      >
+        @if (auth.tieneRol('CLIENTE')) {
+          <a routerLink="/mis-pedidos" routerLinkActive="active" ariaCurrentWhenActive="page"
+            >Mis pedidos</a
+          ><a routerLink="/perfil" routerLinkActive="active" ariaCurrentWhenActive="page">Perfil</a>
+        }
+        @if (auth.usuario()) {
+          @if (
+            !interno() && auth.tieneRol('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'ABASTECIMIENTO')
+          ) {
+            <a routerLink="/interno" routerLinkActive="active">Portal interno</a>
+          }
+          <span class="identity"
+            >{{ auth.usuario()?.nombre }}
+            @if (interno()) {
+              <small>{{ auth.roles().join(' · ') }}</small>
+            }
+          </span>
+          <button type="button" class="secondary" (click)="auth.cerrarSesion()">
+            Cerrar sesión
+          </button>
+        } @else {
+          <button type="button" (click)="auth.iniciarLogin('/')">Iniciar sesión</button>
+        }
+      </div>
     </nav>
     @if (auth.error()) {
       <p role="alert">{{ auth.error() }}</p>
     }
   `,
   styles: `
-    nav {
+    :host {
+      display: block;
+      min-width: 0;
+    }
+    nav,
+    .nav-extra {
       display: flex;
       align-items: center;
+      gap: 0.3rem;
       flex-wrap: wrap;
-      gap: 0.5rem;
     }
-    a,
-    button {
-      padding: 0.6rem 0.85rem;
-      border-radius: 0.35rem;
-      text-decoration: none;
+    a {
+      padding: 0.65rem 0.7rem;
+      min-height: 44px;
       color: var(--muted);
-    }
-    button {
-      margin: 0;
-      background: transparent;
-      border: 1px solid var(--line);
-      cursor: pointer;
-      font: inherit;
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-radius: var(--radius);
     }
     a:hover,
     a.active {
       color: var(--ink);
       background: var(--surface-soft);
     }
+    .cart-link {
+      font-weight: 650;
+      color: var(--accent);
+    }
+    button {
+      font-size: 0.85rem;
+      margin: 0;
+    }
     .identity {
-      font-size: 0.875rem;
-      max-width: 16rem;
+      font-size: 0.8rem;
+      max-width: 11rem;
       overflow-wrap: anywhere;
+      padding-inline: 0.5rem;
     }
     small {
       display: block;
-      font-size: 0.7rem;
       color: var(--muted);
+      font-size: 0.65rem;
+    }
+    .menu-toggle {
+      display: none;
+    }
+    @media (max-width: 900px) {
+      :host {
+        width: 100%;
+      }
+      nav {
+        width: 100%;
+        gap: 0.15rem;
+      }
+      .menu-toggle {
+        display: inline-flex;
+        margin-left: auto;
+      }
+      .nav-extra {
+        display: none;
+        width: 100%;
+        padding-top: 0.75rem;
+        margin-top: 0.5rem;
+        border-top: 1px solid var(--line);
+        gap: 0.5rem;
+      }
+      .nav-extra.abierto {
+        display: flex;
+      }
+      .identity {
+        margin-left: auto;
+      }
+      .nav-extra a {
+        flex: 1;
+      }
+      a {
+        padding-inline: 0.65rem;
+      }
+      .public-link {
+        margin-right: auto;
+      }
     }
   `,
 })
 export class AppNavigation {
+  cerrarMenu(boton: HTMLButtonElement) {
+    this.abierto.set(false);
+    // Keep keyboard focus on the visible disclosure when its contents are hidden.
+    if (boton.offsetWidth > 0) boton.focus();
+  }
   readonly auth = inject(AuthService);
   readonly carrito = inject(CarritoService);
+  readonly interno = input(false);
+  readonly abierto = signal(false);
 }

@@ -1,3 +1,4 @@
+import { EstadoBadge } from '../../shared/estado-badge';
 import { Component, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -10,7 +11,7 @@ import { PedidoResponse, etiqueta } from '../pedidos/pedido.model';
 import { mensajeHttp } from '../../shared/http-error';
 @Component({
   selector: 'app-delivery-list',
-  imports: [CurrencyPipe, DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [EstadoBadge, CurrencyPipe, DatePipe, ReactiveFormsModule, RouterLink],
   templateUrl: './delivery-list.html',
   styleUrl: './delivery.css',
 })

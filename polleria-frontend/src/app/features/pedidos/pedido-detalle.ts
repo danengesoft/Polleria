@@ -1,3 +1,4 @@
+import { EstadoBadge } from '../../shared/estado-badge';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,7 +11,7 @@ import { EstadoPedido, PedidoResponse, etiqueta, transiciones } from './pedido.m
 import { ConfirmarPedido, ConfirmacionPedido } from './confirmar-pedido';
 @Component({
   selector: 'app-pedido-detalle',
-  imports: [CurrencyPipe, DatePipe, RouterLink, MatButtonModule],
+  imports: [EstadoBadge, CurrencyPipe, DatePipe, RouterLink, MatButtonModule],
   templateUrl: './pedido-detalle.html',
   styleUrl: './pedido.css',
 })

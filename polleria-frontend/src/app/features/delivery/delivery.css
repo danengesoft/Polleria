@@ -2,67 +2,40 @@
   display: block;
   min-width: 0;
 }
-h1 {
-  font-size: clamp(1.7rem, 4vw, 2.4rem);
-}
-h2,
-h3 {
-  font-size: 1.15rem;
-}
-p {
-  line-height: 1.6;
-}
-button,
-input,
-select {
-  box-sizing: border-box;
-  font: inherit;
-  max-width: 100%;
-}
-button {
-  cursor: pointer;
-  padding: 0.75rem 1rem;
-  min-height: 44px;
-  background: var(--surface-soft);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 0.4rem;
-}
-button:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-select {
-  padding: 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 0.4rem;
-  color: var(--ink);
+.delivery-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 38rem;
+  margin-block: 1rem 2rem;
+  padding: 1.25rem;
   background: var(--surface);
-  min-width: 0;
-  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
 }
 label {
   display: grid;
   gap: 0.4rem;
 }
-.delivery-form {
-  display: grid;
-  gap: 1rem;
-  max-width: 36rem;
-  margin-block: 1rem 2rem;
+select {
+  width: 100%;
 }
 .delivery-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
   gap: 1rem;
-  margin-block: 1rem;
+  margin-block: 1.25rem;
 }
 .delivery-card {
-  padding: 1rem;
+  padding: 1.25rem;
   border: 1px solid var(--line);
-  border-radius: 0.6rem;
+  border-radius: var(--radius);
   overflow-wrap: anywhere;
   background: var(--surface);
+  min-width: 0;
+}
+.delivery-card h2,
+.delivery-card h3 {
+  margin-top: 0;
 }
 .delivery-actions {
   display: flex;
@@ -72,29 +45,48 @@ label {
 }
 .delivery-actions button {
   flex: 1;
+  min-width: 8rem;
 }
 dl {
   display: grid;
-  gap: 0.35rem;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-block: 1.25rem;
 }
 dt {
   font-size: 0.8rem;
   color: var(--muted);
 }
 dd {
-  margin: 0 0 0.5rem;
+  margin: 0;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 .observacion {
   white-space: pre-wrap;
-  padding: 0.75rem;
+  padding: 0.8rem;
   background: var(--surface-soft);
+  border-radius: var(--radius);
 }
 .estado {
   font-weight: 700;
 }
-[role='alert'] {
-  padding: 0.8rem;
-  border-left: 3px solid #a33929;
-  background: var(--surface-soft);
-  overflow-wrap: anywhere;
+@media (max-width: 600px) {
+  dl {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  dd {
+    margin-bottom: 0.75rem;
+  }
+  .delivery-card,
+  .delivery-form {
+    padding: 1rem;
+  }
+  .delivery-actions {
+    flex-direction: column;
+  }
+  .delivery-actions button {
+    width: 100%;
+  }
 }

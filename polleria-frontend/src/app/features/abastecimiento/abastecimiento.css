@@ -2,21 +2,8 @@
   display: block;
   min-width: 0;
 }
-h1 {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-}
-h2,
-h3 {
-  font-size: 1.15rem;
-}
 p {
-  line-height: 1.6;
   overflow-wrap: anywhere;
-}
-.supply-form {
-  display: grid;
-  gap: 1rem;
-  max-width: 36rem;
 }
 label {
   display: grid;
@@ -24,54 +11,46 @@ label {
 }
 input,
 select,
-textarea,
-button {
-  box-sizing: border-box;
-  font: inherit;
-  max-width: 100%;
-}
-input,
-select,
 textarea {
   width: 100%;
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 0.35rem;
-  padding: 0.65rem;
-  background: var(--surface);
-  color: var(--ink);
 }
-button {
-  cursor: pointer;
-  min-height: 44px;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: 0.35rem;
-  background: var(--surface-soft);
-  color: var(--ink);
-}
-button:disabled {
-  opacity: 0.55;
-  cursor: default;
+.supply-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 38rem;
 }
 .supply-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 1rem;
-  margin-block: 1rem;
+  margin-block: 1.5rem;
 }
 .supply-card {
-  padding: 1rem;
+  padding: 1.25rem;
   border: 1px solid var(--line);
-  border-radius: 0.6rem;
+  background: var(--surface);
+  border-radius: var(--radius);
   margin-block: 1rem;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+.supply-card h2,
+.supply-card h3 {
+  margin-top: 0;
+}
+.supply-grid .supply-card {
+  margin: 0;
 }
 .supply-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
+  margin-block: 1rem;
+}
+.supply-actions button[type='button'] {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--line);
 }
 .check {
   display: flex;
@@ -83,19 +62,55 @@ button:disabled {
 }
 .purchase-line {
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
   min-width: 0;
-  padding: 1rem;
-  margin: 1rem 0;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
   border: 1px solid var(--line);
-  border-radius: 0.5rem;
+  border-radius: var(--radius);
+  background: var(--background);
+}
+.purchase-line label:first-of-type {
+  grid-column: 1/-1;
+}
+.purchase-line p {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.purchase-line button {
+  justify-self: start;
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--line);
+}
+.purchase-line legend {
+  font-size: 0.85rem;
 }
 .total {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
 }
-[role='alert'] {
-  padding: 0.75rem;
-  border-left: 3px solid #a33929;
-  background: var(--surface-soft);
+.operation-note {
+  padding: 0.8rem;
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-radius: var(--radius);
+}
+@media (max-width: 600px) {
+  .supply-card,
+  .purchase-line {
+    padding: 1rem;
+  }
+  .purchase-line {
+    grid-template-columns: 1fr;
+  }
+  .supply-actions {
+    align-items: stretch;
+  }
+  .supply-actions button[type='button'] {
+    flex: 1;
+  }
 }

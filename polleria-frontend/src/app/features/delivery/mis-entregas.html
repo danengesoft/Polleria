@@ -1,6 +1,6 @@
 <h1>Mis entregas</h1>
 <p>Consulta y gestiona únicamente las entregas asignadas a tu perfil.</p>
-<button (click)="cargar()" [disabled]="ocupado()">Actualizar mis entregas</button>
+<button class="secondary" (click)="cargar()" [disabled]="ocupado()">Actualizar mis entregas</button>
 @if (error()) {
   <p role="alert">{{ error() }}</p>
 }
@@ -18,7 +18,7 @@
     @for (e of entregas(); track e.id) {
       <article class="delivery-card">
         <h2>Pedido #{{ e.pedidoId }}</h2>
-        <p class="estado">{{ etiqueta(e.estado) }}</p>
+        <p class="estado"><app-estado [valor]="e.estado" /></p>
         <dl>
           <dt>Cliente</dt>
           <dd>{{ e.pedido.nombreCliente }}</dd>
@@ -33,7 +33,7 @@
           <dt>Método de pago</dt>
           <dd>{{ etiqueta(e.pedido.metodoPago) }}</dd>
           <dt>Estado del pago</dt>
-          <dd>{{ etiqueta(e.pedido.estadoPago) }}</dd>
+          <dd><app-estado [valor]="e.pedido.estadoPago" /></dd>
         </dl>
         @if (e.observacion) {
           <p class="observacion">{{ e.observacion }}</p>
@@ -44,7 +44,9 @@
           }
           @if (e.estado === 'EN_CAMINO') {
             <button (click)="finalizar(e, false)" [disabled]="ocupado()">Entregado</button
-            ><button (click)="finalizar(e, true)" [disabled]="ocupado()">No entregado</button>
+            ><button class="destructive" (click)="finalizar(e, true)" [disabled]="ocupado()">
+              No entregado
+            </button>
           }
         </div>
       </article>

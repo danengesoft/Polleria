@@ -1,56 +1,75 @@
 <h1>Confirmar tu pedido</h1>
+<p>Revisa tu selección y elige cómo recibirla.</p>
 @if (error()) {
   <p role="alert">{{ error() }}</p>
   @if (!perfilListo()) {
-    <button (click)="cargarPerfil()">Reintentar perfil</button>
+    <button class="secondary" (click)="cargarPerfil()">Reintentar perfil</button>
   }
 }
 @if (!carrito.lineas().length) {
-  <p>Tu carrito está vacío.</p>
-  <a routerLink="/catalogo">Elegir productos</a>
+  <div class="empty-state">
+    <p>Tu carrito está vacío.</p>
+    <a class="action" routerLink="/catalogo">Elegir productos</a>
+  </div>
 } @else if (perfilListo()) {
-  @for (l of carrito.lineas(); track l.productoId) {
-    <p>
-      {{ l.cantidad }} × {{ l.nombre }} —
-      {{ l.precio * l.cantidad | currency: 'PEN' : 'S/ ' : '1.2-2' }}
-    </p>
-  }
-  <p class="total">Total estimado {{ carrito.total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
-  <p>El servidor confirma disponibilidad y precios al crear el pedido.</p>
   <form [formGroup]="form" (ngSubmit)="confirmar()" class="formulario">
-    <label
-      >Tipo de pedido<select formControlName="tipoPedido">
-        <option value="RECOJO">Recojo</option>
-        <option value="DELIVERY">Delivery</option>
-      </select></label
-    >
-    @if (form.controls.tipoPedido.value === 'DELIVERY') {
+    <fieldset>
+      <legend>1. Tu pedido</legend>
+      @for (l of carrito.lineas(); track l.productoId) {
+        <div class="linea">
+          <span>{{ l.cantidad }} × {{ l.nombre }}</span
+          ><strong>{{ l.precio * l.cantidad | currency: 'PEN' : 'S/ ' : '1.2-2' }}</strong>
+        </div>
+      }
+      <a routerLink="/carrito">Modificar carrito</a>
+    </fieldset>
+    <fieldset>
+      <legend>2. Tipo de entrega</legend>
       <label
-        >Dirección de entrega<input formControlName="direccionEntrega" maxlength="300" required
-      /></label>
+        >Tipo de pedido<select formControlName="tipoPedido">
+          <option value="RECOJO">Recojo</option>
+          <option value="DELIVERY">Delivery</option>
+        </select></label
+      >
+      @if (form.controls.tipoPedido.value === 'DELIVERY') {
+        <label
+          >Dirección de entrega<input
+            formControlName="direccionEntrega"
+            maxlength="300"
+            required
+            autocomplete="street-address" /></label
+        ><label
+          >Referencia de entrega (opcional)<textarea
+            formControlName="referenciaEntrega"
+            maxlength="300"
+          ></textarea>
+        </label>
+        <p>Esta dirección pertenece al pedido. Tu dirección principal no cambia.</p>
+      } @else {
+        <p>Recogerás tu pedido en el establecimiento.</p>
+      }
+    </fieldset>
+    <fieldset>
+      <legend>3. Método de pago</legend>
       <label
-        >Referencia de entrega (opcional)<textarea
-          formControlName="referenciaEntrega"
-          maxlength="300"
-        ></textarea>
-      </label>
-      <p>Esta dirección pertenece al pedido. Tu dirección principal no cambia.</p>
-    } @else {
-      <p>Recogerás tu pedido en el establecimiento.</p>
-    }
-    <label
-      >Método de pago<select formControlName="metodoPago">
-        @for (m of metodos; track m) {
-          <option [value]="m">{{ m }}</option>
-        }
-      </select></label
-    >
-    <p>
-      Solo registramos el método elegido. El pago queda pendiente; no se realiza un cobro en línea.
-    </p>
+        >Método de pago<select formControlName="metodoPago">
+          @for (m of metodos; track m) {
+            <option [value]="m">{{ m }}</option>
+          }
+        </select></label
+      >
+      <p>
+        Solo registramos el método elegido. El pago queda pendiente; no se realiza un cobro en
+        línea.
+      </p>
+    </fieldset>
+    <section aria-label="Resumen">
+      <h2>Resumen</h2>
+      <p class="total">Total estimado {{ carrito.total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+      <p>La disponibilidad y el precio se confirman al crear el pedido.</p>
+    </section>
     <button type="submit" [disabled]="guardando()">
       {{ guardando() ? 'Creando pedido…' : 'Confirmar pedido' }}
     </button>
   </form>
-  <a routerLink="/carrito">Modificar carrito</a>
 }

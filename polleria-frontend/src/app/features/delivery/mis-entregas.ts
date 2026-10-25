@@ -1,3 +1,4 @@
+import { EstadoBadge } from '../../shared/estado-badge';
 import { Component, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -9,7 +10,7 @@ import { etiqueta } from '../pedidos/pedido.model';
 import { mensajeHttp } from '../../shared/http-error';
 @Component({
   selector: 'app-mis-entregas',
-  imports: [CurrencyPipe],
+  imports: [EstadoBadge, CurrencyPipe],
   templateUrl: './mis-entregas.html',
   styleUrl: './delivery.css',
 })

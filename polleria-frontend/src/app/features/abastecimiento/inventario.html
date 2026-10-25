@@ -9,7 +9,16 @@
 }
 <p role="status">{{ aviso() }}</p>
 <section class="supply-card">
-  <h2>Registrar movimiento</h2>
+  <h2>
+    {{ form.controls.operacion.value === 'SALIDA' ? 'Registrar salida' : 'Ajustar inventario' }}
+  </h2>
+  <p class="operation-note">
+    {{
+      form.controls.operacion.value === 'SALIDA'
+        ? 'Retira una cantidad del stock disponible.'
+        : 'Establece el stock final según el conteo físico.'
+    }}
+  </p>
   <form [formGroup]="form" (ngSubmit)="guardar()" class="supply-form">
     <label
       >Operación<select formControlName="operacion">

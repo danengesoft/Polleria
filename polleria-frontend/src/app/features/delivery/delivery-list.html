@@ -1,6 +1,6 @@
 <h1>Delivery</h1>
 <p>Asigna pedidos listos y consulta el estado de las entregas.</p>
-<button (click)="cargar()" [disabled]="ocupado()">Actualizar entregas</button>
+<button class="secondary" (click)="cargar()" [disabled]="ocupado()">Actualizar entregas</button>
 @if (error()) {
   <p role="alert">{{ error() }}</p>
 }
@@ -44,11 +44,14 @@
         <a [routerLink]="['/interno/pedidos', e.pedidoId]">Pedido #{{ e.pedidoId }}</a>
       </h3>
       <p>
-        {{ e.repartidor.nombreVisible }} · <strong>{{ etiqueta(e.estado) }}</strong>
+        {{ e.repartidor.nombreVisible }} · <strong><app-estado [valor]="e.estado" /></strong>
       </p>
       <p>Asignación: {{ e.fechaAsignacion | date: 'dd/MM/yyyy HH:mm' }}</p>
       <p>{{ e.pedido.nombreCliente }} · {{ e.pedido.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
-      <p>Pedido {{ etiqueta(e.pedido.estadoPedido) }} · Pago {{ etiqueta(e.pedido.estadoPago) }}</p>
+      <p>
+        Pedido <app-estado [valor]="e.pedido.estadoPedido" /> · Pago
+        <app-estado [valor]="e.pedido.estadoPago" />
+      </p>
       @if (e.observacion) {
         <p class="observacion">{{ e.observacion }}</p>
       }
