@@ -99,7 +99,15 @@
       <p role="status">Procesando cambio de estado…</p>
     }
     @if (p.tipoPedido === 'DELIVERY' && p.estado === 'LISTO') {
-      <p class="notice">Pedido listo. El despacho y la entrega requieren el módulo Delivery.</p>
+      <p class="notice">Pedido listo. Asigna el reparto desde Delivery.</p>
+    }
+    @if (p.tipoPedido === 'DELIVERY' && p.estado === 'LISTO') {
+      <a routerLink="/interno/delivery">Gestionar Delivery</a>
+    }
+    @if (p.estadoPago === 'PENDIENTE' && p.metodoPago !== 'EFECTIVO' && p.estado !== 'CANCELADO') {
+      <button matButton="outlined" [disabled]="cambiando() || loading()" (click)="confirmarPago()">
+        Confirmar pago recibido
+      </button>
     }
     @if (!opciones().length && p.estado !== 'LISTO') {
       <p class="muted">No hay cambios de estado disponibles.</p>

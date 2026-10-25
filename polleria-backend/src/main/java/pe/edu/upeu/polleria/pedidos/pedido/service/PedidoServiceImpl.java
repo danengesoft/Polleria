@@ -24,7 +24,7 @@ import pe.edu.upeu.polleria.pedidos.pedido.repository.PedidoRepository;
 
 @Service
 @RequiredArgsConstructor
-public class PedidoServiceImpl implements PedidoService {
+public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryService {
     private final PedidoRepository pedidoRepository;
     private final ProductoConsultaService productoConsultaService;
     private final ClienteConsultaService clienteConsultaService;
@@ -227,6 +227,59 @@ public class PedidoServiceImpl implements PedidoService {
         if (p.getEstado() != EstadoPedido.PENDIENTE) throw new BusinessConflictException("Solo puedes cancelar un pedido pendiente");
         EstadoPedidoRequest r = new EstadoPedidoRequest(); r.setEstado(EstadoPedido.CANCELADO);
         return cambiarEstado(id, r);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView consultar(Long id) {
+        Pedido p = pedidoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        var c = clienteConsultaService.consultarContacto(p.getClienteId());
+        return new pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView(p.getId(), p.getEstado().name(),
+                c.nombreCompleto(), c.telefono(), p.getDireccionEntrega(), p.getReferenciaEntrega(),
+                p.getTotal(), p.getMetodoPago().name(), p.getEstadoPago().name());
+    }
+
+    private Pedido bloquearDelivery(Long id) {
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getTipoPedido() != TipoPedido.DELIVERY) throw new BusinessConflictException("El pedido debe ser DELIVERY");
+        return p;
+    }
+
+    @Override @Transactional
+    public void validarAsignacion(Long id) {
+        if (bloquearDelivery(id).getEstado() != EstadoPedido.LISTO) throw new BusinessConflictException("El pedido debe estar LISTO");
+    }
+
+    @Override @Transactional
+    public void validarReasignacion(Long id) {
+        if (bloquearDelivery(id).getEstado() != EstadoPedido.DESPACHADO) throw new BusinessConflictException("El pedido debe permanecer DESPACHADO para reintentar");
+    }
+
+    @Override @Transactional
+    public void despachar(Long id) {
+        Pedido p = bloquearDelivery(id);
+        if (p.getEstado() != EstadoPedido.LISTO && p.getEstado() != EstadoPedido.DESPACHADO)
+            throw new BusinessConflictException("El pedido no permite iniciar reparto");
+        p.setEstado(EstadoPedido.DESPACHADO);
+        pedidoRepository.saveAndFlush(p);
+    }
+
+    @Override @Transactional
+    public void entregar(Long id) {
+        Pedido p = bloquearDelivery(id);
+        if (p.getEstado() != EstadoPedido.DESPACHADO) throw new BusinessConflictException("El pedido debe estar DESPACHADO");
+        p.setEstado(EstadoPedido.ENTREGADO);
+        if (p.getMetodoPago() == MetodoPago.EFECTIVO && p.getEstadoPago() == EstadoPago.PENDIENTE) p.setEstadoPago(EstadoPago.PAGADO);
+        pedidoRepository.saveAndFlush(p);
+    }
+
+    @Override @Transactional
+    public PedidoResponse confirmarPago(Long id) {
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getEstado() == EstadoPedido.CANCELADO || p.getEstadoPago() != EstadoPago.PENDIENTE || p.getMetodoPago() == MetodoPago.EFECTIVO)
+            throw new BusinessConflictException("Solo puede confirmarse un pago pendiente YAPE, PLIN o TARJETA de un pedido no cancelado");
+        p.setEstadoPago(EstadoPago.PAGADO);
+        return respuesta(pedidoRepository.saveAndFlush(p));
     }
 
     private PedidoResponse respuesta(Pedido pedido) {

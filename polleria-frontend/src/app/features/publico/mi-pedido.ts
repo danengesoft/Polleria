@@ -39,7 +39,10 @@ export class ConfirmarCancelacion {}
         @if (p.tipoPedido === 'DELIVERY') {
           <p>Dirección: {{ p.direccionEntrega }}</p>
           <p>Referencia: {{ p.referenciaEntrega }}</p>
-          <p>El seguimiento muestra el estado del pedido. Todavía no hay seguimiento de reparto.</p>
+          <p>
+            El seguimiento muestra el estado del pedido. Actualiza esta pantalla para consultar
+            cambios; no hay ubicación en vivo.
+          </p>
         }
         @for (l of p.detalles; track l.productoId) {
           <div class="linea">

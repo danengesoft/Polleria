@@ -17,7 +17,7 @@ class ModularityTests {
         // Existing exception/filter packages are shared infrastructure, not business modules.
         org.assertj.core.api.Assertions.assertThat(modules.stream().map(module -> module.getName())
                 .filter(name -> !java.util.Set.of("exception", "filter").contains(name)).toList())
-                .containsExactlyInAnyOrder("catalogo", "clientes", "pedidos");
+                .containsExactlyInAnyOrder("catalogo", "clientes", "pedidos", "delivery");
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("catalogo")).isPresent();
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("clientes")).isPresent();
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("pedidos")).isPresent();

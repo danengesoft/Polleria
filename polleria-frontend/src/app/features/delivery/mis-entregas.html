@@ -1,0 +1,57 @@
+<h1>Mis entregas</h1>
+<p>Consulta y gestiona únicamente las entregas asignadas a tu perfil.</p>
+<button (click)="cargar()" [disabled]="ocupado()">Actualizar mis entregas</button>
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+}
+@if (faltaPerfil()) {
+  <section class="delivery-card">
+    <h2>Comienza tu reparto</h2>
+    <p>
+      Activa tu perfil operativo con tu identidad actual. No necesitas ingresar identificadores.
+    </p>
+    <button (click)="activar()" [disabled]="ocupado()">Activar perfil de reparto</button>
+  </section>
+}
+@if (perfil()?.activo) {
+  <div class="delivery-cards">
+    @for (e of entregas(); track e.id) {
+      <article class="delivery-card">
+        <h2>Pedido #{{ e.pedidoId }}</h2>
+        <p class="estado">{{ etiqueta(e.estado) }}</p>
+        <dl>
+          <dt>Cliente</dt>
+          <dd>{{ e.pedido.nombreCliente }}</dd>
+          <dt>Teléfono</dt>
+          <dd>{{ e.pedido.telefono }}</dd>
+          <dt>Dirección del pedido</dt>
+          <dd>{{ e.pedido.direccionEntrega }}</dd>
+          <dt>Referencia</dt>
+          <dd>{{ e.pedido.referenciaEntrega || 'Sin referencia' }}</dd>
+          <dt>Total</dt>
+          <dd>{{ e.pedido.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</dd>
+          <dt>Método de pago</dt>
+          <dd>{{ etiqueta(e.pedido.metodoPago) }}</dd>
+          <dt>Estado del pago</dt>
+          <dd>{{ etiqueta(e.pedido.estadoPago) }}</dd>
+        </dl>
+        @if (e.observacion) {
+          <p class="observacion">{{ e.observacion }}</p>
+        }
+        <div class="delivery-actions">
+          @if (e.estado === 'ASIGNADO') {
+            <button (click)="iniciar(e)" [disabled]="ocupado()">Iniciar entrega</button>
+          }
+          @if (e.estado === 'EN_CAMINO') {
+            <button (click)="finalizar(e, false)" [disabled]="ocupado()">Entregado</button
+            ><button (click)="finalizar(e, true)" [disabled]="ocupado()">No entregado</button>
+          }
+        </div>
+      </article>
+    } @empty {
+      @if (!ocupado()) {
+        <p>No tienes entregas asignadas.</p>
+      }
+    }
+  </div>
+}

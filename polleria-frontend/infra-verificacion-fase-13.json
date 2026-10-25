@@ -1,0 +1,28 @@
+{
+  "actuator": {
+    "status": 200,
+    "estado": "UP"
+  },
+  "openapi": {
+    "status": 200,
+    "deliveryPaths": [
+      "/api/v1/delivery/repartidores/me",
+      "/api/v1/delivery/entregas",
+      "/api/v1/delivery/entregas/{id}/reasignar",
+      "/api/v1/delivery/entregas/mias/{id}/no-entregado",
+      "/api/v1/delivery/entregas/mias/{id}/iniciar",
+      "/api/v1/delivery/entregas/mias/{id}/entregar",
+      "/api/v1/delivery/repartidores",
+      "/api/v1/delivery/entregas/{id}",
+      "/api/v1/delivery/entregas/mias",
+      "/api/v1/delivery/entregas/mias/{id}"
+    ],
+    "pago": "/api/v1/pedidos/{id}/confirmar-pago"
+  },
+  "cors": 200,
+  "keycloak": {
+    "pkce": "S256",
+    "passwordGrant": false,
+    "publicClient": true
+  }
+}

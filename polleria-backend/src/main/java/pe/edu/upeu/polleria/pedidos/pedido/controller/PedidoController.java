@@ -63,6 +63,10 @@ public class PedidoController {
         return ResponseEntity.created(URI.create("/api/v1/pedidos/" + response.getId())).body(response);
     }
 
+    @Operation(summary = "Confirmar explícitamente pago pendiente YAPE/PLIN/TARJETA")
+    @PatchMapping("/{id}/confirmar-pago")
+    public ResponseEntity<PedidoResponse> confirmarPago(@PathVariable Long id) { return ResponseEntity.ok(service.confirmarPago(id)); }
+
     @Operation(summary = "Cambiar estado mediante transiciones permitidas; sin despacho en esta fase")
     @PatchMapping("/{id}/estado")
     public ResponseEntity<PedidoResponse> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoPedidoRequest request) {

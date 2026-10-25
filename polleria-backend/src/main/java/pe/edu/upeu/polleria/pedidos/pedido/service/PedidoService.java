@@ -5,6 +5,7 @@ import pe.edu.upeu.polleria.pedidos.pedido.dto.*;
 
 public interface PedidoService {
     List<PedidoResponse> listar();
+    PedidoResponse confirmarPago(Long id);
     PedidoResponse crearMio(String sub, MiPedidoRequest request);
     List<PedidoResponse> listarMios(String sub);
     PedidoResponse obtenerMio(String sub, Long id);

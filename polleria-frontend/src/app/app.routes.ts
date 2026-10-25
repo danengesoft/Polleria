@@ -98,6 +98,17 @@ export const routes: Routes = [
           import('./features/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),
       },
       {
+        path: 'delivery',
+        canActivate: [rolGuard(...OPERATIVOS)],
+        loadComponent: () =>
+          import('./features/delivery/delivery-list').then((m) => m.DeliveryList),
+      },
+      {
+        path: 'reparto',
+        canActivate: [rolGuard('REPARTIDOR')],
+        loadComponent: () => import('./features/delivery/mis-entregas').then((m) => m.MisEntregas),
+      },
+      {
         path: 'conexion',
         title: 'Conexión | Pollería',
         loadComponent: () => import('./core/conexion/conexion').then((m) => m.Conexion),

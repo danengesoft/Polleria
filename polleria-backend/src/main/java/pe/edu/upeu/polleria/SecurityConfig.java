@@ -60,6 +60,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/clientes").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/clientes/*").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/clientes/*").hasRole("ADMINISTRADOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/delivery/repartidores/me", "/api/v1/delivery/entregas/mias", "/api/v1/delivery/entregas/mias/*").hasRole("REPARTIDOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/delivery/repartidores/me").hasRole("REPARTIDOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/delivery/entregas/mias/*/iniciar", "/api/v1/delivery/entregas/mias/*/entregar", "/api/v1/delivery/entregas/mias/*/no-entregado").hasRole("REPARTIDOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/delivery/repartidores", "/api/v1/delivery/entregas", "/api/v1/delivery/entregas/*").hasAnyRole("ADMINISTRADOR", "CAJERO")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/delivery/entregas").hasAnyRole("ADMINISTRADOR", "CAJERO")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/delivery/entregas/*/reasignar", "/api/v1/pedidos/*/confirmar-pago").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         // Reports must precede general order matchers.
                         .requestMatchers("/api/v1/pedidos/reportes/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/pedidos", "/api/v1/pedidos/*").hasAnyRole("ADMINISTRADOR", "CAJERO")

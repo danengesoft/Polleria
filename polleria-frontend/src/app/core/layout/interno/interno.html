@@ -16,7 +16,9 @@
       <a routerLink="/interno/productos">Productos</a>
       <a routerLink="/interno/clientes">Clientes</a>
       <a routerLink="/interno/pedidos">Pedidos</a>
+      <a routerLink="/interno/delivery">Delivery</a>
       }
+      @if (auth.tieneRol('REPARTIDOR')) {<a routerLink="/interno/reparto">Mis entregas</a>}
       <a routerLink="/interno/conexion">Comprobar conexión</a>
     </nav>
   </aside>

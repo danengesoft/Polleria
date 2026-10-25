@@ -1,4 +1,4 @@
-# POLLERIA — SPA, Fase 12
+# POLLERIA — SPA, Fase 13
 
 Angular standalone con Catálogo, Clientes y Pedidos internos. Autenticación real
 Keycloak Authorization Code + PKCE S256, sin librería adicional de autenticación.
@@ -37,9 +37,9 @@ Logout utiliza el endpoint de Keycloak y limpia solamente las claves propias.
 
 ADMINISTRADOR administra Catálogo, Clientes y Pedidos. CAJERO lee Catálogo,
 crea/consulta/actualiza Clientes y usa Pedidos; no elimina Clientes.
-REPARTIDOR y ABASTECIMIENTO acceden únicamente al inicio y diagnóstico existentes.
+REPARTIDOR accede a Mis entregas, inicio y diagnóstico. ABASTECIMIENTO continúa sin módulo propio.
 CLIENTE inicia/cierra sesión en el área pública y no entra al portal interno.
-No hay UI de reportes ni módulos Delivery o Abastecimiento. El CLIENTE ahora tiene
+No hay UI de reportes ni módulo Abastecimiento. Delivery ya tiene asignación y reparto. El CLIENTE ahora tiene
 perfil comercial vinculado por JWT sub, checkout y pedidos propios.
 
 Las rutas comerciales conservan `/interno/categorias`, `/interno/productos`,
@@ -48,11 +48,11 @@ El detalle transaccional y sus precios históricos siguen gobernados por el back
 
 ## Verificación
 
-Ver [VERIFICACION-FASE-12.md](VERIFICACION-FASE-12.md): build correcto,
-60 pruebas correctas, flujo real de compra e aislamiento entre dos CLIENTE.
+Ver [VERIFICACION-FASE-13.md](VERIFICACION-FASE-13.md): build correcto,
+73 pruebas correctas, reparto real, reasignación e aislamiento entre dos REPARTIDOR.
 Los documentos de fases anteriores conservan el historial de decisiones y pruebas.
 
-`npm-audit-fase-12.json` conserva 7 hallazgos: 5 altos y 2 críticos.
+`npm-audit-fase-13.json` conserva 7 hallazgos: 5 altos y 2 críticos.
 No se ejecutó audit fix, no se cambiaron versiones ni se agregaron dependencias.
 La aplicación usa configuración local HTTP; no constituye un despliegue productivo.
 Git lo administra el usuario; no se realizaron operaciones de escritura sobre Git.
@@ -80,3 +80,20 @@ La cancelación requiere confirmación y solo se ofrece para el pedido propio
 PENDIENTE no pagado. El backend verifica propiedad y estado con bloqueo de cabecera.
 El registro público de cuentas Keycloak sigue pendiente: se usan identidades CLIENTE
 reales de desarrollo, sin formulario local de contraseña ni Admin API en Angular.
+
+## Delivery
+
+`/interno/delivery` exige ADMINISTRADOR/CAJERO: lista entregas, asigna pedidos
+DELIVERY/LISTO a repartidores activos y reasigna NO_ENTREGADO. Reutiliza los filtros
+existentes de Pedidos. `/interno/reparto` exige REPARTIDOR y solo consume endpoints
+propios resueltos por JWT sub; invita a activar perfil sin pedir identidad al usuario.
+No usa Admin API de Keycloak, contraseñas ni secretos administrativos.
+
+Iniciar, Entregado y No entregado son operaciones explícitas; las dos últimas piden
+confirmación. NO_ENTREGADO requiere observación no vacía. Incidencias se conservan
+tras reasignación. EFECTIVO pendiente se marca PAGADO al entregar; YAPE/PLIN/TARJETA
+no se confirman por repartidor. Detalle interno de Pedido permite confirmar pago
+digital explícitamente con diálogo; no hay pasarela ni cobro en línea.
+
+Mis pedidos del CLIENTE sigue consultando solo Pedidos y refleja DESPACHADO/ENTREGADO
+al actualizar. Sin mapas, GPS, geolocalización ni actualizaciones en tiempo real.

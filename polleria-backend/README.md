@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 12 (Autoservicio del cliente)
+# POLLERIA — backend, Fase 13 (Delivery)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -31,6 +31,7 @@ docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/01-catalogo.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/02-clientes.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/03-pedidos.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/04-cliente-keycloak.sql
+docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/05-delivery.sql
 ```
 
 El script falla ante errores y no elimina/reemplaza tablas existentes. Oracle hace
@@ -371,8 +372,25 @@ estados. No se vincula por correo y el correo duplicado responde 409.
 Un pedido ajeno devuelve 404; solo se cancela el propio PENDIENTE y no pagado.
 La creación reutiliza la lógica transaccional existente de Pedido.
 
-Suite actual: 110 pruebas correctas (93 anteriores + 17 nuevas), incluyendo Oracle,
-seguridad y tres verificaciones de Modulith. Solo siguen existiendo tres módulos
+Suite de Fase 12: 110 pruebas correctas (93 anteriores + 17 nuevas), incluyendo Oracle,
+seguridad y tres verificaciones de Modulith. En Fase 12 existían tres módulos
 comerciales: Catálogo, Clientes y Pedidos. Ver `VERIFICACION-FASE-12.md`.
 La configuración Keycloak definitiva sigue exigiendo Code + PKCE S256 y no permite
 password grant para la SPA; el registro autoservicio permanece deshabilitado.
+
+## Delivery — Fase 13
+
+La base local ya tiene aplicada `scripts/05-delivery.sql`: no repetir. Para una base
+que tenga las migraciones 01–04, aplicar únicamente 05 antes de iniciar validate.
+REPARTIDORES vincula identidad por JWT sub sin autenticar localmente. ENTREGAS tiene
+FK reales a PEDIDOS/REPARTIDORES y UNIQUE por PEDIDO_ID. No hay eliminación física.
+
+Delivery depende únicamente de `pedidos::pedido-delivery`. Pedidos consulta contacto
+por el contrato de Clientes. Los cuatro módulos comerciales se verifican sin ciclos.
+Iniciar/entregar son transaccionales con Pedido; EFECTIVO pendiente se paga al entregar.
+Otros métodos requieren PATCH `/api/v1/pedidos/{id}/confirmar-pago` interno explícito.
+NO_ENTREGADO conserva Pedido DESPACHADO; reasignar conserva observaciones y permite
+nuevo intento en la misma fila. No existe historial de intentos separado en v1.
+
+Suite actual: 139 pruebas correctas, incluidos rollback real y concurrencia en Oracle.
+Consultar `VERIFICACION-FASE-13.md` para todos los endpoints, archivos y datos de prueba.

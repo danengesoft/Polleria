@@ -109,6 +109,13 @@ public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.
         return clienteRepository.findByKeycloakSub(sub).orElseThrow(() -> new ResourceNotFoundException("Completa tu perfil comercial"));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto consultarContacto(Long id) {
+        Cliente c = buscarOFallar(id);
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto(c.getNombres()+" "+c.getApellidos(), c.getTelefono());
+    }
+
     private Cliente buscarOFallar(Long id) {
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: " + id));

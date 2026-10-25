@@ -19,6 +19,12 @@ export class PedidoService {
   crear(request: PedidoRequest) {
     return this.http.post<PedidoResponse>(this.api.buildUrl(this.resource), request);
   }
+  confirmarPago(id: number) {
+    return this.http.patch<PedidoResponse>(
+      this.api.buildUrl(`${this.resource}/${id}/confirmar-pago`),
+      {},
+    );
+  }
   cambiarEstado(id: number, estado: EstadoPedido) {
     return this.http.patch<PedidoResponse>(this.api.buildUrl(`${this.resource}/${id}/estado`), {
       estado,

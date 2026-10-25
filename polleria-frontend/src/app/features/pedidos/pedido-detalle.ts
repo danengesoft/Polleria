@@ -58,6 +58,48 @@ export class PedidoDetalle {
         },
       });
   }
+  confirmarPago() {
+    const p = this.pedido();
+    if (
+      !p ||
+      this.cambiando() ||
+      p.estadoPago !== 'PENDIENTE' ||
+      p.metodoPago === 'EFECTIVO' ||
+      p.estado === 'CANCELADO'
+    )
+      return;
+    this.cambiando.set(true);
+    this.dialog
+      .open(ConfirmarPedido, {
+        data: {
+          titulo: 'Confirmar pago recibido',
+          mensaje:
+            'Confirma que verificaste el pago del Pedido #' +
+            p.id +
+            '. Esta acción no realiza un cobro en línea.',
+        },
+        width: '30rem',
+        maxWidth: '95vw',
+      })
+      .afterClosed()
+      .subscribe((ok) => {
+        if (!ok) {
+          this.cambiando.set(false);
+          return;
+        }
+        this.service.confirmarPago(p.id).subscribe({
+          next: (r) => {
+            this.pedido.set(r);
+            this.cambiando.set(false);
+            this.aviso.set('Pago confirmado.');
+          },
+          error: (e) => {
+            this.error.set(mensajeHttp(e));
+            this.cambiando.set(false);
+          },
+        });
+      });
+  }
   cambiarEstado(estado: EstadoPedido) {
     const pedido = this.pedido();
     if (!pedido || this.cambiando() || this.loading() || !this.opciones().includes(estado)) return;
