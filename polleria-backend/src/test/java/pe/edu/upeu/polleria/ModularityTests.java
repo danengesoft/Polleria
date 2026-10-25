@@ -16,6 +16,7 @@ class ModularityTests {
     void recognizesCatalogoAndClientes() {
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("catalogo")).isPresent();
         org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("clientes")).isPresent();
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("pedidos")).isPresent();
     }
 
     @Test

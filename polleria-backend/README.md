@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 4 (Catálogo y Clientes)
+# POLLERIA — backend, Fase 5 (Catálogo, Clientes y Pedidos)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -29,6 +29,7 @@ docker compose -f compose-dev.yml up -d --wait oracle
 ```bash
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/01-catalogo.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/02-clientes.sql
+docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/03-pedidos.sql
 ```
 
 El script falla ante errores y no elimina/reemplaza tablas existentes. Oracle hace
@@ -95,17 +96,18 @@ ProductoRequest (descripcion e imagenUrl son opcionales):
 - imagenUrl opcional, máximo 1000, HTTP/HTTPS; no se descargan ni almacenan archivos.
 - No existe stock. No hay unicidad de nombres de producto sin una regla solicitada.
 - Categoría utilizada: DELETE devuelve 409; puede desactivarse con PUT.
-- Producto: eliminación física en esta fase, sin lógica de Pedidos.
+- Producto sin referencias: eliminación física; las FK impiden borrar productos históricos
+  utilizados en pedidos, con respuesta 409 de integridad.
 - 400 entrada inválida; 404 recurso/referencia inexistente; 409 conflicto/integridad;
   500 error inesperado sin SQL ni stack trace en HTTP.
 - X-Trace-ID (máximo 64 caracteres seguros) se refleja en respuesta y MDC; si no es
   válido se genera UUID. Logs diarios en logs/polleria.log (retención de 7 días).
 
-Modulith verifica Catálogo y la infraestructura técnica. No se exponen NamedInterface
-anticipadamente: aún no hay un segundo módulo que necesite contratos de Catálogo.
+Modulith verifica Catálogo, Clientes y Pedidos. Los paquetes públicos de consulta
+producto/api y cliente/api son las únicas interfaces nombradas expuestas a Pedidos.
 Las excepciones compartidas usan el paquete técnico abierto, según el patrón académico.
 
-Security, Angular, Pedidos, Delivery, Abastecimiento y reportes quedan fuera de esta fase.
+Security, Angular, Delivery, Abastecimiento y reportes quedan fuera de esta fase.
 Git fue inicializado manualmente por el usuario; Codex no administra commits ni remotos.
 El informe de Fase 2 conserva los nombres históricos originales.
 
@@ -138,10 +140,80 @@ CRUD: GET colección, GET /{id}, POST, PUT /{id}, DELETE /{id} sobre
 - Dirección principal y referencia opcionales, máximo 300; blancos se guardan como null.
 - Activo obligatorio en el modelo, inicial true cuando se omite; null explícito es 400.
   PUT permite desactivar; no se inventa una acción adicional.
-- DELETE físico permitido ahora; **revisar esta regla en Fase 5 cuando exista Pedido**.
+- DELETE físico solo sin referencias: si el cliente tiene pedidos, la FK impide el borrado
+  y se devuelve 409. Desactivar con PUT (`activo:false`) conserva su historial, sin
+  dependencia Clientes → Pedidos.
 - Reutiliza errores 400/404/409/500 y X-Trace-ID/MDC, sin otro handler o filtro.
 - Solo tabla CLIENTES, con PK identity, campos requeridos NOT NULL, DEFAULT 1 y checks
   de nombres no blancos, teléfono y booleano. No hay unicidad de teléfono.
 
 Las pruebas automatizadas usan Oracle real y rollback. Los clientes manuales se
 eliminaron por HTTP después de comprobar su persistencia SQL; Catálogo se conservó.
+
+
+## Pedidos y detalles (S04)
+
+`pedidos/pedido/{controller,dto,entity,mapper,repository,service}`. DetallePedido es
+parte del agregado, sin CRUD ni Repository independientes. No se importan entidades
+ni repositories de otros módulos. Los contratos públicos mínimos son:
+
+- `catalogo.producto.api.ProductoConsultaService` → `ProductoParaPedido`.
+- `clientes.cliente.api.ClienteConsultaService` → `ClienteResumen`.
+
+Los implementan los ServiceImpl existentes; no se expone el CRUD completo de otro módulo.
+La anotación de Pedidos limita dependencias a esas interfaces nombradas y excepciones.
+A nivel Oracle hay FK reales: PEDIDOS.CLIENTE_ID → CLIENTES.ID,
+DETALLE_PEDIDOS.PEDIDO_ID → PEDIDOS.ID, DETALLE_PEDIDOS.PRODUCTO_ID → PRODUCTOS.ID.
+
+```json
+{"clienteId":1,"tipoPedido":"RECOJO","metodoPago":"EFECTIVO",
+ "detalles":[{"productoId":10,"cantidad":2}]}
+```
+
+- POST `/api/v1/pedidos`: 201 con Location, agregado transaccional.
+- GET `/api/v1/pedidos` y GET `/api/v1/pedidos/{id}`: 200.
+- PATCH `/api/v1/pedidos/{id}/estado` con `{"estado":"CONFIRMADO"}`: 200.
+- No hay PUT genérico ni DELETE de Pedido (405); tampoco endpoint de pago.
+
+Tipo: PRESENCIAL, RECOJO, DELIVERY. Estado inicial PENDIENTE; pago inicial PENDIENTE.
+Métodos EFECTIVO, YAPE, PLIN, TARJETA; estados de pago PENDIENTE, PAGADO, ANULADO.
+El método se registra, sin pasarelas ni confirmación de cobros en esta fase.
+
+Todos los pedidos requieren cliente existente y al menos una línea con cantidad
+Integer positiva. No se añade un máximo comercial de cantidad: el límite SQL es el
+rango representable por Integer. Subtotales/total NUMBER(19,2) tienen límite técnico
+comprobado en el servicio (400 si se supera), sin redondeos silenciosos.
+Productos deben existir y estar disponibles, con precio positivo. No hay stock.
+
+Precio, nombre, subtotal y total son obtenidos/calculados en ServiceImpl con BigDecimal;
+los valores ajenos al contrato enviados por HTTP no son autoritativos. Mapper solo
+convierte el agregado a respuesta. Cabecera y detalles se persisten con cascade ALL y
+orphanRemoval, ambos lados de la asociación correctamente establecidos.
+Una excepción revierte la operación completa. No hay escritura parcial de líneas.
+
+Precio/nombre del producto y dirección/referencia de entrega se copian al crear.
+Modificar Catálogo o Cliente no cambia esas fotografías históricas. El resumen del
+cliente se consulta mediante su contrato público y no se duplica en la tabla PEDIDOS.
+DELIVERY exige dirección explícita no vacía (máximo 300), no se toma silenciosamente
+la dirección del perfil. PRESENCIAL/RECOJO admiten null. Fecha LocalDateTime generada
+por backend con America/Lima, persistida como TIMESTAMP(6).
+
+Transiciones de esta fase:
+
+- PENDIENTE → CONFIRMADO → EN_PREPARACION → LISTO.
+- LISTO → ENTREGADO solo para PRESENCIAL/RECOJO.
+- PENDIENTE/CONFIRMADO → CANCELADO solo si estadoPago no es PAGADO.
+- CANCELADO y ENTREGADO son finales; no se permiten saltos, repetición ni retrocesos.
+- Cancelaciones EN_PREPARACION/LISTO quedan bloqueadas hasta la operación administrativa
+  con motivo y Seguridad. No se simulan roles ni se incorpora un campo futuro sin uso.
+- DESPACHADO y su transición a ENTREGADO se integrarán mediante Delivery; no están
+  habilitados por este endpoint. No se cancelan pedidos despachados.
+
+Se bloquea la cabecera durante cambios de estado para serializar transiciones concurrentes.
+Cliente activo y categoría activa no añaden reglas nuevas de admisión no solicitadas;
+la restricción solicitada de producto disponible sí se verifica.
+
+400: forma inválida o delivery sin dirección. 404: cliente/producto/pedido inexistentes.
+409: no disponible, transición conflictiva o integridad. X-Trace-ID y handler reutilizados.
+Las pruebas de rollback incluyen una petición sin transacción externa y comprueban
+conteos JDBC posteriores. Los 32 casos anteriores siguen presentes y pasan.

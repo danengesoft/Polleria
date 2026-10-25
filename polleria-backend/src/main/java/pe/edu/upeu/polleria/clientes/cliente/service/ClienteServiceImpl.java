@@ -14,7 +14,7 @@ import pe.edu.upeu.polleria.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class ClienteServiceImpl implements ClienteService {
+public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.clientes.cliente.api.ClienteConsultaService {
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
 
@@ -58,9 +58,21 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public void eliminar(Long id) {
-        // Eliminación física en Fase 4; revisar cuando Pedido referencie Cliente.
-        clienteRepository.delete(buscarOFallar(id));
-        clienteRepository.flush();
+        Cliente cliente = buscarOFallar(id);
+        try {
+            clienteRepository.delete(cliente);
+            clienteRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new BusinessConflictException("Cliente con operaciones asociadas; puede desactivarlo");
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen consultarCliente(Long id) {
+        Cliente cliente = buscarOFallar(id);
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(
+                cliente.getId(), cliente.getNombres(), cliente.getApellidos());
     }
 
     private Cliente buscarOFallar(Long id) {

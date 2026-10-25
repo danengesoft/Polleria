@@ -14,7 +14,7 @@ import pe.edu.upeu.polleria.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class ProductoServiceImpl implements ProductoService {
+public class ProductoServiceImpl implements ProductoService, pe.edu.upeu.polleria.catalogo.producto.api.ProductoConsultaService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ProductoMapper productoMapper;
@@ -62,6 +62,14 @@ public class ProductoServiceImpl implements ProductoService {
     public void eliminar(Long id) {
         productoRepository.delete(buscarOFallar(id));
         productoRepository.flush();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public pe.edu.upeu.polleria.catalogo.producto.api.ProductoParaPedido consultarParaPedido(Long id) {
+        Producto producto = buscarOFallar(id);
+        return new pe.edu.upeu.polleria.catalogo.producto.api.ProductoParaPedido(
+                producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getDisponible());
     }
 
     private Producto buscarOFallar(Long id) {

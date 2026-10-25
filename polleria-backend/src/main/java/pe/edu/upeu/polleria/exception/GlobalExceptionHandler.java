@@ -33,6 +33,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.CONFLICT, "La operación entra en conflicto con datos existentes o restricciones de integridad");
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<Map<String, Object>> invalidRequest(InvalidRequestException ex) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> validation(MethodArgumentNotValidException ex) {
         return error(HttpStatus.BAD_REQUEST, "Error de validación en los datos enviados");
@@ -46,6 +51,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> missingRoute(NoResourceFoundException ex) {
         return error(HttpStatus.NOT_FOUND, "Recurso no encontrado");
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> methodNotAllowed(Exception ex) {
+        return error(HttpStatus.METHOD_NOT_ALLOWED, "Método HTTP no permitido para este recurso");
     }
 
     @ExceptionHandler(Exception.class)
