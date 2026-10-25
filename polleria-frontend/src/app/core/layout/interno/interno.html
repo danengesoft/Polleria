@@ -1,0 +1,17 @@
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" routerLink="/interno">Sistema Pollería</a>
+    <app-navigation />
+  </div>
+</header>
+<div class="container internal-body">
+  <aside>
+    <p class="eyebrow">Portal interno</p>
+    <nav aria-label="Navegación del portal">
+      <a routerLink="/interno">Inicio del portal</a>
+      <a routerLink="/interno/conexion">Comprobar conexión</a>
+    </nav>
+  </aside>
+  <main id="contenido" tabindex="-1"><router-outlet /></main>
+</div>

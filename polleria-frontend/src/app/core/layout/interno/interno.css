@@ -1,0 +1,15 @@
+:host { display:block; min-height:100dvh; }
+.site-header { border-bottom:1px solid var(--line); background:var(--surface); }
+.header-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; min-height:5rem; padding-block:1rem; }
+.brand { font-weight:700; letter-spacing:-.025em; text-decoration:none; }
+.internal-body { display:grid; grid-template-columns:13rem minmax(0,1fr); gap:3rem; padding-block:2.5rem; }
+aside { border-right:1px solid var(--line); padding-right:1.5rem; }
+nav { display:flex; flex-direction:column; gap:.75rem; }
+nav a { padding-block:.5rem; text-decoration:none; color:var(--muted); }
+nav a:hover { color:var(--ink); text-decoration:underline; }
+main { min-width:0; }
+@media(max-width:700px) {
+  .internal-body { grid-template-columns:1fr; gap:1.5rem; padding-block:1.5rem; }
+  aside { border-right:0; border-bottom:1px solid var(--line); padding:0 0 1.25rem; }
+  nav { flex-direction:row; flex-wrap:wrap; gap:1.5rem; }
+}
