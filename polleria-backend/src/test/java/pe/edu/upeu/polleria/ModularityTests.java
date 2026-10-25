@@ -13,6 +13,12 @@ class ModularityTests {
     }
 
     @Test
+    void recognizesCatalogoAndClientes() {
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("catalogo")).isPresent();
+        org.assertj.core.api.Assertions.assertThat(modules.getModuleByName("clientes")).isPresent();
+    }
+
+    @Test
     void writesModuleDocumentation() {
         new Documenter(modules).writeDocumentation();
     }

@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 3 (Catálogo)
+# POLLERIA — backend, Fase 4 (Catálogo y Clientes)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -24,10 +24,11 @@ docker compose -f compose-dev.yml config --quiet
 docker compose -f compose-dev.yml up -d --wait oracle
 ```
 
-**Solo en una base nueva y sin tablas de Catálogo**, aplicar el DDL una vez:
+**Solo en una base nueva**, aplicar los scripts en orden, una sola vez por tabla:
 
 ```bash
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/01-catalogo.sql
+docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/02-clientes.sql
 ```
 
 El script falla ante errores y no elimina/reemplaza tablas existentes. Oracle hace
@@ -104,5 +105,43 @@ Modulith verifica Catálogo y la infraestructura técnica. No se exponen NamedIn
 anticipadamente: aún no hay un segundo módulo que necesite contratos de Catálogo.
 Las excepciones compartidas usan el paquete técnico abierto, según el patrón académico.
 
-Security, Angular, otros módulos comerciales y reportes quedan fuera de esta fase.
-No se inicializa Git. El informe de Fase 2 conserva los nombres históricos originales.
+Security, Angular, Pedidos, Delivery, Abastecimiento y reportes quedan fuera de esta fase.
+Git fue inicializado manualmente por el usuario; Codex no administra commits ni remotos.
+El informe de Fase 2 conserva los nombres históricos originales.
+
+
+## Clientes (S02 y transacciones S03)
+
+`clientes/cliente/{controller,dto,entity,mapper,repository,service}`.
+Es el segundo módulo funcional y no depende de Catálogo ni representa identidades.
+No tiene contraseña, rol, sub/Keycloak, documentos ni direcciones múltiples.
+
+CRUD: GET colección, GET /{id}, POST, PUT /{id}, DELETE /{id} sobre
+`/api/v1/clientes`. POST 201 con Location, GET/PUT 200, DELETE 204.
+
+```json
+{"nombres":"Ana María","apellidos":"Pérez López","telefono":"+51912345678",
+ "correo":"ana@example.com","direccionPrincipal":null,"referencia":null,"activo":true}
+```
+
+- Nombres y apellidos obligatorios, máximo 100 cada uno; el servicio retira espacios
+  exteriores y reduce espacios interiores consecutivos.
+- Teléfono String obligatorio: 7–9 dígitos nacionales, prefijo literal +51 opcional,
+  sin separadores. No se añade prefijo ni se pierden ceros; puede compartirse.
+  Es una validación sintáctica local, no acredita titularidad ni existencia de la línea.
+- Correo opcional, máximo 254. El setter del Request retira espacios exteriores antes
+  de @Email; ServiceImpl convierte a minúsculas con Locale.ROOT y blanco a null.
+  La regla de duplicados y normalización comercial permanece en el servicio.
+- Repository compara LOWER(TRIM(correo)) al crear y excluye el propio id al actualizar.
+  Índice único Oracle LOWER(TRIM(CORREO)) garantiza unicidad ante concurrencia y clientes
+  SQL externos. Oracle permite múltiples NULL. El formato detallado se valida con @Email.
+- Dirección principal y referencia opcionales, máximo 300; blancos se guardan como null.
+- Activo obligatorio en el modelo, inicial true cuando se omite; null explícito es 400.
+  PUT permite desactivar; no se inventa una acción adicional.
+- DELETE físico permitido ahora; **revisar esta regla en Fase 5 cuando exista Pedido**.
+- Reutiliza errores 400/404/409/500 y X-Trace-ID/MDC, sin otro handler o filtro.
+- Solo tabla CLIENTES, con PK identity, campos requeridos NOT NULL, DEFAULT 1 y checks
+  de nombres no blancos, teléfono y booleano. No hay unicidad de teléfono.
+
+Las pruebas automatizadas usan Oracle real y rollback. Los clientes manuales se
+eliminaron por HTTP después de comprobar su persistencia SQL; Catálogo se conservó.
