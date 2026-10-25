@@ -1,0 +1,14 @@
+{
+  "polleria-prodtest-backend-1": {
+    "jwtEnLogs": false,
+    "oauthCodeEnAccessLog": false
+  },
+  "polleria-prodtest-frontend-1": {
+    "jwtEnLogs": false,
+    "oauthCodeEnAccessLog": false
+  },
+  "polleria-prodtest-keycloak-1": {
+    "jwtEnLogs": false,
+    "oauthCodeEnAccessLog": false
+  }
+}

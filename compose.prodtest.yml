@@ -1,0 +1,12 @@
+# Solo ensayo local: no certificados públicos, sin cambios al stack dev.
+services:
+  frontend:
+    ports: !override
+      - 127.0.0.1:18080:80
+    volumes: !override
+      - ./production/nginx/http.conf:/etc/nginx/conf.d/default.conf:ro,Z
+      - ./production/nginx/00-logging.conf:/etc/nginx/conf.d/00-logging.conf:ro,Z
+      - ./production/nginx/locations.conf:/etc/nginx/polleria/locations.conf:ro,Z
+      - ./production/nginx/security-headers.conf:/etc/nginx/polleria/security-headers.conf:ro,Z
+    healthcheck:
+      test: [CMD-SHELL, "wget -q -O - http://127.0.0.1/healthz | grep -q ok"]

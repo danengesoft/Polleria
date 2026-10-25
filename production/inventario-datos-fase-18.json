@@ -1,0 +1,68 @@
+[
+  {
+    "tabla": "CATEGORIAS",
+    "filas": 1
+  },
+  {
+    "tabla": "PRODUCTOS",
+    "filas": 2
+  },
+  {
+    "tabla": "CLIENTES",
+    "filas": 4
+  },
+  {
+    "tabla": "PEDIDOS",
+    "filas": 12
+  },
+  {
+    "tabla": "DETALLE_PEDIDOS",
+    "filas": 13
+  },
+  {
+    "tabla": "ENTREGAS",
+    "filas": 4
+  },
+  {
+    "tabla": "REPARTIDORES",
+    "filas": 2
+  },
+  {
+    "tabla": "COMPRAS",
+    "filas": 2
+  },
+  {
+    "tabla": "DETALLE_COMPRAS",
+    "filas": 4
+  },
+  {
+    "tabla": "INSUMOS",
+    "filas": 5
+  },
+  {
+    "tabla": "PROVEEDORES",
+    "filas": 2
+  },
+  {
+    "tabla": "MOVIMIENTOS_INVENTARIO",
+    "filas": 10
+  },
+  {
+    "categoriaId": 24,
+    "nombre": "Pollos"
+  },
+  {
+    "productoId": 10,
+    "nombre": "1/4 Pollo",
+    "precio": 20
+  },
+  {
+    "productoId": 95,
+    "nombre": "Producto prueba F9",
+    "precio": 5.5
+  },
+  {
+    "dbtimezone": "+00:00",
+    "sessiontimezone": "+00:00"
+  }
+]

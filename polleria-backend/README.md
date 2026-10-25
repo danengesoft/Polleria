@@ -434,3 +434,12 @@ repartidor, utilidad, valorización de inventario ni suma de KG con L.
 
 198 pruebas backend correctas. Evidencias HTTP/Oracle/Keycloak y resumen técnico:
 `VERIFICACION-FASE-15.md`. No hay migración SQL de esta fase.
+
+
+## Desarrollo y producción — Fase18
+
+El entorno local de desarrollo conserva sus URLs/Compose originales. El paquete de
+producción utiliza perfil `prod`, Angular estático y Nginx con API/Auth del mismo origen.
+Consultar [DEPLOYMENT](../DEPLOYMENT.md), [verificación F18](../VERIFICACION-FASE-18.md)
+y [barreras de go-live](../GO-LIVE-CHECKLIST.md). Preparado no significa publicado:
+limpieza y exposición pública requieren órdenes explícitas independientes.

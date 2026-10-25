@@ -1,0 +1,14 @@
+[
+  {
+    "caso": "placeholder",
+    "rechazado": true
+  },
+  {
+    "caso": "password_corto",
+    "rechazado": true
+  },
+  {
+    "caso": "variable_ausente",
+    "rechazado": true
+  }
+]

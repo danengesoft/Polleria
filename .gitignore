@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.production.example
+production/generated/
+production/certs/
+backups/
+*.dump
+*.dmp
+*.p12
+*.key
+*.pem
+*.log
+**/__pycache__/
+*.pgdump
+tokens/
+*.token
+*.jwt

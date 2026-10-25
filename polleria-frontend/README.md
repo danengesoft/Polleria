@@ -149,3 +149,12 @@ variantes. Único pedido de prueba: #3223, Recojo/Efectivo/Pendiente, S/20.00.
 
 Ver VERIFICACION-FASE-16.md y sus evidencias JSON. npm audit conserva 5 altas y
 2 críticas conocidas; no se aplicaron fixes ni cambios de Angular. Fase 17 pendiente.
+
+
+## Desarrollo y producción — Fase18
+
+El entorno local de desarrollo conserva sus URLs/Compose originales. El paquete de
+producción utiliza perfil `prod`, Angular estático y Nginx con API/Auth del mismo origen.
+Consultar [DEPLOYMENT](../DEPLOYMENT.md), [verificación F18](../VERIFICACION-FASE-18.md)
+y [barreras de go-live](../GO-LIVE-CHECKLIST.md). Preparado no significa publicado:
+limpieza y exposición pública requieren órdenes explícitas independientes.

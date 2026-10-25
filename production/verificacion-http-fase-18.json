@@ -1,0 +1,70 @@
+{
+  "completado": true,
+  "requests": [
+    {
+      "path": "/",
+      "http": 200,
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "X-Frame-Options": "SAMEORIGIN",
+        "Content-Security-Policy": "frame-ancestors 'self'; object-src 'none'; base-uri 'self'"
+      }
+    },
+    {
+      "path": "/catalogo",
+      "http": 200
+    },
+    {
+      "path": "/carrito",
+      "http": 200
+    },
+    {
+      "path": "/mis-pedidos",
+      "http": 200
+    },
+    {
+      "path": "/perfil",
+      "http": 200
+    },
+    {
+      "path": "/interno/productos",
+      "http": 200
+    },
+    {
+      "path": "/interno/pedidos",
+      "http": 200
+    },
+    {
+      "path": "/interno/reportes",
+      "http": 200
+    },
+    {
+      "path": "/api/v1/productos",
+      "http": 200,
+      "traceIdOK": true
+    },
+    {
+      "path": "/api/v1/clientes",
+      "http": 401,
+      "traceIdOK": true
+    },
+    {
+      "path": "/actuator/health",
+      "http": 404
+    },
+    {
+      "path": "/v3/api-docs",
+      "http": 404
+    },
+    {
+      "path": "/auth/admin/",
+      "http": 404
+    },
+    {
+      "path": "/auth/realms/polleria/.well-known/openid-configuration",
+      "http": 200,
+      "issuer": "http://127.0.0.1:18080/auth/realms/polleria"
+    }
+  ]
+}
