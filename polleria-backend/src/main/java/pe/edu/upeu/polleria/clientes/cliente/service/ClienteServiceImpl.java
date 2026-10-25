@@ -10,6 +10,7 @@ import pe.edu.upeu.polleria.clientes.cliente.entity.Cliente;
 import pe.edu.upeu.polleria.clientes.cliente.mapper.ClienteMapper;
 import pe.edu.upeu.polleria.clientes.cliente.repository.ClienteRepository;
 import pe.edu.upeu.polleria.exception.BusinessConflictException;
+import pe.edu.upeu.polleria.exception.InvalidRequestException;
 import pe.edu.upeu.polleria.exception.ResourceNotFoundException;
 
 @Service
@@ -73,6 +74,39 @@ public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.
         Cliente cliente = buscarOFallar(id);
         return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(
                 cliente.getId(), cliente.getNombres(), cliente.getApellidos());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen consultarPorSub(String sub) {
+        Cliente c = buscarPorSub(sub);
+        if (!Boolean.TRUE.equals(c.getActivo())) throw new BusinessConflictException("Perfil comercial desactivado");
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(c.getId(), c.getNombres(), c.getApellidos());
+    }
+
+    @Transactional(readOnly = true)
+    public ClienteResponse miPerfil(String sub) { return clienteMapper.toResponse(buscarPorSub(sub)); }
+
+    @Transactional
+    public ClienteResponse crearPerfil(String sub, pe.edu.upeu.polleria.clientes.cliente.dto.PerfilRequest request) {
+        if (clienteRepository.findByKeycloakSub(sub).isPresent()) throw new BusinessConflictException("Ya existe un perfil comercial");
+        ClienteResponse creado = crear(request.toInterno());
+        Cliente c = buscarOFallar(creado.getId());
+        c.setKeycloakSub(sub);
+        return clienteMapper.toResponse(clienteRepository.saveAndFlush(c));
+    }
+
+    @Transactional
+    public ClienteResponse actualizarPerfil(String sub, pe.edu.upeu.polleria.clientes.cliente.dto.PerfilRequest request) {
+        Cliente c = buscarPorSub(sub);
+        ClienteRequest interno = request.toInterno();
+        interno.setActivo(c.getActivo());
+        return actualizar(c.getId(), interno);
+    }
+
+    private Cliente buscarPorSub(String sub) {
+        if (sub == null || sub.isBlank() || sub.length() > 255) throw new InvalidRequestException("Identidad inválida");
+        return clienteRepository.findByKeycloakSub(sub).orElseThrow(() -> new ResourceNotFoundException("Completa tu perfil comercial"));
     }
 
     private Cliente buscarOFallar(Long id) {

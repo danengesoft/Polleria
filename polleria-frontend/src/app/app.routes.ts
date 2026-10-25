@@ -109,6 +109,35 @@ export const routes: Routes = [
     loadComponent: () => import('./core/layout/publico/publico').then((m) => m.Publico),
     children: [
       {
+        path: 'catalogo',
+        loadComponent: () =>
+          import('./features/publico/catalogo-publico').then((m) => m.CatalogoPublico),
+      },
+      {
+        path: 'carrito',
+        loadComponent: () => import('./features/publico/carrito').then((m) => m.Carrito),
+      },
+      {
+        path: 'perfil',
+        canActivate: [authGuard, rolGuard('CLIENTE')],
+        loadComponent: () => import('./features/publico/perfil').then((m) => m.Perfil),
+      },
+      {
+        path: 'checkout',
+        canActivate: [authGuard, rolGuard('CLIENTE')],
+        loadComponent: () => import('./features/publico/checkout').then((m) => m.Checkout),
+      },
+      {
+        path: 'mis-pedidos',
+        canActivate: [authGuard, rolGuard('CLIENTE')],
+        loadComponent: () => import('./features/publico/mis-pedidos').then((m) => m.MisPedidos),
+      },
+      {
+        path: 'mis-pedidos/:id',
+        canActivate: [authGuard, rolGuard('CLIENTE')],
+        loadComponent: () => import('./features/publico/mi-pedido').then((m) => m.MiPedido),
+      },
+      {
         path: '',
         pathMatch: 'full',
         title: 'Inicio | Pollería',

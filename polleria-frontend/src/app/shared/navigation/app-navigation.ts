@@ -1,3 +1,4 @@
+import { CarritoService } from '../../features/publico/carrito-service';
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth/auth-service';
@@ -13,6 +14,12 @@ import { AuthService } from '../../core/auth/auth-service';
         ariaCurrentWhenActive="page"
         >Inicio</a
       >
+      <a routerLink="/catalogo" routerLinkActive="active">Catálogo</a>
+      <a routerLink="/carrito" routerLinkActive="active">Carrito ({{ carrito.unidades() }})</a>
+      @if (auth.tieneRol('CLIENTE')) {
+        <a routerLink="/mis-pedidos" routerLinkActive="active">Mis pedidos</a
+        ><a routerLink="/perfil" routerLinkActive="active">Perfil</a>
+      }
       @if (auth.usuario()) {
         @if (auth.tieneRol('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'ABASTECIMIENTO')) {
           <a routerLink="/interno" routerLinkActive="active">Portal interno</a>
@@ -69,4 +76,5 @@ import { AuthService } from '../../core/auth/auth-service';
 })
 export class AppNavigation {
   readonly auth = inject(AuthService);
+  readonly carrito = inject(CarritoService);
 }

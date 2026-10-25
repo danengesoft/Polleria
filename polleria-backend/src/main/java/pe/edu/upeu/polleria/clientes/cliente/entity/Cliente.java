@@ -27,6 +27,8 @@ public class Cliente {
     private String direccionPrincipal;
     @Column(name = "REFERENCIA", length = 300)
     private String referencia;
+    @Column(name = "KEYCLOAK_SUB", length = 255, unique = true)
+    private String keycloakSub;
     @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
     @Column(name = "ACTIVO", nullable = false, precision = 1)
     private Boolean activo = true;

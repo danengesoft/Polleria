@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 10 (Seguridad con Keycloak)
+# POLLERIA — backend, Fase 12 (Autoservicio del cliente)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -30,6 +30,7 @@ docker compose -f compose-dev.yml up -d --wait oracle
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/01-catalogo.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/02-clientes.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/03-pedidos.sql
+docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/04-cliente-keycloak.sql
 ```
 
 El script falla ante errores y no elimina/reemplaza tablas existentes. Oracle hace
@@ -354,3 +355,24 @@ La evidencia de esta ejecución, sin secretos, está en `keycloak/verification-h
 Ver `VERIFICACION-FASE-10.md`: compilación correcta y 93 pruebas backend exitosas
 (75 anteriores adaptadas + 18 nuevas). Frontend sin cambios; sus operaciones internas
 recibirán temporalmente 401 hasta Fase 11. No se debilita la API para evitarlos.
+
+## Autoservicio del cliente — Fase 12
+
+La migración incremental `scripts/04-cliente-keycloak.sql` ya se aplicó en la base
+local. No repetirla. Agrega `CLIENTES.KEYCLOAK_SUB VARCHAR2(255 CHAR)` nullable y
+`UK_CLIENTES_KEYCLOAK_SUB` única, sin modificar Clientes existentes.
+Para otra base que ya tenga las tablas de Fase 5, aplicar únicamente el script 04.
+
+Los endpoints GET/POST/PUT `/api/v1/clientes/me` y GET/POST
+`/api/v1/pedidos/mios`, GET `/api/v1/pedidos/mios/{id}` y PATCH
+`/api/v1/pedidos/mios/{id}/cancelar` exigen CLIENTE. Reciben el `sub` del JWT
+validado. El request público no define clienteId, keycloakSub, precio, total ni
+estados. No se vincula por correo y el correo duplicado responde 409.
+Un pedido ajeno devuelve 404; solo se cancela el propio PENDIENTE y no pagado.
+La creación reutiliza la lógica transaccional existente de Pedido.
+
+Suite actual: 110 pruebas correctas (93 anteriores + 17 nuevas), incluyendo Oracle,
+seguridad y tres verificaciones de Modulith. Solo siguen existiendo tres módulos
+comerciales: Catálogo, Clientes y Pedidos. Ver `VERIFICACION-FASE-12.md`.
+La configuración Keycloak definitiva sigue exigiendo Code + PKCE S256 y no permite
+password grant para la SPA; el registro autoservicio permanece deshabilitado.

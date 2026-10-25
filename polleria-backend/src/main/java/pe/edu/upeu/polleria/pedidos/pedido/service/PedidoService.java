@@ -5,6 +5,10 @@ import pe.edu.upeu.polleria.pedidos.pedido.dto.*;
 
 public interface PedidoService {
     List<PedidoResponse> listar();
+    PedidoResponse crearMio(String sub, MiPedidoRequest request);
+    List<PedidoResponse> listarMios(String sub);
+    PedidoResponse obtenerMio(String sub, Long id);
+    PedidoResponse cancelarMio(String sub, Long id);
     List<PedidoResponse> buscar(PedidoFiltro filtro, String ordenarPor, String direccion);
     PedidoResumenReporte resumen(PedidoFiltro filtro);
     List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro);

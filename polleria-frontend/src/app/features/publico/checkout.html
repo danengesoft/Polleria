@@ -1,0 +1,56 @@
+<h1>Confirmar tu pedido</h1>
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  @if (!perfilListo()) {
+    <button (click)="cargarPerfil()">Reintentar perfil</button>
+  }
+}
+@if (!carrito.lineas().length) {
+  <p>Tu carrito está vacío.</p>
+  <a routerLink="/catalogo">Elegir productos</a>
+} @else if (perfilListo()) {
+  @for (l of carrito.lineas(); track l.productoId) {
+    <p>
+      {{ l.cantidad }} × {{ l.nombre }} —
+      {{ l.precio * l.cantidad | currency: 'PEN' : 'S/ ' : '1.2-2' }}
+    </p>
+  }
+  <p class="total">Total estimado {{ carrito.total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+  <p>El servidor confirma disponibilidad y precios al crear el pedido.</p>
+  <form [formGroup]="form" (ngSubmit)="confirmar()" class="formulario">
+    <label
+      >Tipo de pedido<select formControlName="tipoPedido">
+        <option value="RECOJO">Recojo</option>
+        <option value="DELIVERY">Delivery</option>
+      </select></label
+    >
+    @if (form.controls.tipoPedido.value === 'DELIVERY') {
+      <label
+        >Dirección de entrega<input formControlName="direccionEntrega" maxlength="300" required
+      /></label>
+      <label
+        >Referencia de entrega (opcional)<textarea
+          formControlName="referenciaEntrega"
+          maxlength="300"
+        ></textarea>
+      </label>
+      <p>Esta dirección pertenece al pedido. Tu dirección principal no cambia.</p>
+    } @else {
+      <p>Recogerás tu pedido en el establecimiento.</p>
+    }
+    <label
+      >Método de pago<select formControlName="metodoPago">
+        @for (m of metodos; track m) {
+          <option [value]="m">{{ m }}</option>
+        }
+      </select></label
+    >
+    <p>
+      Solo registramos el método elegido. El pago queda pendiente; no se realiza un cobro en línea.
+    </p>
+    <button type="submit" [disabled]="guardando()">
+      {{ guardando() ? 'Creando pedido…' : 'Confirmar pedido' }}
+    </button>
+  </form>
+  <a routerLink="/carrito">Modificar carrito</a>
+}

@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  max-width: 100%;
+}
+h1 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+}
+h2 {
+  font-size: 1.2rem;
+}
+p {
+  line-height: 1.65;
+}
+button,
+a,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+button {
+  cursor: pointer;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+a {
+  color: var(--ink);
+  text-underline-offset: 0.2em;
+}
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  min-width: 0;
+}
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+select {
+  margin-block: 0.5rem 1rem;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 1.3rem;
+  margin-block: 1rem 2rem;
+}
+.card {
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.card img,
+.placeholder {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+.placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 1.3rem;
+  letter-spacing: 0.05em;
+}
+.card h2,
+.card p {
+  margin: 0.2rem 0;
+}
+.card button {
+  margin-top: auto;
+}
+.linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-block: 1rem;
+  overflow-wrap: anywhere;
+}
+.cantidad {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+}
+.cantidad input {
+  width: 5rem;
+}
+.formulario {
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+}
+.total {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: 1rem 2rem;
+}
+[role='alert'] {
+  padding: 1rem;
+  border-left: 3px solid #a33929;
+  background: var(--surface-soft);
+  overflow-wrap: anywhere;
+}

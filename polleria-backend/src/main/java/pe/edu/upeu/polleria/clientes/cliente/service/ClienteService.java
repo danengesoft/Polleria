@@ -9,4 +9,7 @@ public interface ClienteService {
     ClienteResponse crear(ClienteRequest request);
     ClienteResponse actualizar(Long id, ClienteRequest request);
     void eliminar(Long id);
+    ClienteResponse miPerfil(String sub);
+    ClienteResponse crearPerfil(String sub, PerfilRequest request);
+    ClienteResponse actualizarPerfil(String sub, PerfilRequest request);
 }

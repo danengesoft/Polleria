@@ -198,6 +198,37 @@ public class PedidoServiceImpl implements PedidoService {
         return respuesta(pedidoRepository.saveAndFlush(pedido));
     }
 
+    @Transactional
+    public PedidoResponse crearMio(String sub, MiPedidoRequest request) {
+        if (request.tipoPedido() == TipoPedido.PRESENCIAL) throw new InvalidRequestException("Selecciona recojo o delivery");
+        return crear(request.toInterno(clienteConsultaService.consultarPorSub(sub).id()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PedidoResponse> listarMios(String sub) {
+        PedidoFiltro filtro = new PedidoFiltro();
+        filtro.setClienteId(clienteConsultaService.consultarPorSub(sub).id());
+        return buscar(filtro, "fecha", "DESC");
+    }
+
+    @Transactional(readOnly = true)
+    public PedidoResponse obtenerMio(String sub, Long id) {
+        Long clienteId = clienteConsultaService.consultarPorSub(sub).id();
+        Pedido p = pedidoRepository.findById(id).filter(x -> clienteId.equals(x.getClienteId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        return respuesta(p);
+    }
+
+    @Transactional
+    public PedidoResponse cancelarMio(String sub, Long id) {
+        Long clienteId = clienteConsultaService.consultarPorSub(sub).id();
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id).filter(x -> clienteId.equals(x.getClienteId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getEstado() != EstadoPedido.PENDIENTE) throw new BusinessConflictException("Solo puedes cancelar un pedido pendiente");
+        EstadoPedidoRequest r = new EstadoPedidoRequest(); r.setEstado(EstadoPedido.CANCELADO);
+        return cambiarEstado(id, r);
+    }
+
     private PedidoResponse respuesta(Pedido pedido) {
         return pedidoMapper.toResponse(pedido, clienteConsultaService.consultarCliente(pedido.getClienteId()));
     }

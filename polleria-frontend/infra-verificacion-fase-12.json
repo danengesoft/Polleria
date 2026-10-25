@@ -1,0 +1,22 @@
+{
+  "health": {
+    "status": 200,
+    "estado": "UP"
+  },
+  "openapi": {
+    "status": 200,
+    "paths": [
+      "/api/v1/clientes/me",
+      "/api/v1/pedidos/mios",
+      "/api/v1/pedidos/mios/{id}",
+      "/api/v1/pedidos/mios/{id}/cancelar"
+    ]
+  },
+  "catalogoAnonimo": {
+    "status": 200
+  },
+  "cors": {
+    "status": 200,
+    "origin": "http://localhost:4200"
+  }
+}
