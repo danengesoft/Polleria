@@ -1,0 +1,102 @@
+<app-abastecimiento-nav />
+<h1>Compras</h1>
+<p>
+  El registro confirma el ingreso de insumos. Una compra guardada conserva su historial y no se
+  edita ni elimina.
+</p>
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+}
+<p role="status">{{ aviso() }}</p>
+<section class="supply-card">
+  <h2>Registrar compra</h2>
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <label
+      >Proveedor activo<select formControlName="proveedorId">
+        <option [ngValue]="0">Selecciona proveedor</option>
+        @for (p of proveedores(); track p.id) {
+          <option [ngValue]="p.id">{{ p.razonSocial }}</option>
+        }
+      </select></label
+    >
+    <div formArrayName="detalles">
+      @for (l of form.controls.detalles.controls; track l; let i = $index) {
+        <fieldset [formGroupName]="i" class="purchase-line">
+          <legend>Insumo {{ i + 1 }}</legend>
+          <label
+            >Insumo activo<select formControlName="insumoId">
+              <option [ngValue]="0">Selecciona insumo</option>
+              @for (item of activos(); track item.id) {
+                <option [ngValue]="item.id">
+                  {{ item.nombre }} ({{ unidad(item.unidadMedida) }})
+                </option>
+              }
+            </select></label
+          >
+          @if (stock(l.controls.insumoId.value); as item) {
+            <p>Stock {{ item.stockActual | number: '1.3-3' }} {{ unidad(item.unidadMedida) }}</p>
+          }
+          <label
+            >Cantidad<input
+              formControlName="cantidad"
+              inputmode="decimal"
+              placeholder="0.000" /></label
+          ><label
+            >Costo unitario (S/)<input
+              formControlName="costoUnitario"
+              inputmode="decimal"
+              placeholder="0.0000"
+          /></label>
+          <p>Subtotal estimado {{ subtotal(i) | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+          <button type="button" (click)="quitar(i)" [disabled]="ocupado()">
+            Quitar línea {{ i + 1 }}
+          </button>
+        </fieldset>
+      }
+    </div>
+    <button type="button" (click)="agregar()" [disabled]="ocupado()">Agregar insumo</button>
+    <p>Total estimado {{ total() | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+    <p>Cantidades: hasta 3 decimales. Costo unitario: hasta 4. Usa punto decimal.</p>
+    @if (form.invalid && form.touched) {
+      <p role="alert">
+        Selecciona proveedor e insumos activos sin repetir. Ingresa cantidades y costos positivos y
+        al menos una línea.
+      </p>
+    }
+    <button type="submit" [disabled]="ocupado()">Registrar compra</button>
+  </form>
+</section>
+@if (seleccionada(); as c) {
+  <section class="supply-card">
+    <h2>Compra #{{ c.id }}</h2>
+    <p>{{ c.proveedor.razonSocial }} · {{ c.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+    @for (d of c.detalles; track d.id) {
+      <p>
+        {{ d.nombreInsumo }} · {{ d.cantidad | number: '1.3-3' }} {{ unidad(d.unidadMedida) }} ×
+        {{ d.costoUnitario | number: '1.4-4' }} =
+        {{ d.subtotal | currency: 'PEN' : 'S/ ' : '1.2-2' }}
+      </p>
+    }
+    <p class="total">Total confirmado {{ c.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+    @for (m of entradas(); track m.id) {
+      <p>
+        Entrada {{ m.nombreInsumo }}: {{ m.stockAnterior | number: '1.3-3' }} →
+        {{ m.stockPosterior | number: '1.3-3' }} {{ unidad(m.unidadMedida) }}
+      </p>
+    }
+  </section>
+}
+<h2>Historial de compras</h2>
+<button (click)="cargar()" [disabled]="ocupado()">Actualizar compras</button>
+<div class="supply-grid">
+  @for (c of compras(); track c.id) {
+    <article class="supply-card">
+      <h3>Compra #{{ c.id }}</h3>
+      <p>{{ c.proveedor.razonSocial }} · {{ c.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+      <p>{{ c.total | currency: 'PEN' : 'S/ ' : '1.2-2' }}</p>
+      <button (click)="abrir(c.id)" [disabled]="ocupado()">Ver compra #{{ c.id }}</button>
+    </article>
+  } @empty {
+    <p>No hay compras registradas.</p>
+  }
+</div>

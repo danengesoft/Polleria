@@ -19,6 +19,7 @@
       <a routerLink="/interno/delivery">Delivery</a>
       }
       @if (auth.tieneRol('REPARTIDOR')) {<a routerLink="/interno/reparto">Mis entregas</a>}
+      @if (auth.tieneRol('ADMINISTRADOR','ABASTECIMIENTO')) {<a routerLink="/interno/abastecimiento/insumos">Abastecimiento</a>}
       <a routerLink="/interno/conexion">Comprobar conexión</a>
     </nav>
   </aside>

@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/delivery/repartidores", "/api/v1/delivery/entregas", "/api/v1/delivery/entregas/*").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.POST, "/api/v1/delivery/entregas").hasAnyRole("ADMINISTRADOR", "CAJERO")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/delivery/entregas/*/reasignar", "/api/v1/pedidos/*/confirmar-pago").hasAnyRole("ADMINISTRADOR", "CAJERO")
+                        .requestMatchers("/api/v1/abastecimiento/**").hasAnyRole("ADMINISTRADOR", "ABASTECIMIENTO")
                         // Reports must precede general order matchers.
                         .requestMatchers("/api/v1/pedidos/reportes/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.GET, "/api/v1/pedidos", "/api/v1/pedidos/*").hasAnyRole("ADMINISTRADOR", "CAJERO")

@@ -109,6 +109,28 @@ export const routes: Routes = [
         loadComponent: () => import('./features/delivery/mis-entregas').then((m) => m.MisEntregas),
       },
       {
+        path: 'abastecimiento/insumos',
+        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
+        loadComponent: () => import('./features/abastecimiento/insumos').then((m) => m.Insumos),
+      },
+      {
+        path: 'abastecimiento/proveedores',
+        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
+        loadComponent: () =>
+          import('./features/abastecimiento/proveedores').then((m) => m.Proveedores),
+      },
+      {
+        path: 'abastecimiento/compras',
+        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
+        loadComponent: () => import('./features/abastecimiento/compras').then((m) => m.Compras),
+      },
+      {
+        path: 'abastecimiento/inventario',
+        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
+        loadComponent: () =>
+          import('./features/abastecimiento/inventario').then((m) => m.Inventario),
+      },
+      {
         path: 'conexion',
         title: 'Conexión | Pollería',
         loadComponent: () => import('./core/conexion/conexion').then((m) => m.Conexion),

@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 13 (Delivery)
+# POLLERIA — backend, Fase 14 (Abastecimiento)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -32,6 +32,7 @@ docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/02-clientes.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/03-pedidos.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/04-cliente-keycloak.sql
 docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/05-delivery.sql
+docker exec -i polleria-oracle sqlplus -s / as sysdba < scripts/06-abastecimiento.sql
 ```
 
 El script falla ante errores y no elimina/reemplaza tablas existentes. Oracle hace
@@ -392,5 +393,22 @@ Otros métodos requieren PATCH `/api/v1/pedidos/{id}/confirmar-pago` interno exp
 NO_ENTREGADO conserva Pedido DESPACHADO; reasignar conserva observaciones y permite
 nuevo intento en la misma fila. No existe historial de intentos separado en v1.
 
-Suite actual: 139 pruebas correctas, incluidos rollback real y concurrencia en Oracle.
+Suite de Fase 13: 139 pruebas correctas, incluidos rollback real y concurrencia en Oracle.
 Consultar `VERIFICACION-FASE-13.md` para todos los endpoints, archivos y datos de prueba.
+
+## Abastecimiento — Fase 14
+
+La base local ya tiene aplicada `scripts/06-abastecimiento.sql`. No repetirla.
+En una base que tenga 01–05, aplicar solo 06 antes de iniciar `ddl-auto: validate`.
+Agrega INSUMOS, PROVEEDORES, COMPRAS, DETALLE_COMPRAS y MOVIMIENTOS_INVENTARIO.
+
+Quinto módulo independiente, solo ADMINISTRADOR/ABASTECIMIENTO. Insumo inicia con
+stock 0 y no acepta modificarlo por CRUD. Compras generan ENTRADA y stock en una
+transacción; SALIDA no permite saldo negativo; AJUSTE fija nuevo conteo no negativo.
+Bloqueos por Insumo, orden de IDs en Compra y checks Oracle protegen el inventario.
+Stock/cantidades NUMBER(19,3), costo unitario (19,4), importes (19,2) HALF_UP.
+Sin DELETE de Insumo/Proveedor (se desactivan), ni PUT/DELETE de Compra.
+
+Suite actual: 180 pruebas correctas; cinco módulos verificados sin ciclos. Ver
+`VERIFICACION-FASE-14.md` para endpoints, archivos y verificación real de Oracle/HTTP.
+No hay relación con Producto, recetas ni consumo de inventario desde Pedidos.

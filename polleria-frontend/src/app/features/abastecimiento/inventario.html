@@ -1,0 +1,90 @@
+<app-abastecimiento-nav />
+<h1>Inventario y movimientos</h1>
+<p>
+  Las compras generan entradas. Registra salidas operativas o ajustes por conteo físico con motivo
+  obligatorio.
+</p>
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+}
+<p role="status">{{ aviso() }}</p>
+<section class="supply-card">
+  <h2>Registrar movimiento</h2>
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="supply-form">
+    <label
+      >Operación<select formControlName="operacion">
+        <option value="SALIDA">Registrar salida</option>
+        <option value="AJUSTE">Ajustar inventario</option>
+      </select></label
+    >
+    <label
+      >Insumo<select formControlName="insumoId">
+        <option [ngValue]="0">Selecciona insumo activo</option>
+        @for (i of insumos(); track i.id) {
+          @if (i.activo) {
+            <option [ngValue]="i.id">{{ i.nombre }} ({{ unidad(i.unidadMedida) }})</option>
+          }
+        }
+      </select></label
+    >
+    @if (stock(); as i) {
+      <p>Stock disponible: {{ i.stockActual | number: '1.3-3' }} {{ unidad(i.unidadMedida) }}</p>
+    }
+    <label
+      >{{
+        form.controls.operacion.value === 'SALIDA'
+          ? 'Cantidad a retirar'
+          : 'Nuevo stock físico contado'
+      }}<input formControlName="cantidad" inputmode="decimal" placeholder="0.000"
+    /></label>
+    @if (form.controls.operacion.value === 'AJUSTE') {
+      <p>Indica el conteo final, no la diferencia. No se admiten valores negativos.</p>
+    }
+    <label>Motivo<textarea formControlName="motivo" maxlength="500"></textarea></label>
+    @if (form.invalid && form.touched) {
+      <p role="alert">
+        Selecciona un insumo, una cantidad con hasta tres decimales y un motivo no vacío.
+      </p>
+    }
+    <button type="submit" [disabled]="ocupado()">
+      {{ form.controls.operacion.value === 'SALIDA' ? 'Registrar salida' : 'Registrar ajuste' }}
+    </button>
+  </form>
+</section>
+<h2>Historial de movimientos</h2>
+<form [formGroup]="filtros" (ngSubmit)="cargar()" class="supply-form">
+  <label
+    >Filtrar por insumo<select formControlName="insumoId">
+      <option [ngValue]="0">Todos</option>
+      @for (i of insumos(); track i.id) {
+        <option [ngValue]="i.id">{{ i.nombre }}</option>
+      }
+    </select></label
+  ><label
+    >Tipo de movimiento<select formControlName="tipo">
+      <option value="">Todos</option>
+      <option value="ENTRADA">Entrada</option>
+      <option value="SALIDA">Salida</option>
+      <option value="AJUSTE">Ajuste</option>
+    </select></label
+  ><button type="submit" [disabled]="ocupado()">Filtrar movimientos</button>
+</form>
+<div class="supply-grid">
+  @for (m of movimientos(); track m.id) {
+    <article class="supply-card">
+      <h3>{{ m.nombreInsumo }} · {{ m.tipo }}</h3>
+      <p>{{ m.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+      <p>Cantidad / diferencia: {{ m.cantidad | number: '1.3-3' }} {{ unidad(m.unidadMedida) }}</p>
+      <p>
+        Stock {{ m.stockAnterior | number: '1.3-3' }} →
+        <strong>{{ m.stockPosterior | number: '1.3-3' }}</strong>
+      </p>
+      <p>{{ m.motivo }}</p>
+      @if (m.compraId) {
+        <p>Compra #{{ m.compraId }}</p>
+      }
+    </article>
+  } @empty {
+    <p>No hay movimientos para este filtro.</p>
+  }
+</div>

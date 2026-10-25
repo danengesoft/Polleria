@@ -1,0 +1,65 @@
+{
+  "insumos": {
+    "aceite": 84,
+    "papas": 85
+  },
+  "proveedor": 44,
+  "compra": 7,
+  "total": 43.99,
+  "subtotales": [
+    30.86,
+    13.13
+  ],
+  "stockTrasSalida": 1.875,
+  "salidaInsuficiente": 409,
+  "movimientosTrasRechazo": 3,
+  "rollbackInsumoInexistente": 404,
+  "compraParcialAusente": true,
+  "roles": {
+    "ADMINISTRADOR": {
+      "insumos": 200,
+      "proveedores": 200,
+      "compras": 200,
+      "movimientos": 200
+    },
+    "ABASTECIMIENTO": {
+      "insumos": 200,
+      "proveedores": 200,
+      "compras": 200,
+      "movimientos": 200
+    },
+    "CAJERO": {
+      "insumos": 403,
+      "proveedores": 403,
+      "compras": 403,
+      "movimientos": 403
+    },
+    "REPARTIDOR": {
+      "insumos": 403,
+      "proveedores": 403,
+      "compras": 403,
+      "movimientos": 403
+    },
+    "CLIENTE": {
+      "insumos": 403,
+      "proveedores": 403,
+      "compras": 403,
+      "movimientos": 403
+    }
+  },
+  "sinToken": 401,
+  "ajuste": {
+    "cantidad": -0.625,
+    "stockAnterior": 1.875,
+    "stockPosterior": 1.25,
+    "motivo": "Conteo f\u00edsico de prueba F14"
+  },
+  "nombreRestaurado": true,
+  "historicoVerificadoEnSPA": true,
+  "regresion": {
+    "catalogo": 200,
+    "clientes": 200,
+    "pedidos": 200,
+    "delivery": 200
+  }
+}

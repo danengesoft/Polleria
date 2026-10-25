@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+h2,
+h3 {
+  font-size: 1.15rem;
+}
+p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.supply-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 36rem;
+}
+label {
+  display: grid;
+  gap: 0.4rem;
+}
+input,
+select,
+textarea,
+button {
+  box-sizing: border-box;
+  font: inherit;
+  max-width: 100%;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  padding: 0.65rem;
+  background: var(--surface);
+  color: var(--ink);
+}
+button {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.supply-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.supply-card {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  margin-block: 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.supply-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.check input {
+  width: auto;
+}
+.purchase-line {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+.total {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+[role='alert'] {
+  padding: 0.75rem;
+  border-left: 3px solid #a33929;
+  background: var(--surface-soft);
+}

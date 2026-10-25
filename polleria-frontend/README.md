@@ -1,4 +1,4 @@
-# POLLERIA — SPA, Fase 13
+# POLLERIA — SPA, Fase 14
 
 Angular standalone con Catálogo, Clientes y Pedidos internos. Autenticación real
 Keycloak Authorization Code + PKCE S256, sin librería adicional de autenticación.
@@ -37,9 +37,9 @@ Logout utiliza el endpoint de Keycloak y limpia solamente las claves propias.
 
 ADMINISTRADOR administra Catálogo, Clientes y Pedidos. CAJERO lee Catálogo,
 crea/consulta/actualiza Clientes y usa Pedidos; no elimina Clientes.
-REPARTIDOR accede a Mis entregas, inicio y diagnóstico. ABASTECIMIENTO continúa sin módulo propio.
+REPARTIDOR accede a Mis entregas, inicio y diagnóstico. ABASTECIMIENTO accede a Insumos, Proveedores, Compras e Inventario.
 CLIENTE inicia/cierra sesión en el área pública y no entra al portal interno.
-No hay UI de reportes ni módulo Abastecimiento. Delivery ya tiene asignación y reparto. El CLIENTE ahora tiene
+No hay UI de reportes ampliados. Delivery y Abastecimiento tienen sus pantallas operativas. El CLIENTE ahora tiene
 perfil comercial vinculado por JWT sub, checkout y pedidos propios.
 
 Las rutas comerciales conservan `/interno/categorias`, `/interno/productos`,
@@ -48,11 +48,11 @@ El detalle transaccional y sus precios históricos siguen gobernados por el back
 
 ## Verificación
 
-Ver [VERIFICACION-FASE-13.md](VERIFICACION-FASE-13.md): build correcto,
-73 pruebas correctas, reparto real, reasignación e aislamiento entre dos REPARTIDOR.
+Ver [VERIFICACION-FASE-14.md](VERIFICACION-FASE-14.md): build correcto,
+89 pruebas correctas, compra e inventario reales, y regresión de los módulos previos.
 Los documentos de fases anteriores conservan el historial de decisiones y pruebas.
 
-`npm-audit-fase-13.json` conserva 7 hallazgos: 5 altos y 2 críticos.
+`npm-audit-fase-14.json` conserva 7 hallazgos: 5 altos y 2 críticos.
 No se ejecutó audit fix, no se cambiaron versiones ni se agregaron dependencias.
 La aplicación usa configuración local HTTP; no constituye un despliegue productivo.
 Git lo administra el usuario; no se realizaron operaciones de escritura sobre Git.
@@ -97,3 +97,21 @@ digital explícitamente con diálogo; no hay pasarela ni cobro en línea.
 
 Mis pedidos del CLIENTE sigue consultando solo Pedidos y refleja DESPACHADO/ENTREGADO
 al actualizar. Sin mapas, GPS, geolocalización ni actualizaciones en tiempo real.
+
+## Abastecimiento
+
+Rutas `/interno/abastecimiento/insumos`, `/proveedores`, `/compras`, `/inventario`
+con ese prefijo común, solo ADMINISTRADOR/ABASTECIMIENTO mediante guards existentes.
+Insumo tiene stock inicial cero, no editable en su formulario; unidad controlada.
+Proveedor admite RUC opcional de 11 dígitos, sin consulta SUNAT ni validar formalidad.
+
+Compras usa Reactive Forms/FormArray, proveedores e insumos activos y sin duplicados.
+Cantidad hasta tres decimales; costo unitario hasta cuatro; punto decimal. El request
+solo envía IDs/cantidad/costo; los decimales se mantienen como texto para conservar
+la entrada exacta. Backend BigDecimal calcula total, stock y entradas. Después del
+éxito se muestran total real/entradas y se actualizan datos; ante error se conserva el formulario.
+
+Inventario consulta historial con filtros Insumo/Tipo. Salida exige cantidad positiva
+más motivo. Ajuste solicita nuevo conteo físico no negativo, y el backend registra
+la diferencia. No se envían stockAnterior/stockPosterior. No hay entrada manual,
+recetas, vínculo con Producto ni descuento automático por ventas.
