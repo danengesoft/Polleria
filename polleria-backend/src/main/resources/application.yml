@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: polleria-backend
+  jpa:
+    open-in-view: false
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
