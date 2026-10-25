@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../auth/auth-service';
 import { AppNavigation } from '../../../shared/navigation/app-navigation';
 
 @Component({
@@ -8,4 +9,4 @@ import { AppNavigation } from '../../../shared/navigation/app-navigation';
   templateUrl: './interno.html',
   styleUrl: './interno.css',
 })
-export class Interno {}
+export class Interno { readonly auth = inject(AuthService); }

@@ -1,3 +1,4 @@
+import { AuthService } from '../../../core/auth/auth-service';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -14,6 +15,7 @@ import { Cliente } from './cliente.model';
   templateUrl: './cliente-list.html',
 })
 export class ClienteList {
+  readonly auth = inject(AuthService);
   private readonly service = inject(ClienteService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);

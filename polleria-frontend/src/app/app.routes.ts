@@ -1,8 +1,21 @@
+import { authGuard, authChildGuard } from './core/guards/auth-guard';
+import { rolGuard } from './core/guards/rol-guard';
+import { INTERNOS, OPERATIVOS } from './core/auth/auth-service';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: 'auth/callback',
+    loadComponent: () => import('./core/auth/auth-callback').then((m) => m.AuthCallback),
+  },
+  {
+    path: 'sin-permiso',
+    loadComponent: () => import('./core/auth/sin-permiso').then((m) => m.SinPermiso),
+  },
+  {
     path: 'interno',
+    canActivate: [authGuard, rolGuard(...INTERNOS)],
+    canActivateChild: [authChildGuard, rolGuard(...INTERNOS)],
     loadComponent: () => import('./core/layout/interno/interno').then((m) => m.Interno),
     children: [
       {
@@ -13,61 +26,73 @@ export const routes: Routes = [
       },
       {
         path: 'categorias',
+        canActivate: [rolGuard(...OPERATIVOS)],
         loadComponent: () =>
           import('./features/catalogo/categoria/categoria-list').then((m) => m.CategoriaList),
       },
       {
         path: 'categorias/nuevo',
+        canActivate: [rolGuard('ADMINISTRADOR')],
         loadComponent: () =>
           import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
       },
       {
         path: 'categorias/:id/editar',
+        canActivate: [rolGuard('ADMINISTRADOR')],
         loadComponent: () =>
           import('./features/catalogo/categoria/categoria-form').then((m) => m.CategoriaForm),
       },
       {
         path: 'productos',
+        canActivate: [rolGuard(...OPERATIVOS)],
         loadComponent: () =>
           import('./features/catalogo/producto/producto-list').then((m) => m.ProductoList),
       },
       {
         path: 'productos/nuevo',
+        canActivate: [rolGuard('ADMINISTRADOR')],
         loadComponent: () =>
           import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
       },
       {
         path: 'productos/:id/editar',
+        canActivate: [rolGuard('ADMINISTRADOR')],
         loadComponent: () =>
           import('./features/catalogo/producto/producto-form').then((m) => m.ProductoForm),
       },
       {
         path: 'clientes',
+        canActivate: [rolGuard(...OPERATIVOS)],
         loadComponent: () =>
           import('./features/clientes/cliente/cliente-list').then((m) => m.ClienteList),
       },
       {
         path: 'clientes/nuevo',
+        canActivate: [rolGuard(...OPERATIVOS)],
         loadComponent: () =>
           import('./features/clientes/cliente/cliente-form').then((m) => m.ClienteForm),
       },
       {
         path: 'clientes/:id/editar',
+        canActivate: [rolGuard(...OPERATIVOS)],
         loadComponent: () =>
           import('./features/clientes/cliente/cliente-form').then((m) => m.ClienteForm),
       },
       {
         path: 'pedidos',
+        canActivate: [rolGuard(...OPERATIVOS)],
         title: 'Pedidos | Pollería',
         loadComponent: () => import('./features/pedidos/pedido-list').then((m) => m.PedidoList),
       },
       {
         path: 'pedidos/nuevo',
+        canActivate: [rolGuard(...OPERATIVOS)],
         title: 'Nuevo pedido | Pollería',
         loadComponent: () => import('./features/pedidos/pedido-form').then((m) => m.PedidoForm),
       },
       {
         path: 'pedidos/:id',
+        canActivate: [rolGuard(...OPERATIVOS)],
         title: 'Detalle del pedido | Pollería',
         loadComponent: () =>
           import('./features/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),

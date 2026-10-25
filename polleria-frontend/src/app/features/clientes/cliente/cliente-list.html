@@ -39,14 +39,14 @@
           <td data-label="Estado">{{ item.activo ? 'Activo' : 'Inactivo' }}</td>
           <td data-label="Acciones" class="row-actions">
             <a matButton [routerLink]="['/interno/clientes', item.id, 'editar']">Editar</a
-            ><button
+            >@if (auth.tieneRol('ADMINISTRADOR')) {<button
               matButton
               class="danger"
               [disabled]="eliminando() !== null"
               (click)="eliminar(item)"
             >
               Eliminar
-            </button>
+            </button>}
           </td>
         </tr>
       } @empty {

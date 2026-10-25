@@ -1,3 +1,5 @@
+import { AuthService } from '../../core/auth/auth-service';
+import { authFixture } from '../../testing/auth-fixture';
 import { Type } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { TestBed } from '@angular/core/testing';
@@ -64,7 +66,7 @@ describe('Pedidos transaccionales', () => {
   let http: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: AuthService, useFactory: () => authFixture() },provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
     });
     http = TestBed.inject(HttpTestingController);
   });

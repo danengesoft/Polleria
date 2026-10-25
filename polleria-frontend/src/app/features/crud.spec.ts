@@ -1,3 +1,5 @@
+import { AuthService } from '../core/auth/auth-service';
+import { authFixture } from '../testing/auth-fixture';
 import { By } from '@angular/platform-browser';
 import { Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -53,7 +55,7 @@ describe('CRUD conectados al contrato HTTP', () => {
   let http: HttpTestingController;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: AuthService, useFactory: () => authFixture() },provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
     });
     http = TestBed.inject(HttpTestingController);
   });

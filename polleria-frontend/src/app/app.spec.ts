@@ -1,3 +1,5 @@
+import { AuthService } from './core/auth/auth-service';
+import { authFixture } from './testing/auth-fixture';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -11,7 +13,7 @@ import { environment } from '../environments/environment';
 describe('Arquitectura SPA', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [App],
-    providers: [provideRouter(routes), provideHttpClient(withInterceptors([traceIdInterceptor])), provideHttpClientTesting()],
+    providers: [{ provide: AuthService, useFactory: () => authFixture() },provideRouter(routes), provideHttpClient(withInterceptors([traceIdInterceptor])), provideHttpClientTesting()],
   }));
 
   afterEach(() => TestBed.inject(HttpTestingController).verify());
@@ -37,7 +39,7 @@ describe('Arquitectura SPA', () => {
 
   it('consulta el backend usando la URL central y conserva el Trace ID', async () => {
     const harness = await RouterTestingHarness.create('/interno/conexion');
-    harness.routeNativeElement?.querySelector('button')?.click();
+    harness.routeNativeElement?.querySelector<HTMLButtonElement>('app-conexion button')?.click();
     const req = TestBed.inject(HttpTestingController).expectOne(`${environment.apiBaseUrl}/api/v1/categorias`);
     expect(req.request.method).toBe('GET');
     const traceId = req.request.headers.get('X-Trace-ID');
@@ -50,7 +52,7 @@ describe('Arquitectura SPA', () => {
 
   it('muestra un fallo de conexión sin romper el layout', async () => {
     const harness = await RouterTestingHarness.create('/interno/conexion');
-    harness.routeNativeElement?.querySelector('button')?.click();
+    harness.routeNativeElement?.querySelector<HTMLButtonElement>('app-conexion button')?.click();
     TestBed.inject(HttpTestingController).expectOne(`${environment.apiBaseUrl}/api/v1/categorias`)
       .flush({}, { status: 503, statusText: 'Service Unavailable' });
     await harness.fixture.whenStable();

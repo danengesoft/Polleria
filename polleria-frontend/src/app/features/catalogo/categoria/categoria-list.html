@@ -1,6 +1,6 @@
 <div class="page-heading">
   <h1>Categorías</h1>
-  <a matButton="filled" routerLink="/interno/categorias/nuevo">Nueva categoría</a>
+  @if (auth.tieneRol('ADMINISTRADOR')) {<a matButton="filled" routerLink="/interno/categorias/nuevo">Nueva categoría</a>}
 </div>
 
 @if (aviso()) {
@@ -36,7 +36,7 @@
           <td data-label="Descripción">{{ item.descripcion || '—' }}</td>
           <td data-label="Estado">{{ item.activo ? 'Activa' : 'Inactiva' }}</td>
           <td data-label="Acciones" class="row-actions">
-            <a matButton [routerLink]="['/interno/categorias', item.id, 'editar']">Editar</a
+            @if (auth.tieneRol('ADMINISTRADOR')) {            <a matButton [routerLink]="['/interno/categorias', item.id, 'editar']">Editar</a
             ><button
               matButton
               class="danger"
@@ -45,7 +45,7 @@
             >
               Eliminar
             </button>
-          </td>
+          }</td>
         </tr>
       } @empty {
         @if (!loading() && !error()) {

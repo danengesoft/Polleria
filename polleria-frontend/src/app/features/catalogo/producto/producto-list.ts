@@ -1,3 +1,4 @@
+import { AuthService } from '../../../core/auth/auth-service';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -20,6 +21,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './producto-list.html',
 })
 export class ProductoList {
+  readonly auth = inject(AuthService);
   private readonly service = inject(ProductoService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);

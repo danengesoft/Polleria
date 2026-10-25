@@ -1,6 +1,6 @@
 <div class="page-heading">
   <h1>Productos</h1>
-  <a matButton="filled" routerLink="/interno/productos/nuevo">Nuevo producto</a>
+  @if (auth.tieneRol('ADMINISTRADOR')) {<a matButton="filled" routerLink="/interno/productos/nuevo">Nuevo producto</a>}
 </div>
 <mat-form-field appearance="outline" class="filter"
   ><mat-label>Filtrar por categoría</mat-label>
@@ -56,7 +56,7 @@
             {{ item.disponible ? 'Disponible' : 'No disponible' }}
           </td>
           <td data-label="Acciones" class="row-actions">
-            <a matButton [routerLink]="['/interno/productos', item.id, 'editar']">Editar</a
+            @if (auth.tieneRol('ADMINISTRADOR')) {            <a matButton [routerLink]="['/interno/productos', item.id, 'editar']">Editar</a
             ><button
               matButton
               class="danger"
@@ -65,7 +65,7 @@
             >
               Eliminar
             </button>
-          </td>
+          }</td>
         </tr>
       } @empty {
         @if (!loading() && !error()) {

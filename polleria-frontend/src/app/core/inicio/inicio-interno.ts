@@ -9,9 +9,9 @@ import { RouterLink } from '@angular/router';
       <p class="eyebrow">Inicio</p>
       <h1>Portal interno</h1>
       <p class="lead">El punto de partida para la gestión de la pollería.</p>
-      <p>Las funciones de negocio se incorporarán en las siguientes etapas.</p>
+      <p>El menú muestra las funciones disponibles para tu rol.</p>
       <a class="action" routerLink="/interno/conexion">Comprobar conexión</a>
-      <p class="development-note">Entorno de desarrollo. Este portal aún no tiene autenticación.</p>
+      <p class="development-note">Sesión autenticada. Las operaciones se autorizan también en el servidor.</p>
     </section>
   `,
 })
