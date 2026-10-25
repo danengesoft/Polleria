@@ -1,0 +1,53 @@
+{
+  "realm": "polleria",
+  "enabled": true,
+  "displayName": "POLLERIA",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "es"
+  ],
+  "defaultLocale": "es",
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMINISTRADOR"
+      },
+      {
+        "name": "CAJERO"
+      },
+      {
+        "name": "REPARTIDOR"
+      },
+      {
+        "name": "ABASTECIMIENTO"
+      },
+      {
+        "name": "CLIENTE"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "polleria-frontend",
+      "name": "POLLERIA SPA",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:4200/*"
+      }
+    }
+  ]
+}

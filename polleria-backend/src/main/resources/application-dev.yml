@@ -2,6 +2,11 @@ server:
   address: 127.0.0.1
   port: 8080
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:38080/realms/polleria}
   datasource:
     url: jdbc:oracle:thin:@localhost:1522/FREEPDB1
     username: POLLERIA
@@ -13,7 +18,7 @@ spring:
 management:
   endpoint:
     health:
-      show-details: always
+      show-details: never
 polleria:
   cors:
     allowed-origins: http://localhost:4200

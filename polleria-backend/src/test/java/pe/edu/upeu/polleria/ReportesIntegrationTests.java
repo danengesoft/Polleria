@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@org.springframework.security.test.context.support.WithMockUser(username = "regression", roles = "ADMINISTRADOR")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")

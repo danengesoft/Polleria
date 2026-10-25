@@ -1,4 +1,4 @@
-# POLLERIA — backend, Fase 6 (Consultas y reportes iniciales)
+# POLLERIA — backend, Fase 10 (Seguridad con Keycloak)
 
 Monolito modular LP2. Java 21, Spring Boot 4.0.7, Modulith 2.0.7,
 MapStruct 1.6.3, Springdoc 3.0.2 y Maven Wrapper 3.9.16.
@@ -46,7 +46,8 @@ set +a
 ```
 
 Esperar el mensaje `Started PolleriaBackendApplication` antes de consultar la API.
-Las pruebas necesitan Oracle y el esquema aplicado; los datos de las pruebas MockMvc
+Las pruebas necesitan Oracle y el esquema aplicado; las verificaciones JWT reales también Keycloak.
+La suite usa autenticación simulada para la regresión y mantiene filtros de seguridad activos; los datos de las pruebas MockMvc
 se revierten al finalizar cada caso. No utilizan H2 ni sustituyen Oracle.
 Cambiar `.env` no modifica contraseñas de un volumen ya inicializado.
 
@@ -55,10 +56,11 @@ Cambiar `.env` no modifica contraseñas de un volumen ya inicializado.
 - Oracle: `localhost:1522/FREEPDB1`, usuario de aplicación `POLLERIA`.
 - Contenedor: `polleria-oracle`; volumen: `polleria-oracle-data`.
 - API: `http://127.0.0.1:8080`.
-- Salud: `/actuator/health`, incluye JDBC.
+- Salud: `/actuator/health`, pública y sin detalles internos; comprueba también JDBC.
 - OpenAPI: `/v3/api-docs`; Swagger: `/swagger-ui.html`.
 - `ddl-auto: validate` y `open-in-view: false`.
-- Endpoints sin autenticación únicamente durante desarrollo; Keycloak es una fase posterior.
+- Resource Server stateless con issuer `http://localhost:38080/realms/polleria`.
+- Solo lecturas de Catálogo, health y Swagger/OpenAPI son públicos en desarrollo.
 
 ## Catálogo (S02/S03)
 
@@ -107,7 +109,8 @@ Modulith verifica Catálogo, Clientes y Pedidos. Los paquetes públicos de consu
 producto/api y cliente/api son las únicas interfaces nombradas expuestas a Pedidos.
 Las excepciones compartidas usan el paquete técnico abierto, según el patrón académico.
 
-Security, Angular, Delivery y Abastecimiento quedan fuera de esta fase.
+Keycloak protege el backend; Angular permanece sin autenticación hasta Fase 11.
+Delivery y Abastecimiento siguen fuera del alcance actual.
 Git fue inicializado manualmente por el usuario; Codex no administra commits ni remotos.
 El informe de Fase 2 conserva los nombres históricos originales.
 
@@ -173,7 +176,9 @@ DETALLE_PEDIDOS.PEDIDO_ID → PEDIDOS.ID, DETALLE_PEDIDOS.PRODUCTO_ID → PRODUC
 - POST `/api/v1/pedidos`: 201 con Location, agregado transaccional.
 - GET `/api/v1/pedidos` y GET `/api/v1/pedidos/{id}`: 200.
 - PATCH `/api/v1/pedidos/{id}/estado` con `{"estado":"CONFIRMADO"}`: 200.
-- No hay PUT genérico ni DELETE de Pedido (405); tampoco endpoint de pago.
+- No hay PUT genérico ni DELETE de Pedido; Security los deniega con 403 para un
+  usuario autenticado (antes llegaban a MVC y respondían 405). Sin token, 401.
+  Tampoco hay endpoint de pago.
 
 Tipo: PRESENCIAL, RECOJO, DELIVERY. Estado inicial PENDIENTE; pago inicial PENDIENTE.
 Métodos EFECTIVO, YAPE, PLIN, TARJETA; estados de pago PENDIENTE, PAGADO, ANULADO.
@@ -205,7 +210,7 @@ Transiciones de esta fase:
 - PENDIENTE/CONFIRMADO → CANCELADO solo si estadoPago no es PAGADO.
 - CANCELADO y ENTREGADO son finales; no se permiten saltos, repetición ni retrocesos.
 - Cancelaciones EN_PREPARACION/LISTO quedan bloqueadas hasta la operación administrativa
-  con motivo y Seguridad. No se simulan roles ni se incorpora un campo futuro sin uso.
+  con motivo. Introducir seguridad no cambia esta regla ni incorpora campos futuros.
 - DESPACHADO y su transición a ENTREGADO se integrarán mediante Delivery; no están
   habilitados por este endpoint. No se cancelan pedidos despachados.
 
@@ -268,9 +273,84 @@ no nombre actual ni necesariamente el último. No divide el producto en varias f
 Ranking completo: cantidad DESC, importe DESC, productoId ASC, sin límite inventado.
 Nunca consulta Producto actual para reconstruir nombre o importe de una venta anterior.
 
-CORS de desarrollo sigue WebMvcConfigurer de S05, configurable con
-`polleria.cors.allowed-origins=http://localhost:4200` en perfil dev. Solo /api/**;
-métodos GET/POST/PUT/PATCH/DELETE; headers Content-Type y X-Trace-ID. Expone
-X-Trace-ID/Location. Sin credenciales ni origen comodín ni dominios de producción.
-Preflight permitido/prohibido comprobado por MockMvc y HTTP. Cuando llegue Spring
-Security, revisar la integración CORS según S11; no se incorpora seguridad ahora.
+CORS de desarrollo usa un único CorsConfigurationSource, integrado en Spring Security,
+configurable con `polleria.cors.allowed-origins=http://localhost:4200` en perfil dev.
+Solo /api/**; métodos GET/POST/PUT/PATCH/DELETE/OPTIONS; headers Content-Type,
+X-Trace-ID y Authorization. Expone X-Trace-ID/Location. Sin credenciales ni origen
+comodín ni dominios de producción. Preflight y respuestas 401 conservan CORS/Trace ID.
+
+## Seguridad backend — S10b, Fase 10
+
+Infraestructura independiente de Oracle en `compose-keycloak.yml`:
+
+- `polleria-keycloak-db`: PostgreSQL 17-alpine (17.11 verificado), 127.0.0.1:35432.
+- `polleria-keycloak`: Keycloak 26.8.0, 127.0.0.1:38080, modo start-dev.
+- Volumen exclusivo `polleria-keycloak-postgres-data`.
+- Realm `polleria` importado de `keycloak/polleria-realm.json`, sin contraseñas.
+- Cliente público `polleria-frontend`, Standard Flow activado, sin client secret.
+- Redirect/post logout `http://localhost:4200/*`; web origin exacto `http://localhost:4200`.
+- Direct Access Grants activado solo para el laboratorio S10b. Fase 11 lo retirará
+  y exigirá PKCE S256 según S11. No se implementa autenticación Angular en esta fase.
+
+Completar las variables KEYCLOAK_* de `.env.example` en el `.env` local antes de iniciar.
+Usar secretos locales propios, nunca los placeholders. El administrador bootstrap solo
+se crea al inicializar una base vacía; cambiar .env no rota un usuario ya existente.
+
+```bash
+docker compose -f compose-keycloak.yml config --quiet
+docker compose -f compose-keycloak.yml up -d --wait
+python scripts/keycloak-dev-users.py
+```
+
+El último comando crea/completa cinco usuarios de desarrollo y fija sus contraseñas
+leyéndolas de .env: administrador, cajero, repartidor, abastecimiento y cliente.
+Es una acción de aprovisionamiento local explícita; repetirla restablece esas cinco
+contraseñas a sus valores locales. No genera archivos de tokens ni imprime secretos.
+La importación inicial no sobrescribe un realm ya existente al reiniciar.
+
+Permisos centralizados en SecurityConfig:
+
+| Operación | Acceso |
+| --- | --- |
+| GET Categorías/Productos, colección e ID | Público |
+| Crear/editar/eliminar Categoría/Producto | ADMINISTRADOR |
+| Crear/consultar/editar Cliente | ADMINISTRADOR, CAJERO |
+| Eliminar Cliente | ADMINISTRADOR |
+| Consultar/crear Pedido, PATCH estado | ADMINISTRADOR, CAJERO |
+| Reportes Pedidos | ADMINISTRADOR |
+| Health sin detalles; Swagger/OpenAPI | Público en desarrollo |
+| Otros Actuator expuestos | ADMINISTRADOR |
+| Cualquier otra operación | Denegada |
+
+Roles funcionales exactos: ADMINISTRADOR, CAJERO, REPARTIDOR, ABASTECIMIENTO, CLIENTE.
+Keycloak incluye roles técnicos propios; el converter los ignora y solo convierte los
+cinco autorizados a ROLE_*. Spring Security puede añadir autoridades técnicas propias,
+como FACTOR_BEARER; no representan roles de negocio ni amplían la matriz.
+Principal = sub validado, String. No se confía en userId/username/rol del request.
+
+No existe vínculo sub ↔ Cliente comercial aún. CLIENTE no consulta Clientes ni Pedidos
+globales o IDs arbitrarios. No hay endpoint mi perfil/mis pedidos anticipado.
+REPARTIDOR y ABASTECIMIENTO no tienen permisos administrativos ajenos.
+Rol correcto no prueba propiedad: la futura autorización de recursos propios o
+entregas asignadas necesitará además validar esa relación en el backend.
+
+Spring no emite tokens, no almacena contraseñas en Oracle, no usa sesiones, Basic,
+form-login ni un AuthController. Los errores de filtros usan SecurityErrorHandler
+(AuthenticationEntryPoint/AccessDeniedHandler), con el contrato HTTP existente y sin
+crear otro GlobalExceptionHandler. 401 = falta/token inválido; 403 = permiso insuficiente.
+CorrelationIdFilter se ejecuta antes de Security para conservar X-Trace-ID y MDC.
+
+Prueba HTTP real reproducible (requiere un Cliente y Producto disponibles existentes):
+
+```bash
+python scripts/verify-keycloak-http.py --cliente-id 172 --producto-id 10
+```
+
+El script obtiene tokens solo en memoria, comprueba la matriz de cinco roles, firma
+alterada, CORS/Trace ID, health y OpenAPI. Crea/elimina una categoría temporal y crea
+un pedido que cancela, conservando historial. No usarlo como consulta sin efectos.
+La evidencia de esta ejecución, sin secretos, está en `keycloak/verification-http.json`.
+
+Ver `VERIFICACION-FASE-10.md`: compilación correcta y 93 pruebas backend exitosas
+(75 anteriores adaptadas + 18 nuevas). Frontend sin cambios; sus operaciones internas
+recibirán temporalmente 401 hasta Fase 11. No se debilita la API para evitarlos.

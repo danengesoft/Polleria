@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@org.springframework.security.test.context.support.WithMockUser(username = "regression", roles = "ADMINISTRADOR")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
@@ -248,9 +249,9 @@ class PedidosIntegrationTests {
     @Test
     void noExisteDeleteNiPutGenerico() throws Exception {
         Long id = crear().getId();
-        mvc.perform(delete("/api/v1/pedidos/{id}", id)).andExpect(status().isMethodNotAllowed());
+        mvc.perform(delete("/api/v1/pedidos/{id}", id)).andExpect(status().isForbidden());
         mvc.perform(put("/api/v1/pedidos/{id}", id).contentType(MediaType.APPLICATION_JSON).content("{}"))
-                .andExpect(status().isMethodNotAllowed());
+                .andExpect(status().isForbidden());
     }
 
     @Test
