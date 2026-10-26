@@ -15,7 +15,8 @@ import pe.edu.upeu.polleria.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.clientes.cliente.api.ClienteConsultaService {
+public class ClienteServiceImpl
+        implements ClienteService, pe.edu.upeu.polleria.clientes.cliente.api.ClienteConsultaService {
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
 
@@ -80,16 +81,21 @@ public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.
     @Transactional(readOnly = true)
     public pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen consultarPorSub(String sub) {
         Cliente c = buscarPorSub(sub);
-        if (!Boolean.TRUE.equals(c.getActivo())) throw new BusinessConflictException("Perfil comercial desactivado");
-        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(c.getId(), c.getNombres(), c.getApellidos());
+        if (!Boolean.TRUE.equals(c.getActivo()))
+            throw new BusinessConflictException("Perfil comercial desactivado");
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(c.getId(), c.getNombres(),
+                c.getApellidos());
     }
 
     @Transactional(readOnly = true)
-    public ClienteResponse miPerfil(String sub) { return clienteMapper.toResponse(buscarPorSub(sub)); }
+    public ClienteResponse miPerfil(String sub) {
+        return clienteMapper.toResponse(buscarPorSub(sub));
+    }
 
     @Transactional
     public ClienteResponse crearPerfil(String sub, pe.edu.upeu.polleria.clientes.cliente.dto.PerfilRequest request) {
-        if (clienteRepository.findByKeycloakSub(sub).isPresent()) throw new BusinessConflictException("Ya existe un perfil comercial");
+        if (clienteRepository.findByKeycloakSub(sub).isPresent())
+            throw new BusinessConflictException("Ya existe un perfil comercial");
         ClienteResponse creado = crear(request.toInterno());
         Cliente c = buscarOFallar(creado.getId());
         c.setKeycloakSub(sub);
@@ -97,7 +103,8 @@ public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.
     }
 
     @Transactional
-    public ClienteResponse actualizarPerfil(String sub, pe.edu.upeu.polleria.clientes.cliente.dto.PerfilRequest request) {
+    public ClienteResponse actualizarPerfil(String sub,
+            pe.edu.upeu.polleria.clientes.cliente.dto.PerfilRequest request) {
         Cliente c = buscarPorSub(sub);
         ClienteRequest interno = request.toInterno();
         interno.setActivo(c.getActivo());
@@ -105,15 +112,18 @@ public class ClienteServiceImpl implements ClienteService, pe.edu.upeu.polleria.
     }
 
     private Cliente buscarPorSub(String sub) {
-        if (sub == null || sub.isBlank() || sub.length() > 255) throw new InvalidRequestException("Identidad inválida");
-        return clienteRepository.findByKeycloakSub(sub).orElseThrow(() -> new ResourceNotFoundException("Completa tu perfil comercial"));
+        if (sub == null || sub.isBlank() || sub.length() > 255)
+            throw new InvalidRequestException("Identidad inválida");
+        return clienteRepository.findByKeycloakSub(sub)
+                .orElseThrow(() -> new ResourceNotFoundException("Completa tu perfil comercial"));
     }
 
     @Override
     @Transactional(readOnly = true)
     public pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto consultarContacto(Long id) {
         Cliente c = buscarOFallar(id);
-        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto(c.getNombres()+" "+c.getApellidos(), c.getTelefono());
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto(c.getNombres() + " " + c.getApellidos(),
+                c.getTelefono());
     }
 
     private Cliente buscarOFallar(Long id) {

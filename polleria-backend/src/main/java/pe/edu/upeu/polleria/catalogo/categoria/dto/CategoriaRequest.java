@@ -7,7 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoriaRequest {
-    @NotBlank @Size(max = 80)
+    @NotBlank
+    @Size(max = 80)
     private String nombre;
     @Size(max = 500)
     private String descripcion;

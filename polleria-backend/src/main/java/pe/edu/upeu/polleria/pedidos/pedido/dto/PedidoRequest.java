@@ -8,9 +8,11 @@ import lombok.Setter;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.TipoPedido;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.MetodoPago;
 
-@Getter @Setter
+@Getter
+@Setter
 public class PedidoRequest {
-    @NotNull @Positive
+    @NotNull
+    @Positive
     private Long clienteId;
     @NotNull
     private TipoPedido tipoPedido;
@@ -20,6 +22,7 @@ public class PedidoRequest {
     private String direccionEntrega;
     @Size(max = 300)
     private String referenciaEntrega;
-    @NotEmpty @Valid
+    @NotEmpty
+    @Valid
     private List<@NotNull DetallePedidoRequest> detalles;
 }

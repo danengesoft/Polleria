@@ -19,6 +19,7 @@ public class OpenApiConfig {
                         .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
+
     @Bean
     OpenApiCustomizer publicCatalogReads() {
         return api -> api.getPaths().forEach((path, item) -> {

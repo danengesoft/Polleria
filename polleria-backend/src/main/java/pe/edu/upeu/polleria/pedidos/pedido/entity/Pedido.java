@@ -11,22 +11,29 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "PEDIDOS", schema = "POLLERIA")
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class Pedido {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
     @Column(name = "CLIENTE_ID", nullable = false)
     private Long clienteId;
     @Column(name = "FECHA", nullable = false)
     private LocalDateTime fecha;
-    @Enumerated(EnumType.STRING) @Column(name = "TIPO_PEDIDO", nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TIPO_PEDIDO", nullable = false, length = 15)
     private TipoPedido tipoPedido;
-    @Enumerated(EnumType.STRING) @Column(name = "ESTADO", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ESTADO", nullable = false, length = 20)
     private EstadoPedido estado;
-    @Enumerated(EnumType.STRING) @Column(name = "METODO_PAGO", nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "METODO_PAGO", nullable = false, length = 15)
     private MetodoPago metodoPago;
-    @Enumerated(EnumType.STRING) @Column(name = "ESTADO_PAGO", nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ESTADO_PAGO", nullable = false, length = 15)
     private EstadoPago estadoPago;
     @Column(name = "DIRECCION_ENTREGA", length = 300)
     private String direccionEntrega;

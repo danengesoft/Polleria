@@ -9,7 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.EstadoPedido;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.TipoPedido;
 
-@Getter @Setter
+@Getter
+@Setter
 public class PedidoFiltro {
     private EstadoPedido estado;
     private TipoPedido tipoPedido;

@@ -8,8 +8,11 @@ import pe.edu.upeu.polleria.catalogo.categoria.entity.Categoria;
 public interface CategoriaMapper {
     @Mapping(target = "id", ignore = true)
     Categoria toEntity(CategoriaRequest request);
+
     CategoriaResponse toResponse(Categoria categoria);
+
     CategoriaResumen toResumen(Categoria categoria);
+
     @Mapping(target = "id", ignore = true)
     void actualizar(CategoriaRequest request, @MappingTarget Categoria categoria);
 }

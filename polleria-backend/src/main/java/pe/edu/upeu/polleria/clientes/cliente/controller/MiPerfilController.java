@@ -1,4 +1,5 @@
 package pe.edu.upeu.polleria.clientes.cliente.controller;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -8,15 +9,28 @@ import org.springframework.http.ResponseEntity;
 import java.net.URI;
 import pe.edu.upeu.polleria.clientes.cliente.dto.*;
 import pe.edu.upeu.polleria.clientes.cliente.service.ClienteService;
-@io.swagger.v3.oas.annotations.tags.Tag(name="Mi perfil")
-@RestController @RequestMapping("/api/v1/clientes/me") @RequiredArgsConstructor
+
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Mi perfil")
+@RestController
+@RequestMapping("/api/v1/clientes/me")
+@RequiredArgsConstructor
 public class MiPerfilController {
     private final ClienteService service;
-    @GetMapping public ClienteResponse obtener(@AuthenticationPrincipal Jwt jwt) { return service.miPerfil(jwt.getSubject()); }
-    @PostMapping public ResponseEntity<ClienteResponse> crear(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody PerfilRequest request) {
-        return ResponseEntity.created(URI.create("/api/v1/clientes/me")).body(service.crearPerfil(jwt.getSubject(), request));
+
+    @GetMapping
+    public ClienteResponse obtener(@AuthenticationPrincipal Jwt jwt) {
+        return service.miPerfil(jwt.getSubject());
     }
-    @PutMapping public ClienteResponse actualizar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody PerfilRequest request) {
+
+    @PostMapping
+    public ResponseEntity<ClienteResponse> crear(@AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody PerfilRequest request) {
+        return ResponseEntity.created(URI.create("/api/v1/clientes/me"))
+                .body(service.crearPerfil(jwt.getSubject(), request));
+    }
+
+    @PutMapping
+    public ClienteResponse actualizar(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody PerfilRequest request) {
         return service.actualizarPerfil(jwt.getSubject(), request);
     }
 }

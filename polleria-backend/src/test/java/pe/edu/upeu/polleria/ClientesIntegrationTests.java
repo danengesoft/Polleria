@@ -24,11 +24,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("dev")
 @Transactional
 class ClientesIntegrationTests {
-    @Autowired private MockMvc mvc;
-    @Autowired private ClienteService clientes;
-    @Autowired private JdbcTemplate jdbc;
+    @Autowired
+    private MockMvc mvc;
+    @Autowired
+    private ClienteService clientes;
+    @Autowired
+    private JdbcTemplate jdbc;
 
-    private String correoUnico() { return "cliente-" + UUID.randomUUID() + "@example.com"; }
+    private String correoUnico() {
+        return "cliente-" + UUID.randomUUID() + "@example.com";
+    }
 
     private String json(String correo) {
         String campoCorreo = correo == null ? "null" : "\"" + correo + "\"";
@@ -40,8 +45,10 @@ class ClientesIntegrationTests {
 
     private Long crear(String correo) {
         ClienteRequest request = new ClienteRequest();
-        request.setNombres("Ana");request.setApellidos("Pérez");
-        request.setTelefono("+51912345678");request.setCorreo(correo);
+        request.setNombres("Ana");
+        request.setApellidos("Pérez");
+        request.setTelefono("+51912345678");
+        request.setCorreo(correo);
         return clientes.crear(request).getId();
     }
 
@@ -49,7 +56,7 @@ class ClientesIntegrationTests {
     void creaNormalizaYAplicaActivoInicial() throws Exception {
         String correo = correoUnico();
         mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                        .content(json("  " + correo.toUpperCase() + "  ")))
+                .content(json("  " + correo.toUpperCase() + "  ")))
                 .andExpect(status().isCreated()).andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.nombres").value("Ana María"))
                 .andExpect(jsonPath("$.apellidos").value("Pérez López"))
@@ -67,10 +74,12 @@ class ClientesIntegrationTests {
 
     @Test
     void actualizaConservandoSuCorreoYPermiteDesactivar() throws Exception {
-        String correo = correoUnico();Long id = crear(correo);
+        String correo = correoUnico();
+        Long id = crear(correo);
         mvc.perform(put("/api/v1/clientes/{id}", id).contentType(MediaType.APPLICATION_JSON)
-                        .content(json(correo.toUpperCase())
-                                .replace("\"correo\":", "\"activo\":false,\"direccionPrincipal\":\" Calle Uno 123 \",\"correo\":")))
+                .content(json(correo.toUpperCase())
+                        .replace("\"correo\":",
+                                "\"activo\":false,\"direccionPrincipal\":\" Calle Uno 123 \",\"correo\":")))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.activo").value(false))
                 .andExpect(jsonPath("$.direccionPrincipal").value("Calle Uno 123"));
         assertThat(clientes.obtener(id).getActivo()).isFalse();
@@ -86,7 +95,7 @@ class ClientesIntegrationTests {
     @Test
     void rechazaNombresVaciosConTrazabilidad() throws Exception {
         mvc.perform(post("/api/v1/clientes").header("X-Trace-ID", "clientes-test")
-                        .contentType(MediaType.APPLICATION_JSON).content(json(null).replace("  Ana   María  ", "  ")))
+                .contentType(MediaType.APPLICATION_JSON).content(json(null).replace("  Ana   María  ", "  ")))
                 .andExpect(status().isBadRequest()).andExpect(header().string("X-Trace-ID", "clientes-test"))
                 .andExpect(jsonPath("$.traceId").value("clientes-test"));
     }
@@ -94,24 +103,24 @@ class ClientesIntegrationTests {
     @Test
     void rechazaApellidosVacios() throws Exception {
         mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                        .content(json(null).replace("  Pérez   López  ", "")))
+                .content(json(null).replace("  Pérez   López  ", "")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void rechazaTelefonosInvalidos() throws Exception {
-        for (String telefono : new String[]{"123", "telefono", "+52912345678", "912 345 678", "1234567890"}) {
+        for (String telefono : new String[] { "123", "telefono", "+52912345678", "912 345 678", "1234567890" }) {
             mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                            .content(json(null).replace("+51912345678", telefono)))
+                    .content(json(null).replace("+51912345678", telefono)))
                     .andExpect(status().isBadRequest());
         }
     }
 
     @Test
     void aceptaTelefonoCompartidoYConservaCerosYPrefijo() throws Exception {
-        for (String telefono : new String[]{"01234567", "01234567", "+5101234567"}) {
+        for (String telefono : new String[] { "01234567", "01234567", "+5101234567" }) {
             mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                            .content(json(null).replace("+51912345678", telefono)))
+                    .content(json(null).replace("+51912345678", telefono)))
                     .andExpect(status().isCreated()).andExpect(jsonPath("$.telefono").value(telefono));
         }
     }
@@ -124,10 +133,12 @@ class ClientesIntegrationTests {
 
     @Test
     void rechazaDuplicadoNormalizadoAlCrearYActualizar() throws Exception {
-        String correo = correoUnico();crear(correo);
+        String correo = correoUnico();
+        crear(correo);
         mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                        .content(json("  " + correo.toUpperCase() + "  ")))
-                .andExpect(status().isConflict()).andExpect(jsonPath("$.message").value("Ya existe un cliente con ese correo"));
+                .content(json("  " + correo.toUpperCase() + "  ")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Ya existe un cliente con ese correo"));
         Long otroId = crear(null);
         mvc.perform(put("/api/v1/clientes/{id}", otroId).contentType(MediaType.APPLICATION_JSON).content(json(correo)))
                 .andExpect(status().isConflict());
@@ -138,13 +149,14 @@ class ClientesIntegrationTests {
     void clienteInexistenteEs404EnConsultaActualizacionYBorrado() throws Exception {
         String ruta = "/api/v1/clientes/9223372036854775807";
         mvc.perform(get(ruta)).andExpect(status().isNotFound());
-        mvc.perform(put(ruta).contentType(MediaType.APPLICATION_JSON).content(json(null))).andExpect(status().isNotFound());
+        mvc.perform(put(ruta).contentType(MediaType.APPLICATION_JSON).content(json(null)))
+                .andExpect(status().isNotFound());
         mvc.perform(delete(ruta)).andExpect(status().isNotFound());
     }
 
     @Test
     void permiteVariosClientesSinCorreoNiDireccion() throws Exception {
-        for (String correo : new String[]{null, "", "   "}) {
+        for (String correo : new String[] { null, "", "   " }) {
             mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON).content(json(correo)))
                     .andExpect(status().isCreated()).andExpect(jsonPath("$.correo").isEmpty())
                     .andExpect(jsonPath("$.direccionPrincipal").isEmpty());
@@ -154,16 +166,17 @@ class ClientesIntegrationTests {
     @Test
     void rechazaLongitudesExcesivasYActivoNulo() throws Exception {
         mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                        .content(json(null).replace("  Ana   María  ", "A".repeat(101))))
+                .content(json(null).replace("  Ana   María  ", "A".repeat(101))))
                 .andExpect(status().isBadRequest());
         mvc.perform(post("/api/v1/clientes").contentType(MediaType.APPLICATION_JSON)
-                        .content(json(null).replace("\"correo\":", "\"activo\":null,\"correo\":")))
+                .content(json(null).replace("\"correo\":", "\"activo\":null,\"correo\":")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void indiceOracleImpideDuplicadosInclusoFueraDelServicio() {
-        String correo = correoUnico();crear(correo);
+        String correo = correoUnico();
+        crear(correo);
         assertThatThrownBy(() -> jdbc.update("""
                 INSERT INTO POLLERIA.CLIENTES (NOMBRES, APELLIDOS, TELEFONO, CORREO)
                 VALUES ('Prueba', 'Índice', '912345678', ?)

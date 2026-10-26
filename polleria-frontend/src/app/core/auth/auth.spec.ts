@@ -247,7 +247,7 @@ describe('guards e interceptor OAuth', () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     TestBed.inject(HttpClient)
       .get(environment.apiBaseUrl + '/api/v1/clientes')
-      .subscribe({ error: () => {} });
+      .subscribe({ error: () => { } });
     http
       .expectOne(environment.apiBaseUrl + '/api/v1/clientes')
       .flush({}, { status: 403, statusText: 'Forbidden' });
@@ -264,7 +264,7 @@ describe('guards e interceptor OAuth', () => {
     const url = environment.apiBaseUrl + '/api/v1/clientes';
     TestBed.inject(HttpClient)
       .get(url)
-      .subscribe({ error: () => {} });
+      .subscribe({ error: () => { } });
     http.expectOne(url).flush({}, { status: 401, statusText: 'Unauthorized' });
     await Promise.resolve();
     await Promise.resolve();

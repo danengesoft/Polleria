@@ -7,6 +7,7 @@ import pe.edu.upeu.polleria.clientes.cliente.entity.Cliente;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     java.util.Optional<Cliente> findByKeycloakSub(String sub);
+
     @Query("SELECT COUNT(c) FROM Cliente c WHERE LOWER(TRIM(c.correo)) = :correo")
     long contarPorCorreo(@Param("correo") String correo);
 

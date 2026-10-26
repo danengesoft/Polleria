@@ -72,11 +72,14 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
         return productosMasVendidos(filtro, 20);
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<ProductoVendidoReporte> productosMasVendidos(PedidoFiltro filtro, int top) {
-        validarFiltro(filtro); validarTop(top);
+        validarFiltro(filtro);
+        validarTop(top);
         return pedidoRepository.productosVendidos(filtro.getEstado(), filtro.getTipoPedido(),
-            filtro.getClienteId(), desde(filtro), hasta(filtro), org.springframework.data.domain.PageRequest.of(0, top));
+                filtro.getClienteId(), desde(filtro), hasta(filtro),
+                org.springframework.data.domain.PageRequest.of(0, top));
     }
 
     @Override
@@ -96,7 +99,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
         validarFiltro(filtro);
         EnumMap<TipoPedido, Long> cantidades = new EnumMap<>(TipoPedido.class);
         pedidoRepository.porTipo(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
-                desde(filtro), hasta(filtro)).forEach(fila -> cantidades.put(fila.tipoPedido(), fila.cantidadPedidos()));
+                desde(filtro), hasta(filtro))
+                .forEach(fila -> cantidades.put(fila.tipoPedido(), fila.cantidadPedidos()));
         return Arrays.stream(TipoPedido.values())
                 .map(tipo -> new TipoPedidoReporte(tipo, cantidades.getOrDefault(tipo, 0L))).toList();
     }
@@ -109,9 +113,12 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
                 && filtro.getFechaDesde().isAfter(filtro.getFechaHasta())) {
             throw new InvalidRequestException("fechaDesde no puede ser posterior a fechaHasta");
         }
-        // Oracle y el contrato ISO usan años de cuatro dígitos; además evita desbordar plusDays.
-        if ((filtro.getFechaDesde() != null && (filtro.getFechaDesde().getYear() < 1 || filtro.getFechaDesde().getYear() > 9999))
-                || (filtro.getFechaHasta() != null && (filtro.getFechaHasta().getYear() < 1 || filtro.getFechaHasta().getYear() >= 9999))) {
+        // Oracle y el contrato ISO usan años de cuatro dígitos; además evita desbordar
+        // plusDays.
+        if ((filtro.getFechaDesde() != null
+                && (filtro.getFechaDesde().getYear() < 1 || filtro.getFechaDesde().getYear() > 9999))
+                || (filtro.getFechaHasta() != null
+                        && (filtro.getFechaHasta().getYear() < 1 || filtro.getFechaHasta().getYear() >= 9999))) {
             throw new InvalidRequestException("Rango de fechas fuera del intervalo admitido");
         }
     }
@@ -178,7 +185,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     @Override
     @Transactional
     public PedidoResponse cambiarEstado(Long id, EstadoPedidoRequest request) {
-        // Serializa cambios sobre la cabecera; no permite que dos solicitudes validen el mismo estado previo.
+        // Serializa cambios sobre la cabecera; no permite que dos solicitudes validen
+        // el mismo estado previo.
         Pedido pedido = pedidoRepository.buscarParaCambioEstado(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado: " + id));
         EstadoPedido origen = pedido.getEstado();
@@ -205,7 +213,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
 
     @Transactional
     public PedidoResponse crearMio(String sub, MiPedidoRequest request) {
-        if (request.tipoPedido() == TipoPedido.PRESENCIAL) throw new InvalidRequestException("Selecciona recojo o delivery");
+        if (request.tipoPedido() == TipoPedido.PRESENCIAL)
+            throw new InvalidRequestException("Selecciona recojo o delivery");
         return crear(request.toInterno(clienteConsultaService.consultarPorSub(sub).id()));
     }
 
@@ -229,15 +238,18 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
         Long clienteId = clienteConsultaService.consultarPorSub(sub).id();
         Pedido p = pedidoRepository.buscarParaCambioEstado(id).filter(x -> clienteId.equals(x.getClienteId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getEstado() != EstadoPedido.PENDIENTE) throw new BusinessConflictException("Solo puedes cancelar un pedido pendiente");
-        EstadoPedidoRequest r = new EstadoPedidoRequest(); r.setEstado(EstadoPedido.CANCELADO);
+        if (p.getEstado() != EstadoPedido.PENDIENTE)
+            throw new BusinessConflictException("Solo puedes cancelar un pedido pendiente");
+        EstadoPedidoRequest r = new EstadoPedidoRequest();
+        r.setEstado(EstadoPedido.CANCELADO);
         return cambiarEstado(id, r);
     }
 
     @Override
     @Transactional(readOnly = true)
     public pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView consultar(Long id) {
-        Pedido p = pedidoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        Pedido p = pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
         var c = clienteConsultaService.consultarContacto(p.getClienteId());
         return new pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView(p.getId(), p.getEstado().name(),
                 c.nombreCompleto(), c.telefono(), p.getDireccionEntrega(), p.getReferenciaEntrega(),
@@ -245,22 +257,29 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     }
 
     private Pedido bloquearDelivery(Long id) {
-        Pedido p = pedidoRepository.buscarParaCambioEstado(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getTipoPedido() != TipoPedido.DELIVERY) throw new BusinessConflictException("El pedido debe ser DELIVERY");
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getTipoPedido() != TipoPedido.DELIVERY)
+            throw new BusinessConflictException("El pedido debe ser DELIVERY");
         return p;
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void validarAsignacion(Long id) {
-        if (bloquearDelivery(id).getEstado() != EstadoPedido.LISTO) throw new BusinessConflictException("El pedido debe estar LISTO");
+        if (bloquearDelivery(id).getEstado() != EstadoPedido.LISTO)
+            throw new BusinessConflictException("El pedido debe estar LISTO");
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void validarReasignacion(Long id) {
-        if (bloquearDelivery(id).getEstado() != EstadoPedido.DESPACHADO) throw new BusinessConflictException("El pedido debe permanecer DESPACHADO para reintentar");
+        if (bloquearDelivery(id).getEstado() != EstadoPedido.DESPACHADO)
+            throw new BusinessConflictException("El pedido debe permanecer DESPACHADO para reintentar");
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void despachar(Long id) {
         Pedido p = bloquearDelivery(id);
         if (p.getEstado() != EstadoPedido.LISTO && p.getEstado() != EstadoPedido.DESPACHADO)
@@ -269,20 +288,27 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
         pedidoRepository.saveAndFlush(p);
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void entregar(Long id) {
         Pedido p = bloquearDelivery(id);
-        if (p.getEstado() != EstadoPedido.DESPACHADO) throw new BusinessConflictException("El pedido debe estar DESPACHADO");
+        if (p.getEstado() != EstadoPedido.DESPACHADO)
+            throw new BusinessConflictException("El pedido debe estar DESPACHADO");
         p.setEstado(EstadoPedido.ENTREGADO);
-        if (p.getMetodoPago() == MetodoPago.EFECTIVO && p.getEstadoPago() == EstadoPago.PENDIENTE) p.setEstadoPago(EstadoPago.PAGADO);
+        if (p.getMetodoPago() == MetodoPago.EFECTIVO && p.getEstadoPago() == EstadoPago.PENDIENTE)
+            p.setEstadoPago(EstadoPago.PAGADO);
         pedidoRepository.saveAndFlush(p);
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public PedidoResponse confirmarPago(Long id) {
-        Pedido p = pedidoRepository.buscarParaCambioEstado(id).orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getEstado() == EstadoPedido.CANCELADO || p.getEstadoPago() != EstadoPago.PENDIENTE || p.getMetodoPago() == MetodoPago.EFECTIVO)
-            throw new BusinessConflictException("Solo puede confirmarse un pago pendiente YAPE, PLIN o TARJETA de un pedido no cancelado");
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getEstado() == EstadoPedido.CANCELADO || p.getEstadoPago() != EstadoPago.PENDIENTE
+                || p.getMetodoPago() == MetodoPago.EFECTIVO)
+            throw new BusinessConflictException(
+                    "Solo puede confirmarse un pago pendiente YAPE, PLIN o TARJETA de un pedido no cancelado");
         p.setEstadoPago(EstadoPago.PAGADO);
         return respuesta(pedidoRepository.saveAndFlush(p));
     }
@@ -302,13 +328,17 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     private String opcional(String valor) {
         return valor == null || valor.isBlank() ? null : valor.strip();
     }
-    @Override @Transactional(readOnly = true)
+
+    @Override
+    @Transactional(readOnly = true)
     public List<VentaDiaReporte> ventasPorDia(PedidoFiltro filtro) {
         validarFiltro(filtro);
-        return pedidoRepository.ventasPorDia(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(), desde(filtro), hasta(filtro));
+        return pedidoRepository.ventasPorDia(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro));
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<MetodoPagoReporte> metodosPago(PedidoFiltro filtro) {
         validarFiltro(filtro);
         EnumMap<MetodoPago, MetodoPagoReporte> filas = new EnumMap<>(MetodoPago.class);
@@ -318,14 +348,18 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
                 new MetodoPagoReporte(metodo, 0L, new BigDecimal("0.00")))).toList();
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<ClienteCompradorReporte> clientesCompradores(PedidoFiltro filtro, int top) {
-        validarFiltro(filtro); validarTop(top);
-        return pedidoRepository.clientesCompradores(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(), desde(filtro), hasta(filtro), org.springframework.data.domain.PageRequest.of(0, top));
+        validarFiltro(filtro);
+        validarTop(top);
+        return pedidoRepository.clientesCompradores(filtro.getEstado(), filtro.getTipoPedido(), filtro.getClienteId(),
+                desde(filtro), hasta(filtro), org.springframework.data.domain.PageRequest.of(0, top));
     }
 
     private void validarTop(int top) {
-        if (top < 1 || top > 100) throw new InvalidRequestException("top debe estar entre 1 y 100");
+        if (top < 1 || top > 100)
+            throw new InvalidRequestException("top debe estar entre 1 y 100");
     }
 
 }

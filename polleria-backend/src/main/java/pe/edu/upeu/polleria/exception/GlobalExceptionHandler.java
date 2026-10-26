@@ -30,7 +30,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> integrity(DataIntegrityViolationException ex) {
-        return error(HttpStatus.CONFLICT, "La operación entra en conflicto con datos existentes o restricciones de integridad");
+        return error(HttpStatus.CONFLICT,
+                "La operación entra en conflicto con datos existentes o restricciones de integridad");
     }
 
     @ExceptionHandler(InvalidRequestException.class)
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, "Error de validación en los datos enviados");
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler({ HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class })
     public ResponseEntity<Map<String, Object>> malformed(Exception ex) {
         return error(HttpStatus.BAD_REQUEST, "Formato de solicitud inválido");
     }

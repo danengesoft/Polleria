@@ -11,7 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("dev")
 class OracleConnectionTests {
-    @Autowired private JdbcTemplate jdbc;
+    @Autowired
+    private JdbcTemplate jdbc;
 
     @Test
     void connectsToDedicatedApplicationSchema() {

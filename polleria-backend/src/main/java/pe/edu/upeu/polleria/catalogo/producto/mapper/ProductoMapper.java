@@ -13,7 +13,9 @@ public interface ProductoMapper {
     @Mapping(target = "descripcion", source = "request.descripcion")
     @Mapping(target = "categoria", source = "categoria")
     Producto toEntity(ProductoRequest request, Categoria categoria);
+
     ProductoResponse toResponse(Producto producto);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nombre", source = "request.nombre")
     @Mapping(target = "descripcion", source = "request.descripcion")

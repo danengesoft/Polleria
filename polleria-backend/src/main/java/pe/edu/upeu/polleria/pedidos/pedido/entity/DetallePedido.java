@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "DETALLE_PEDIDOS", schema = "POLLERIA")
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class DetallePedido {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)

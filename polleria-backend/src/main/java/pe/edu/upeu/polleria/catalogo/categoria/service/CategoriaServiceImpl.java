@@ -62,7 +62,8 @@ public class CategoriaServiceImpl implements CategoriaService {
             categoriaRepository.delete(categoria);
             categoriaRepository.flush();
         } catch (DataIntegrityViolationException ex) {
-            // La FK protege incluso ante una asociación concurrente, sin dependencia inversa de Producto.
+            // La FK protege incluso ante una asociación concurrente, sin dependencia
+            // inversa de Producto.
             throw new BusinessConflictException("No se puede eliminar una categoría utilizada; puede desactivarla");
         }
     }

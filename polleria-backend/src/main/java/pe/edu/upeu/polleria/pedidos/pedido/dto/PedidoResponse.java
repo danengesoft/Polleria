@@ -7,7 +7,11 @@ import lombok.*;
 import pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.*;
 
-@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PedidoResponse {
     private Long id;
     private ClienteResumen cliente;
