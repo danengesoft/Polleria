@@ -3,7 +3,11 @@ package pe.edu.upeu.polleria.pedidos.pedido.dto;
 import java.math.BigDecimal;
 import lombok.*;
 
-@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DetallePedidoResponse {
     private Long productoId;
     private Long presentacionId;

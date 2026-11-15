@@ -4,13 +4,13 @@ import { Router } from '@angular/router';
 import { catchError, from, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth-service';
-export const OPTIONAL_AUTH = new HttpContextToken<boolean>(()=>false);
+export const OPTIONAL_AUTH = new HttpContextToken<boolean>(() => false);
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Exact API origin and path boundary, never Keycloak or a third party.
   if (!req.url.startsWith(environment.apiBaseUrl + '/api/')) return next(req);
   // El recorrido público no inicia OAuth por errores de su credencial de compra.
-  const path=req.url.slice(environment.apiBaseUrl.length).split('?')[0];
-  if(path.startsWith('/api/v1/web/') || (req.method==='GET' && /^\/api\/v1\/(productos|categorias)(\/[^/]+)?$/.test(path)))return next(req);
+  const path = req.url.slice(environment.apiBaseUrl.length).split('?')[0];
+  if (path.startsWith('/api/v1/web/') || (req.method === 'GET' && /^\/api\/v1\/(productos|categorias)(\/[^/]+)?$/.test(path))) return next(req);
   const auth = inject(AuthService);
   const router = inject(Router);
   const tokenInicial = auth.accessToken();
@@ -24,7 +24,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   };
   const reautenticar = (error: HttpErrorResponse) => {
     auth.descartarSesion();
-    if(!req.context.get(OPTIONAL_AUTH)) void auth.iniciarLogin(router.url);
+    if (!req.context.get(OPTIONAL_AUTH)) void auth.iniciarLogin(router.url);
     return throwError(() => error);
   };
   return next(bearer()).pipe(

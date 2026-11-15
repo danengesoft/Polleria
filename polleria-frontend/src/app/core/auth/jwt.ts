@@ -1,7 +1,7 @@
 export interface JwtPayload {
   sub: string;
-  email?:string;
-  email_verified?:boolean;
+  email?: string;
+  email_verified?: boolean;
   exp: number;
   iss: string;
   name?: string;

@@ -27,14 +27,15 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<ClienteResponse> crear(@Valid @RequestBody ClienteRequest request) {
-        validarCorreo(request.getCorreo(),null);
+        validarCorreo(request.getCorreo(), null);
         ClienteResponse response = service.crear(request);
         return ResponseEntity.created(URI.create("/api/v1/clientes/" + response.getId())).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponse> actualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequest request) {
-        validarCorreo(request.getCorreo(),service.obtener(id).getCorreo());
+    public ResponseEntity<ClienteResponse> actualizar(@PathVariable Long id,
+            @Valid @RequestBody ClienteRequest request) {
+        validarCorreo(request.getCorreo(), service.obtener(id).getCorreo());
         return ResponseEntity.ok(service.actualizar(id, request));
     }
 
@@ -43,9 +44,11 @@ public class ClienteController {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-    private void validarCorreo(String correo,String anterior) {
-        if(correo==null||correo.isBlank()||correo.equalsIgnoreCase(anterior))return;
-        if(!correo.matches("(?i)[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@gmail\\.com"))
+
+    private void validarCorreo(String correo, String anterior) {
+        if (correo == null || correo.isBlank() || correo.equalsIgnoreCase(anterior))
+            return;
+        if (!correo.matches("(?i)[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@gmail\\.com"))
             throw new pe.edu.upeu.polleria.exception.InvalidRequestException("Utiliza un correo @gmail.com");
     }
 

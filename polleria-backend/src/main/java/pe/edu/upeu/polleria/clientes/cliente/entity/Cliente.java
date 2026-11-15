@@ -29,11 +29,11 @@ public class Cliente {
     private String referencia;
     @Column(name = "KEYCLOAK_SUB", length = 255, unique = true)
     private String keycloakSub;
-    @Column(name="WEB_SESION_ID",length=36)
+    @Column(name = "WEB_SESION_ID", length = 36)
     private String webSesionId;
-    @Column(name="WEB_HUELLA",length=64)
+    @Column(name = "WEB_HUELLA", length = 64)
     private String webHuella;
-    @Column(name="CORREO_CONTACTO_WEB",length=254)
+    @Column(name = "CORREO_CONTACTO_WEB", length = 254)
     private String correoContactoWeb;
     @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
     @Column(name = "ACTIVO", nullable = false, precision = 1)

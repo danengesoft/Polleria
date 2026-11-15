@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import {destinoInterno} from '../guards/rol-guard';
+import { destinoInterno } from '../guards/rol-guard';
 import { AuthService, INTERNOS } from './auth-service';
 @Component({
   selector: 'app-auth-callback',
@@ -25,9 +25,9 @@ export class AuthCallback {
     const code = route.snapshot.queryParamMap.get('code');
     const state = route.snapshot.queryParamMap.get('state');
     history.replaceState(history.state, '', '/auth/callback');
-    const receptor=window.opener||(window.parent!==window?window.parent:null);
-    if(receptor && state?.startsWith('popup.')){
-      receptor.postMessage({tipo:'la-brava-auth-callback',code:code||'',state,error:route.snapshot.queryParamMap.has('error')},location.origin);
+    const receptor = window.opener || (window.parent !== window ? window.parent : null);
+    if (receptor && state?.startsWith('popup.')) {
+      receptor.postMessage({ tipo: 'la-brava-auth-callback', code: code || '', state, error: route.snapshot.queryParamMap.has('error') }, location.origin);
       return;
     }
     if (route.snapshot.queryParamMap.has('error') || !code || !state) {
@@ -40,12 +40,12 @@ export class AuthCallback {
     auth
       .completarLogin(code, state)
       .then(() => {
-        if(sessionStorage.getItem('la_brava_registro')){
-          sessionStorage.removeItem('la_brava_registro');auth.cerrarSesion();return;
+        if (sessionStorage.getItem('la_brava_registro')) {
+          sessionStorage.removeItem('la_brava_registro'); auth.cerrarSesion(); return;
         }
         let destino = auth.destinoPendiente();
         if (destino.startsWith('/interno') && !auth.tieneRol(...INTERNOS)) destino = '/sin-permiso';
-        if(auth.tieneRol(...INTERNOS)) destino=destinoInterno(auth);
+        if (auth.tieneRol(...INTERNOS)) destino = destinoInterno(auth);
         return router.navigateByUrl(destino, { replaceUrl: true });
       })
       .catch(() =>

@@ -21,15 +21,15 @@ public class Pedido {
     private Long id;
     @Column(name = "CLIENTE_ID", nullable = false)
     private Long clienteId;
-    @Column(name="FLUJO_VERSION", nullable=false)
+    @Column(name = "FLUJO_VERSION", nullable = false)
     private Integer flujoVersion = 2;
-    @Column(name="OCUPACION_MESA_ID")
+    @Column(name = "OCUPACION_MESA_ID")
     private Long ocupacionMesaId;
-    @Column(name="CREADO_POR_SUB", length=255)
+    @Column(name = "CREADO_POR_SUB", length = 255)
     private String creadoPorSub;
-    @Column(name="COBRADO_POR_SUB", length=255)
+    @Column(name = "COBRADO_POR_SUB", length = 255)
     private String cobradoPorSub;
-    @Column(name="FECHA_PAGO")
+    @Column(name = "FECHA_PAGO")
     private LocalDateTime fechaPago;
     @Column(name = "FECHA", nullable = false)
     private LocalDateTime fecha;

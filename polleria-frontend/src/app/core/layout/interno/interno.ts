@@ -1,4 +1,4 @@
-import {IconoPortal} from '../../../shared/icono-portal';
+import { IconoPortal } from '../../../shared/icono-portal';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../auth/auth-service';

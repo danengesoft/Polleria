@@ -19,7 +19,9 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
-    public ResponseEntity<Map<String,Object>> imagenGrande(Exception ex){return error(HttpStatus.PAYLOAD_TOO_LARGE,"La imagen no puede superar 20 MB");}
+    public ResponseEntity<Map<String, Object>> imagenGrande(Exception ex) {
+        return error(HttpStatus.PAYLOAD_TOO_LARGE, "La imagen no puede superar 20 MB");
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> notFound(ResourceNotFoundException ex) {
@@ -73,7 +75,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<Map<String,Object>> denied(Exception ex){return error(HttpStatus.FORBIDDEN,"Operación no permitida");}
+    public ResponseEntity<Map<String, Object>> denied(Exception ex) {
+        return error(HttpStatus.FORBIDDEN, "Operación no permitida");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> unexpected(Exception ex) {
         log.error("Error no controlado", ex);

@@ -21,7 +21,8 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoriaResponse> listar() {
-        return categoriaRepository.findAll().stream().filter(c->!Boolean.TRUE.equals(c.getEliminado())).map(this::respuesta).toList();
+        return categoriaRepository.findAll().stream().filter(c -> !Boolean.TRUE.equals(c.getEliminado()))
+                .map(this::respuesta).toList();
     }
 
     @Override
@@ -45,7 +46,8 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional
     public CategoriaResponse actualizar(Long id, CategoriaRequest request) {
-        Categoria categoria = categoriaRepository.bloquear(id).filter(c->!Boolean.TRUE.equals(c.getEliminado())).orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
+        Categoria categoria = categoriaRepository.bloquear(id).filter(c -> !Boolean.TRUE.equals(c.getEliminado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
         String nombre = normalizarNombre(request.getNombre());
         if (categoriaRepository.existsByNombreIgnoreCaseAndIdNotAndEliminadoFalse(nombre, id)) {
             throw new BusinessConflictException("Ya existe una categoría con ese nombre");
@@ -62,9 +64,14 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional
     public void eliminar(Long id) {
-        Categoria categoria=categoriaRepository.bloquear(id).filter(c->!Boolean.TRUE.equals(c.getEliminado())).orElseThrow(()->new ResourceNotFoundException("Categoría no encontrada: "+id));
-        categoria.setEliminado(true);categoria.setActivo(false);
-        productoRepository.findByCategoriaId(id).forEach(p->{p.setEliminado(true);p.setDisponible(false);});
+        Categoria categoria = categoriaRepository.bloquear(id).filter(c -> !Boolean.TRUE.equals(c.getEliminado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
+        categoria.setEliminado(true);
+        categoria.setActivo(false);
+        productoRepository.findByCategoriaId(id).forEach(p -> {
+            p.setEliminado(true);
+            p.setDisponible(false);
+        });
         categoriaRepository.saveAndFlush(categoria);
     }
 
@@ -75,7 +82,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     private Categoria buscarOFallar(Long id) {
-        return categoriaRepository.findById(id).filter(c->!Boolean.TRUE.equals(c.getEliminado()))
+        return categoriaRepository.findById(id).filter(c -> !Boolean.TRUE.equals(c.getEliminado()))
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
     }
 

@@ -35,11 +35,11 @@
                 (click)="mover(i,1)" [attr.aria-label]="'Bajar foto '+(i+1)">→</button></div>
     </article>}</div>
 } @else if (vista() === 'ubicacion') {
-    <app-ubicacion-admin />
+<app-ubicacion-admin />
 } @else if (vista() === 'destacados') {
-    <app-destacados-admin />
+<app-destacados-admin />
 } @else {
-    <app-promociones-admin />
+<app-promociones-admin />
 }
 <ng-template #editor>
     <h2 mat-dialog-title>Editar fotografía</h2><mat-dialog-content>@if(seleccionada();as b){<div class="photo-editor">
