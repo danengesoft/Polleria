@@ -1,9 +1,14 @@
 import { authGuard, authChildGuard } from './core/guards/auth-guard';
-import { rolGuard } from './core/guards/rol-guard';
+import { rolGuard,inicioInternoGuard,publicoGuard } from './core/guards/rol-guard';
 import { INTERNOS, OPERATIVOS } from './core/auth/auth-service';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  {path:'inicio',canActivate:[publicoGuard],title:'LA BRAVA | Pollos y Parrillas',loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
+  {path:'destacados',canActivate:[publicoGuard],title:'Destacados de la carta | Polleria Neyos',data:{seccion:'destacados'},loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
+  {path:'promociones',canActivate:[publicoGuard],title:'Promociones | Polleria Neyos',data:{seccion:'promociones'},loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
+  {path:'',pathMatch:'full',redirectTo:'inicio'},
+  {path:'acceso',canActivate:[publicoGuard],loadComponent:()=>import('./features/publico/acceso').then(m=>m.Acceso)},
   {
     path: 'auth/callback',
     loadComponent: () => import('./core/auth/auth-callback').then((m) => m.AuthCallback),
@@ -18,16 +23,22 @@ export const routes: Routes = [
     canActivateChild: [authChildGuard, rolGuard(...INTERNOS)],
     loadComponent: () => import('./core/layout/interno/interno').then((m) => m.Interno),
     children: [
+      {path:'ubicacion',redirectTo:'portada',pathMatch:'full'},
+      {path:'portada',canActivate:[rolGuard('ADMINISTRADOR')],title:'Local y página de inicio | LA BRAVA',loadComponent:()=>import('./features/contenido/banners').then(m=>m.Banners)},
+      {path:'caja',canActivate:[rolGuard('CAJERO','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Caja)},
+      {path:'operaciones',canActivate:[rolGuard('OPERACIONES','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Operaciones)},
+      {path:'mesero',canActivate:[rolGuard('MESERO','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Mesero)},
       {
         path: 'reportes',
         canActivate: [rolGuard('ADMINISTRADOR')],
-        title: 'Reportes | Pollería',
+        title: 'Reportes | LA BRAVA',
         loadComponent: () => import('./features/reportes/reportes').then((m) => m.Reportes),
       },
       {
         path: '',
         pathMatch: 'full',
-        title: 'Portal interno | Pollería',
+        canActivate:[inicioInternoGuard],
+        title: 'Portal interno | LA BRAVA',
         loadComponent: () => import('./core/inicio/inicio-interno').then((m) => m.InicioInterno),
       },
       {
@@ -87,64 +98,28 @@ export const routes: Routes = [
       {
         path: 'pedidos',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Pedidos | Pollería',
+        title: 'Pedidos | LA BRAVA',
         loadComponent: () => import('./features/pedidos/pedido-list').then((m) => m.PedidoList),
       },
       {
         path: 'pedidos/nuevo',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Nuevo pedido | Pollería',
+        title: 'Nuevo pedido | LA BRAVA',
         loadComponent: () => import('./features/pedidos/pedido-form').then((m) => m.PedidoForm),
       },
       {
         path: 'pedidos/:id',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Detalle del pedido | Pollería',
+        title: 'Detalle del pedido | LA BRAVA',
         loadComponent: () =>
           import('./features/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),
       },
-      {
-        path: 'delivery',
-        canActivate: [rolGuard(...OPERATIVOS)],
-        loadComponent: () =>
-          import('./features/delivery/delivery-list').then((m) => m.DeliveryList),
-      },
-      {
-        path: 'reparto',
-        canActivate: [rolGuard('REPARTIDOR')],
-        loadComponent: () => import('./features/delivery/mis-entregas').then((m) => m.MisEntregas),
-      },
-      {
-        path: 'abastecimiento/insumos',
-        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
-        loadComponent: () => import('./features/abastecimiento/insumos').then((m) => m.Insumos),
-      },
-      {
-        path: 'abastecimiento/proveedores',
-        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
-        loadComponent: () =>
-          import('./features/abastecimiento/proveedores').then((m) => m.Proveedores),
-      },
-      {
-        path: 'abastecimiento/compras',
-        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
-        loadComponent: () => import('./features/abastecimiento/compras').then((m) => m.Compras),
-      },
-      {
-        path: 'abastecimiento/inventario',
-        canActivate: [rolGuard('ADMINISTRADOR', 'ABASTECIMIENTO')],
-        loadComponent: () =>
-          import('./features/abastecimiento/inventario').then((m) => m.Inventario),
-      },
-      {
-        path: 'conexion',
-        title: 'Conexión | Pollería',
-        loadComponent: () => import('./core/conexion/conexion').then((m) => m.Conexion),
-      },
+
     ],
   },
   {
     path: '',
+    canActivateChild: [publicoGuard],
     loadComponent: () => import('./core/layout/publico/publico').then((m) => m.Publico),
     children: [
       {
@@ -163,9 +138,9 @@ export const routes: Routes = [
       },
       {
         path: 'checkout',
-        canActivate: [authGuard, rolGuard('CLIENTE')],
         loadComponent: () => import('./features/publico/checkout').then((m) => m.Checkout),
       },
+      {path:'seguimiento/:id',data:{web:true},loadComponent:()=>import('./features/publico/mi-pedido').then(m=>m.MiPedido)},
       {
         path: 'mis-pedidos',
         canActivate: [authGuard, rolGuard('CLIENTE')],
@@ -179,8 +154,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        title: 'Inicio | Pollería',
-        loadComponent: () => import('./core/inicio/inicio-publico').then((m) => m.InicioPublico),
+        redirectTo: 'inicio',
       },
     ],
   },

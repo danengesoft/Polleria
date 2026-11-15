@@ -1,5 +1,9 @@
 # Solo ensayo local: no certificados públicos, sin cambios al stack dev.
 services:
+  backend:
+    environment:
+      WEB_COOKIE_SECURE: "false"
+      PAGO_SIMULADOR_HABILITADO: "false"
   frontend:
     ports: !override
       - 127.0.0.1:18080:80

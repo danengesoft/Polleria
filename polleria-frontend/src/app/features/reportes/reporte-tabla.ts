@@ -1,10 +1,10 @@
 import { Component, input } from '@angular/core';
-import { CurrencyPipe, DecimalPipe, registerLocaleData } from '@angular/common';
+import { CurrencyPipe, registerLocaleData } from '@angular/common';
 import esPE from '@angular/common/locales/es-PE';
 registerLocaleData(esPE);
 export interface Columna {
   nombre: string;
-  formato?: 'moneda' | 'cantidad';
+  formato?: 'moneda';
 }
 export type Celda = string | number;
 export interface TablaReporte {
@@ -14,7 +14,7 @@ export interface TablaReporte {
 }
 @Component({
   selector: 'app-reporte-tabla',
-  imports: [CurrencyPipe, DecimalPipe],
+  imports: [CurrencyPipe],
   template: ` <section [attr.aria-busy]="datos().cargando">
     <h3>{{ titulo() }}</h3>
     @if (nota()) {
@@ -49,9 +49,6 @@ export interface TablaReporte {
                     @switch (columnas()[$index].formato) {
                       @case ('moneda') {
                         {{ asNumero(v) | currency: 'PEN' : 'S/' : '1.2-2' : 'es-PE' }}
-                      }
-                      @case ('cantidad') {
-                        {{ asNumero(v) | number: '1.0-3' : 'es-PE' }}
                       }
                       @default {
                         {{ v }}

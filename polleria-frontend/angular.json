@@ -55,6 +55,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -67,6 +78,9 @@
             },
             "development": {
               "buildTarget": "polleria-frontend:build:development"
+            },
+            "local": {
+              "buildTarget": "polleria-frontend:build:local"
             }
           },
           "defaultConfiguration": "development"

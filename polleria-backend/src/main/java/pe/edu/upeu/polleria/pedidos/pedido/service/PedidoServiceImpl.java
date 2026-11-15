@@ -24,11 +24,30 @@ import pe.edu.upeu.polleria.pedidos.pedido.repository.PedidoRepository;
 
 @Service
 @RequiredArgsConstructor
-public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryService {
+public class PedidoServiceImpl implements PedidoService {
+    private final pe.edu.upeu.polleria.pedidos.web.repository.WebPedidoRepository pedidosWeb;
+    private final pe.edu.upeu.polleria.contenido.promocion.api.PrecioPromocionService preciosPromocion;
     private final PedidoRepository pedidoRepository;
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
     private final ProductoConsultaService productoConsultaService;
     private final ClienteConsultaService clienteConsultaService;
     private final PedidoMapper pedidoMapper;
+    private final pe.edu.upeu.polleria.pedidos.mesa.service.MesaService mesas;
+    private final pe.edu.upeu.polleria.pedidos.eventos.EventosService eventos;
+
+    private String actor() {
+        var a = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        return a == null || a instanceof org.springframework.security.authentication.AnonymousAuthenticationToken ? null
+                : a.getName();
+    }
+
+    private void exigirRol(String... roles) {
+        var a = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (a == null || a.getAuthorities().stream()
+                .noneMatch(x -> java.util.Arrays.stream(roles).anyMatch(r -> x.getAuthority().equals("ROLE_" + r))))
+            throw new org.springframework.security.access.AccessDeniedException("Operación no permitida para el rol");
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -141,13 +160,30 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     @Override
     @Transactional
     public PedidoResponse crear(PedidoRequest request) {
+        return crearConActor(request, actor());
+    }
+
+    @Transactional
+    public PedidoResponse crearWeb(PedidoRequest request, String sub) {
+        return crearConActor(request, sub);
+    }
+
+    private PedidoResponse crearConActor(PedidoRequest request, String actorPedido) {
+        if (!java.util.Set.of(TipoPedido.MESA, TipoPedido.PARA_LLEVAR).contains(request.getTipoPedido()))
+            throw new InvalidRequestException("Tipo histórico no permitido en pedidos nuevos");
+        if (request.getTipoPedido() == TipoPedido.MESA && request.getMesaId() == null)
+            throw new InvalidRequestException("Selecciona una mesa disponible");
+        if (request.getTipoPedido() != TipoPedido.MESA && request.getMesaId() != null)
+            throw new InvalidRequestException("Solo los pedidos MESA admiten mesaId");
         ClienteResumen cliente = clienteConsultaService.consultarCliente(request.getClienteId());
         String direccion = opcional(request.getDireccionEntrega());
-        if (request.getTipoPedido() == TipoPedido.DELIVERY && direccion == null) {
-            throw new InvalidRequestException("Un pedido delivery requiere dirección de entrega");
-        }
+
         Pedido pedido = new Pedido();
         pedido.setClienteId(cliente.id());
+        pedido.setFlujoVersion(2);
+        pedido.setCreadoPorSub(actorPedido);
+        if (request.getTipoPedido() == TipoPedido.MESA)
+            pedido.setOcupacionMesaId(mesas.reservar(request.getMesaId(), cliente.id()));
         pedido.setFecha(LocalDateTime.now(ZoneId.of("America/Lima")));
         pedido.setTipoPedido(request.getTipoPedido());
         pedido.setEstado(EstadoPedido.PENDIENTE);
@@ -158,7 +194,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
 
         BigDecimal total = new BigDecimal("0.00");
         for (DetallePedidoRequest linea : request.getDetalles()) {
-            ProductoParaPedido producto = productoConsultaService.consultarParaPedido(linea.getProductoId());
+            ProductoParaPedido producto = productoConsultaService.consultarPresentacion(linea.getProductoId(),
+                    linea.getPresentacionId());
             if (!Boolean.TRUE.equals(producto.disponible())) {
                 throw new BusinessConflictException("Producto no disponible: " + producto.id());
             }
@@ -166,11 +203,19 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
                 throw new BusinessConflictException("Producto con precio inválido: " + producto.id());
             }
             BigDecimal precio = producto.precio().setScale(2, RoundingMode.UNNECESSARY);
+            BigDecimal regular = precio;
+            if (linea.getPromocionId() != null)
+                precio = preciosPromocion.precioPresentacion(producto.id(), producto.presentacionId(),
+                        linea.getPromocionId(), regular);
             BigDecimal subtotal = importe(precio.multiply(BigDecimal.valueOf(linea.getCantidad())));
             DetallePedido detalle = new DetallePedido();
             detalle.setProductoId(producto.id());
+            detalle.setPresentacionId(producto.presentacionId());
+            detalle.setNombrePresentacion(producto.nombrePresentacion());
             detalle.setNombreProducto(producto.nombre());
             detalle.setPrecioUnitario(precio);
+            detalle.setPromocionId(linea.getPromocionId());
+            detalle.setPrecioRegular(regular);
             detalle.setCantidad(linea.getCantidad());
             detalle.setSubtotal(subtotal);
             detalle.setPedido(pedido);
@@ -179,7 +224,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
         }
         pedido.setTotal(total);
         Pedido guardado = pedidoRepository.saveAndFlush(pedido);
-        return pedidoMapper.toResponse(guardado, cliente);
+        eventos.publicar("PEDIDO_CREADO", guardado.getId());
+        return respuesta(guardado);
     }
 
     @Override
@@ -191,30 +237,26 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado: " + id));
         EstadoPedido origen = pedido.getEstado();
         EstadoPedido destino = request.getEstado();
-        boolean permitido;
-        if (destino == EstadoPedido.CANCELADO) {
-            permitido = (origen == EstadoPedido.PENDIENTE || origen == EstadoPedido.CONFIRMADO)
-                    && pedido.getEstadoPago() != EstadoPago.PAGADO;
-        } else {
-            permitido = switch (origen) {
-                case PENDIENTE -> destino == EstadoPedido.CONFIRMADO;
-                case CONFIRMADO -> destino == EstadoPedido.EN_PREPARACION;
-                case EN_PREPARACION -> destino == EstadoPedido.LISTO;
-                case LISTO -> destino == EstadoPedido.ENTREGADO && pedido.getTipoPedido() != TipoPedido.DELIVERY;
-                default -> false;
-            };
-        }
-        if (!permitido) {
+        if (pedido.getFlujoVersion() != 2
+                || !java.util.Set.of(TipoPedido.MESA, TipoPedido.PARA_LLEVAR).contains(pedido.getTipoPedido()))
+            throw new BusinessConflictException("Pedido histórico de solo lectura operativa");
+        boolean permitido = origen == EstadoPedido.PENDIENTE && destino == EstadoPedido.LISTO
+                || origen == EstadoPedido.LISTO && destino == EstadoPedido.ENTREGADO;
+        if (!permitido)
             throw new BusinessConflictException("Transición de pedido no permitida: " + origen + " → " + destino);
+        if (destino == EstadoPedido.LISTO)
+            exigirRol("OPERACIONES", "ADMINISTRADOR");
+        else {
+            exigirRol("MESERO", "ADMINISTRADOR");
+            exigirPagado(pedido);
         }
+        eventos.publicar(destino == EstadoPedido.LISTO ? "PEDIDO_LISTO" : "PEDIDO_ENTREGADO", id);
         pedido.setEstado(destino);
         return respuesta(pedidoRepository.saveAndFlush(pedido));
     }
 
     @Transactional
     public PedidoResponse crearMio(String sub, MiPedidoRequest request) {
-        if (request.tipoPedido() == TipoPedido.PRESENCIAL)
-            throw new InvalidRequestException("Selecciona recojo o delivery");
         return crear(request.toInterno(clienteConsultaService.consultarPorSub(sub).id()));
     }
 
@@ -235,69 +277,8 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
 
     @Transactional
     public PedidoResponse cancelarMio(String sub, Long id) {
-        Long clienteId = clienteConsultaService.consultarPorSub(sub).id();
-        Pedido p = pedidoRepository.buscarParaCambioEstado(id).filter(x -> clienteId.equals(x.getClienteId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getEstado() != EstadoPedido.PENDIENTE)
-            throw new BusinessConflictException("Solo puedes cancelar un pedido pendiente");
-        EstadoPedidoRequest r = new EstadoPedidoRequest();
-        r.setEstado(EstadoPedido.CANCELADO);
-        return cambiarEstado(id, r);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView consultar(Long id) {
-        Pedido p = pedidoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        var c = clienteConsultaService.consultarContacto(p.getClienteId());
-        return new pe.edu.upeu.polleria.pedidos.pedido.api.PedidoDeliveryView(p.getId(), p.getEstado().name(),
-                c.nombreCompleto(), c.telefono(), p.getDireccionEntrega(), p.getReferenciaEntrega(),
-                p.getTotal(), p.getMetodoPago().name(), p.getEstadoPago().name());
-    }
-
-    private Pedido bloquearDelivery(Long id) {
-        Pedido p = pedidoRepository.buscarParaCambioEstado(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getTipoPedido() != TipoPedido.DELIVERY)
-            throw new BusinessConflictException("El pedido debe ser DELIVERY");
-        return p;
-    }
-
-    @Override
-    @Transactional
-    public void validarAsignacion(Long id) {
-        if (bloquearDelivery(id).getEstado() != EstadoPedido.LISTO)
-            throw new BusinessConflictException("El pedido debe estar LISTO");
-    }
-
-    @Override
-    @Transactional
-    public void validarReasignacion(Long id) {
-        if (bloquearDelivery(id).getEstado() != EstadoPedido.DESPACHADO)
-            throw new BusinessConflictException("El pedido debe permanecer DESPACHADO para reintentar");
-    }
-
-    @Override
-    @Transactional
-    public void despachar(Long id) {
-        Pedido p = bloquearDelivery(id);
-        if (p.getEstado() != EstadoPedido.LISTO && p.getEstado() != EstadoPedido.DESPACHADO)
-            throw new BusinessConflictException("El pedido no permite iniciar reparto");
-        p.setEstado(EstadoPedido.DESPACHADO);
-        pedidoRepository.saveAndFlush(p);
-    }
-
-    @Override
-    @Transactional
-    public void entregar(Long id) {
-        Pedido p = bloquearDelivery(id);
-        if (p.getEstado() != EstadoPedido.DESPACHADO)
-            throw new BusinessConflictException("El pedido debe estar DESPACHADO");
-        p.setEstado(EstadoPedido.ENTREGADO);
-        if (p.getMetodoPago() == MetodoPago.EFECTIVO && p.getEstadoPago() == EstadoPago.PENDIENTE)
-            p.setEstadoPago(EstadoPago.PAGADO);
-        pedidoRepository.saveAndFlush(p);
+        obtenerMio(sub, id);
+        throw new BusinessConflictException("La cancelación no forma parte del nuevo flujo operativo");
     }
 
     @Override
@@ -305,16 +286,98 @@ public class PedidoServiceImpl implements PedidoService, pe.edu.upeu.polleria.pe
     public PedidoResponse confirmarPago(Long id) {
         Pedido p = pedidoRepository.buscarParaCambioEstado(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
-        if (p.getEstado() == EstadoPedido.CANCELADO || p.getEstadoPago() != EstadoPago.PENDIENTE
-                || p.getMetodoPago() == MetodoPago.EFECTIVO)
+        exigirRol("ADMINISTRADOR", "CAJERO");
+        if (!java.util.Set.of(TipoPedido.MESA, TipoPedido.PARA_LLEVAR).contains(p.getTipoPedido()))
+            throw new BusinessConflictException("Pedido histórico de solo lectura operativa");
+        if (p.getMetodoPago() != MetodoPago.EFECTIVO)
             throw new BusinessConflictException(
-                    "Solo puede confirmarse un pago pendiente YAPE, PLIN o TARJETA de un pedido no cancelado");
+                    "Los pagos electrónicos requieren confirmación del proveedor; Caja solo confirma efectivo");
+        if (p.getFlujoVersion() != 2 || p.getEstadoPago() != EstadoPago.PENDIENTE)
+            throw new BusinessConflictException(
+                    "Solo puede confirmarse un pago pendiente de un pedido nuevo");
         p.setEstadoPago(EstadoPago.PAGADO);
+        p.setCobradoPorSub(actor());
+        p.setFechaPago(LocalDateTime.now(ZoneId.of("America/Lima")));
+        eventos.publicar("PEDIDO_PAGADO", id);
         return respuesta(pedidoRepository.saveAndFlush(p));
     }
 
+    @org.springframework.beans.factory.annotation.Value("${polleria.pagos.simulador-habilitado:false}")
+    private boolean simuladorHabilitado;
+
+    /**
+     * Exclusivamente el simulador local autorizado; no representa un cobro real.
+     */
+    @Transactional
+    public void confirmarPagoSimulado(Long id) {
+        if (!simuladorHabilitado)
+            throw new ResourceNotFoundException("Simulador no disponible");
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        // El canal web puede haber leído la entidad antes de obtener el bloqueo.
+        // Refrescar evita reutilizar un estado PENDIENTE anterior a un cobro
+        // concurrente.
+        entityManager.refresh(p, jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+        if (p.getFlujoVersion() != 2 || p.getMetodoPago() == MetodoPago.EFECTIVO)
+            throw new BusinessConflictException("Pago no compatible con el simulador electrónico");
+        if (p.getEstadoPago() == EstadoPago.PAGADO)
+            return;
+        p.setEstadoPago(EstadoPago.PAGADO);
+        p.setCobradoPorSub("SIMULADOR_LOCAL_SIN_COBRO_REAL");
+        p.setFechaPago(LocalDateTime.now(ZoneId.of("America/Lima")));
+        pedidoRepository.saveAndFlush(p);
+        eventos.publicar("PEDIDO_PAGADO", id);
+    }
+
+    @Override
+    @Transactional
+    public java.util.Map<String, Object> pagoPruebaInterno(Long id, String resultado) {
+        exigirRol("ADMINISTRADOR", "CAJERO");
+        if (!simuladorHabilitado)
+            throw new ResourceNotFoundException("Simulador no disponible");
+        if (!java.util.Set.of("CONSULTAR", "APROBAR", "RECHAZAR").contains(resultado))
+            throw new InvalidRequestException("Resultado de prueba inválido");
+        Pedido p = pedidoRepository.buscarParaCambioEstado(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado"));
+        if (p.getFlujoVersion() != 2 || p.getMetodoPago() == MetodoPago.EFECTIVO)
+            throw new BusinessConflictException(
+                    "El efectivo se confirma en Caja y los pedidos históricos son de consulta");
+        if (resultado.equals("APROBAR"))
+            confirmarPagoSimulado(id);
+        return java.util.Map.of("modo", "SIMULADOR_LOCAL", "pedidoId", id, "metodo", p.getMetodoPago(), "monto",
+                p.getTotal(), "moneda", "PEN", "estadoPago", p.getEstadoPago(), "resultado",
+                resultado.equals("RECHAZAR") && p.getEstadoPago() != EstadoPago.PAGADO ? "RECHAZADO"
+                        : p.getEstadoPago().name(),
+                "qrTexto", "POLLERIA_NEYOS_PRUEBA|PEDIDO=" + id + "|METODO=" + p.getMetodoPago() + "|PEN="
+                        + p.getTotal().toPlainString());
+    }
+
+    private void exigirPagado(Pedido p) {
+        if (p.getEstadoPago() != EstadoPago.PAGADO)
+            throw new BusinessConflictException("Debes confirmar el pago antes de entregar");
+    }
+
+    public record CajaResumen(long cantidadCobros, BigDecimal totalCobrado) {
+    }
+
+    @Transactional(readOnly = true)
+    public CajaResumen miCaja() {
+        exigirRol("CAJERO", "ADMINISTRADOR");
+        var inicio = java.time.LocalDate.now(ZoneId.of("America/Lima")).atStartOfDay();
+        var lista = pedidoRepository.findByCobradoPorSubAndFechaPagoGreaterThanEqualAndFechaPagoLessThan(actor(),
+                inicio, inicio.plusDays(1));
+        return new CajaResumen(lista.size(),
+                lista.stream().map(Pedido::getTotal).reduce(new BigDecimal("0.00"), BigDecimal::add));
+    }
+
     private PedidoResponse respuesta(Pedido pedido) {
-        return pedidoMapper.toResponse(pedido, clienteConsultaService.consultarCliente(pedido.getClienteId()));
+        var r = pedidoMapper.toResponse(pedido, clienteConsultaService.consultarCliente(pedido.getClienteId()));
+        if (pedido.getOcupacionMesaId() != null) {
+            var mesa = mesas.referencia(pedido.getOcupacionMesaId());
+            r.setMesaId(mesa.id());
+            r.setMesaNumero(mesa.numero());
+        }
+        return r;
     }
 
     private BigDecimal importe(BigDecimal valor) {

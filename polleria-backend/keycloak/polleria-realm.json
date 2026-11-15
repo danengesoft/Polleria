@@ -1,8 +1,8 @@
 {
   "realm": "polleria",
   "enabled": true,
-  "displayName": "POLLERIA",
-  "registrationAllowed": false,
+  "displayName": "Polleria Neyos · Restaurant Pollos y Parrillas",
+  "registrationAllowed": true,
   "resetPasswordAllowed": false,
   "internationalizationEnabled": true,
   "supportedLocales": [
@@ -18,13 +18,13 @@
         "name": "CAJERO"
       },
       {
-        "name": "REPARTIDOR"
-      },
-      {
-        "name": "ABASTECIMIENTO"
-      },
-      {
         "name": "CLIENTE"
+      },
+      {
+        "name": "OPERACIONES"
+      },
+      {
+        "name": "MESERO"
       }
     ]
   },
@@ -50,5 +50,11 @@
         "pkce.code.challenge.method": "S256"
       }
     }
+  ],
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "defaultRoles": [
+    "CLIENTE"
   ]
 }

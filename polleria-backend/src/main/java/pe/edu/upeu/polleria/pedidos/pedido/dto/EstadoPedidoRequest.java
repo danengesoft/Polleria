@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import pe.edu.upeu.polleria.pedidos.pedido.entity.EstadoPedido;
 
-@Getter @Setter
+@Getter
+@Setter
 public class EstadoPedidoRequest {
     @NotNull
     private EstadoPedido estado;

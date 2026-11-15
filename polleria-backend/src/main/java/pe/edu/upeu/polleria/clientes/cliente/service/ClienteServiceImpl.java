@@ -23,13 +23,13 @@ public class ClienteServiceImpl
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> listar() {
-        return clienteRepository.findAll().stream().map(clienteMapper::toResponse).toList();
+        return clienteRepository.findAll().stream().map(this::respuesta).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public ClienteResponse obtener(Long id) {
-        return clienteMapper.toResponse(buscarOFallar(id));
+        return respuesta(buscarOFallar(id));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ClienteServiceImpl
         }
         Cliente cliente = clienteMapper.toEntity(request);
         normalizar(cliente, correo);
-        return clienteMapper.toResponse(clienteRepository.saveAndFlush(cliente));
+        return respuesta(clienteRepository.saveAndFlush(cliente));
     }
 
     @Override
@@ -54,13 +54,14 @@ public class ClienteServiceImpl
         }
         clienteMapper.actualizar(request, cliente);
         normalizar(cliente, correo);
-        return clienteMapper.toResponse(clienteRepository.saveAndFlush(cliente));
+        return respuesta(clienteRepository.saveAndFlush(cliente));
     }
 
     @Override
     @Transactional
     public void eliminar(Long id) {
         Cliente cliente = buscarOFallar(id);
+        if (cliente.getKeycloakSub() != null) throw new BusinessConflictException("Cliente con cuenta registrada; puede desactivarlo");
         try {
             clienteRepository.delete(cliente);
             clienteRepository.flush();
@@ -89,7 +90,7 @@ public class ClienteServiceImpl
 
     @Transactional(readOnly = true)
     public ClienteResponse miPerfil(String sub) {
-        return clienteMapper.toResponse(buscarPorSub(sub));
+        return respuesta(buscarPorSub(sub));
     }
 
     @Transactional
@@ -99,7 +100,7 @@ public class ClienteServiceImpl
         ClienteResponse creado = crear(request.toInterno());
         Cliente c = buscarOFallar(creado.getId());
         c.setKeycloakSub(sub);
-        return clienteMapper.toResponse(clienteRepository.saveAndFlush(c));
+        return respuesta(clienteRepository.saveAndFlush(c));
     }
 
     @Transactional
@@ -109,6 +110,22 @@ public class ClienteServiceImpl
         ClienteRequest interno = request.toInterno();
         interno.setActivo(c.getActivo());
         return actualizar(c.getId(), interno);
+    }
+
+
+    @Override
+    @Transactional
+    public pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen resolverCompradorWeb(String sesion,String sub,pe.edu.upeu.polleria.clientes.cliente.api.DatosCompradorWeb d,String huella){
+        var existente=sub==null?clienteRepository.findByWebSesionIdAndWebHuella(sesion,huella):clienteRepository.findByKeycloakSub(sub);
+        Cliente c=existente.orElseGet(()->{
+            Cliente nuevo=new Cliente();nuevo.setNombres(d.nombres());nuevo.setApellidos(d.apellidos());nuevo.setTelefono(d.telefono());
+            // El correo no verificado es contacto, nunca una prueba de identidad.
+            nuevo.setCorreoContactoWeb(d.correo());
+            if(sub==null){nuevo.setWebSesionId(sesion);nuevo.setWebHuella(huella);}else nuevo.setKeycloakSub(sub);
+            return clienteRepository.saveAndFlush(nuevo);
+        });
+        if(!Boolean.TRUE.equals(c.getActivo()))throw new BusinessConflictException("Perfil comercial desactivado");
+        return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteResumen(c.getId(),c.getNombres(),c.getApellidos());
     }
 
     private Cliente buscarPorSub(String sub) {
@@ -124,6 +141,12 @@ public class ClienteServiceImpl
         Cliente c = buscarOFallar(id);
         return new pe.edu.upeu.polleria.clientes.cliente.api.ClienteContacto(c.getNombres() + " " + c.getApellidos(),
                 c.getTelefono());
+    }
+
+    private ClienteResponse respuesta(Cliente entidad) {
+        ClienteResponse respuesta = clienteMapper.toResponse(entidad);
+        respuesta.setEliminable(entidad.getKeycloakSub() == null && clienteRepository.contarReferencias(entidad.getId()) == 0);
+        return respuesta;
     }
 
     private Cliente buscarOFallar(Long id) {

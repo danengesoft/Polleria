@@ -6,7 +6,7 @@ import { CarritoService } from '../../features/publico/carrito-service';
   selector: 'app-navigation',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav aria-label="Navegación principal" (keydown.escape)="cerrarMenu(menuButton)">
+    <nav [class.internal-session]="interno()" aria-label="Navegación principal" (keydown.escape)="cerrarMenu(menuButton)">
       @if (!interno()) {
         <a
           (click)="abierto.set(false)"
@@ -31,9 +31,8 @@ import { CarritoService } from '../../features/publico/carrito-service';
           ariaCurrentWhenActive="page"
           >Carrito ({{ carrito.unidades() }})</a
         >
-      } @else {
-        <a (click)="abierto.set(false)" routerLink="/catalogo" class="public-link">Ver catálogo</a>
       }
+
       <button
         class="secondary menu-toggle"
         #menuButton
@@ -50,14 +49,14 @@ import { CarritoService } from '../../features/publico/carrito-service';
         [id]="interno() ? 'sesion-interna' : 'sesion-publica'"
         (click)="abierto.set(false)"
       >
-        @if (auth.tieneRol('CLIENTE')) {
+        @if (!interno() && auth.tieneRol('CLIENTE')) {
           <a routerLink="/mis-pedidos" routerLinkActive="active" ariaCurrentWhenActive="page"
             >Mis pedidos</a
           ><a routerLink="/perfil" routerLinkActive="active" ariaCurrentWhenActive="page">Perfil</a>
         }
         @if (auth.usuario()) {
           @if (
-            !interno() && auth.tieneRol('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'ABASTECIMIENTO')
+            !interno() && auth.tieneRol('ADMINISTRADOR', 'CAJERO', 'OPERACIONES', 'MESERO')
           ) {
             <a routerLink="/interno" routerLinkActive="active">Portal interno</a>
           }
@@ -161,6 +160,14 @@ import { CarritoService } from '../../features/publico/carrito-service';
       .public-link {
         margin-right: auto;
       }
+    }
+    @media(max-width:1000px){
+      .internal-session .menu-toggle{display:none}
+      .internal-session,.internal-session .nav-extra{display:flex;flex-wrap:nowrap;width:100%;min-width:0;gap:.4rem}
+      .internal-session .nav-extra{padding:0;margin:0;border:0}
+      .internal-session .identity{margin:0;min-width:0;flex:1;font-size:.75rem;padding:0;max-width:none}
+      .internal-session .identity small{font-size:.58rem}
+      .internal-session .nav-extra>button{margin-left:auto;flex:none;padding:10px;font-size:.75rem;white-space:nowrap}
     }
   `,
 })

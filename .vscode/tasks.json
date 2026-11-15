@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Polleria: actualizar frontend y backend al guardar",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/desarrollo.sh"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen", "instanceLimit": 1 },
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    }
+  ]
+}

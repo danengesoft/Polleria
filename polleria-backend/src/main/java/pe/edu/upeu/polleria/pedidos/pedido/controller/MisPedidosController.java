@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import pe.edu.upeu.polleria.pedidos.pedido.dto.*;
 import pe.edu.upeu.polleria.pedidos.pedido.service.PedidoService;
 
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Mis pedidos")
 @RestController
 @RequestMapping("/api/v1/pedidos/mios")
 @RequiredArgsConstructor

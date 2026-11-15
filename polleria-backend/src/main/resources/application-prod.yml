@@ -23,11 +23,6 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
 management:
   endpoints:
     web:
@@ -44,5 +39,9 @@ logging:
     org.hibernate.SQL: OFF
     org.hibernate.orm.jdbc.bind: OFF
 polleria:
+  pagos:
+    simulador-habilitado: ${PAGO_SIMULADOR_HABILITADO:false}
+  web:
+    cookie-secure: ${WEB_COOKIE_SECURE:true}
   cors:
     allowed-origins: ${PUBLIC_APP_URL}

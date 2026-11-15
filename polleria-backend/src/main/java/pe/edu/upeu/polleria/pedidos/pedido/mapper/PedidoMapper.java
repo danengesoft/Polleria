@@ -7,6 +7,8 @@ import pe.edu.upeu.polleria.pedidos.pedido.dto.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface PedidoMapper {
+    @Mapping(target = "mesaId", ignore = true)
+    @Mapping(target = "mesaNumero", ignore = true)
     @Mapping(target = "id", source = "pedido.id")
     @Mapping(target = "cliente", source = "cliente")
     PedidoResponse toResponse(Pedido pedido, ClienteResumen cliente);

@@ -27,6 +27,7 @@ export class PedidoList {
   private readonly service = inject(PedidoService);
   private readonly destroyRef = inject(DestroyRef);
   private consulta?: Subscription;
+  readonly seleccionado=signal<PedidoResponse|null>(null);
   readonly pedidos = signal<PedidoResponse[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');

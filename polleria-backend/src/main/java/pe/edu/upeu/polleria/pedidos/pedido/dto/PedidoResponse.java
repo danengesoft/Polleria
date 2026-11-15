@@ -14,6 +14,10 @@ import pe.edu.upeu.polleria.pedidos.pedido.entity.*;
 @AllArgsConstructor
 public class PedidoResponse {
     private Long id;
+    private Integer flujoVersion;
+    private Long ocupacionMesaId;
+    private Long mesaId;
+    private String mesaNumero;
     private ClienteResumen cliente;
     private LocalDateTime fecha;
     private TipoPedido tipoPedido;

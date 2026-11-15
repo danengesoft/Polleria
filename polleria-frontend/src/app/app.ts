@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { TemaService } from './core/theme/selector-tema';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -7,4 +8,4 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {}
+export class App { private readonly tema = inject(TemaService); }

@@ -8,7 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductoResponse {
+    private java.util.List<PresentacionResponse> presentaciones;
     private Long id;
+    private Boolean eliminable;
     private String nombre;
     private String descripcion;
     private java.math.BigDecimal precio;

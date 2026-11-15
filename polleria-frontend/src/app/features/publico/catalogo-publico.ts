@@ -1,4 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FotoProducto } from './foto-producto';
+import { IconoCliente } from './icono-cliente';
+import { ProductoDetallePublico } from './producto-detalle';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProductoService } from '../catalogo/producto/producto-service';
@@ -9,64 +14,19 @@ import { CarritoService } from './carrito-service';
 import { mensajeHttp } from '../../shared/http-error';
 @Component({
   selector: 'app-catalogo-publico',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, FotoProducto, IconoCliente],
   styleUrl: './publico.css',
-  template: ` <p class="eyebrow">A tu gusto</p>
-    <h1>Nuestro catálogo</h1>
-    <p>Elige tus productos y prepara tu pedido. Los precios se confirman al ordenar.</p>
-    <div class="catalog-filter">
-      <label for="categoria">Categoría</label
-      ><select id="categoria" (change)="cargar($any($event.target).value)">
-        <option value="">Todos</option>
-        @for (c of categorias(); track c.id) {
-          <option [value]="c.id">{{ c.nombre }}</option>
-        }
-      </select>
-    </div>
-    @if (error()) {
-      <p role="alert">{{ error() }}</p>
-      <button (click)="cargar()">Reintentar</button>
-    }
-    @if (cargando()) {
-      <p role="status">Cargando catálogo…</p>
-    }
-    <p role="status">{{ aviso() }}</p>
-    <div class="cards">
-      @for (p of productos(); track p.id) {
-        <article class="card" [class.unavailable]="!p.disponible">
-          @if (imagen(p.imagenUrl) && !imagenesFallidas().has(p.id)) {
-            <img
-              [src]="imagen(p.imagenUrl)"
-              [alt]="p.nombre"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-              (error)="imagenFallida(p.id)"
-            />
-          } @else {
-            <div class="placeholder" aria-hidden="true">Sin imagen</div>
-          }
-          <div class="product-info">
-            <p class="eyebrow">{{ p.categoria.nombre }}</p>
-            <h2>{{ p.nombre }}</h2>
-            <p>{{ p.descripcion }}</p>
-            <strong class="price">{{ p.precio | currency: 'PEN' : 'S/ ' : '1.2-2' }}</strong>
-            @if (p.disponible) {
-              <button (click)="agregar(p)">Agregar al carrito</button>
-            } @else {
-              <p class="availability">No disponible</p>
-              <button class="secondary" disabled>Agregar al carrito</button>
-            }
-          </div>
-        </article>
-      } @empty {
-        @if (!cargando() && !error()) {
-          <p>No hay productos en esta categoría.</p>
-        }
-      }
-    </div>
-    <a routerLink="/carrito">Ver carrito</a>`,
+  templateUrl: './catalogo-publico.html',
 })
 export class CatalogoPublico {
+  private readonly dialog = inject(MatDialog);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly viendoProductos = signal(false);
+  abrirCategoria(id = '') { this.router.navigate(['/catalogo'], { queryParams: id ? { categoria: id } : { todos: '1' } }); }
+  readonly categoriaSeleccionada = signal('');
+  readonly busqueda = signal('');
+  readonly filtrados = computed(() => { const normalizar = (v: string) => v.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase('es-PE'); const q = normalizar(this.busqueda().trim()); return this.productos().filter(p => !q || normalizar(p.nombre + ' ' + (p.descripcion || '')).includes(q)); });
   private readonly productosApi = inject(ProductoService);
   private readonly categoriasApi = inject(CategoriaService);
   readonly carrito = inject(CarritoService);
@@ -81,17 +41,23 @@ export class CatalogoPublico {
   readonly cargando = signal(false);
   constructor() {
     this.categoriasApi.listar().subscribe({
-      next: (c) => this.categorias.set(c),
+      next: (c) => this.categorias.set(c.filter((categoria) => categoria.activo)),
       error: (e) => this.error.set(mensajeHttp(e)),
     });
-    this.cargar();
+    this.route.queryParamMap.subscribe((p) => {
+      this.busqueda.set((p.get('q') || '').slice(0, 120));
+      const id = p.get('categoria') || '';
+      this.viendoProductos.set(!!id || p.get('todos') === '1' || !!p.get('q'));
+      this.cargar(/^[1-9][0-9]*$/.test(id) ? id : '');
+    });
   }
   cargar(id = '') {
+    this.categoriaSeleccionada.set(id);
     this.cargando.set(true);
     this.error.set('');
     this.productosApi.listar(id ? Number(id) : undefined).subscribe({
       next: (p) => {
-        this.productos.set(p);
+        this.productos.set(p.filter((producto) => producto.disponible === true));
         this.cargando.set(false);
       },
       error: (e) => {
@@ -100,7 +66,23 @@ export class CatalogoPublico {
       },
     });
   }
+  verDetalle(p: Producto) {
+    this.dialog
+      .open(ProductoDetallePublico, {
+        data: p,
+        width: '600px',
+        maxWidth: '94vw',
+        maxHeight: '92dvh',
+        autoFocus: 'first-tabbable',
+        restoreFocus: true,
+      })
+      .afterClosed()
+      .subscribe((agregado) => {
+        if (agregado) this.aviso.set(p.nombre + ' agregado al carrito.');
+      });
+  }
   agregar(p: Producto) {
+    if ((p.presentaciones?.filter(x => x.disponible).length || 0) > 1) { this.verDetalle(p); return; }
     this.carrito.agregar(p);
     this.aviso.set(p.nombre + ' agregado al carrito.');
   }

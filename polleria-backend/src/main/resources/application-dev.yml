@@ -20,5 +20,9 @@ management:
     health:
       show-details: never
 polleria:
+  pagos:
+    simulador-habilitado: ${PAGO_SIMULADOR_HABILITADO:false}
+  web:
+    cookie-secure: false
   cors:
     allowed-origins: http://localhost:4200

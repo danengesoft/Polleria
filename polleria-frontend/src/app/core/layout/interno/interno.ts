@@ -1,3 +1,4 @@
+import {IconoPortal} from '../../../shared/icono-portal';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../auth/auth-service';
@@ -5,7 +6,7 @@ import { AppNavigation } from '../../../shared/navigation/app-navigation';
 
 @Component({
   selector: 'app-layout-interno',
-  imports: [RouterLinkActive, RouterLink, RouterOutlet, AppNavigation],
+  imports: [RouterLinkActive, RouterLink, RouterOutlet, AppNavigation, IconoPortal],
   templateUrl: './interno.html',
   styleUrl: './interno.css',
 })

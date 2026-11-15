@@ -1,5 +1,6 @@
+import { RegistroDetalle } from '../../../shared/registro-detalle';
 import { AuthService } from '../../../core/auth/auth-service';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +12,7 @@ import { Cliente } from './cliente.model';
 
 @Component({
   selector: 'app-cliente-list',
-  imports: [RouterLink, MatButtonModule],
+  imports: [RegistroDetalle, RouterLink, MatButtonModule],
   templateUrl: './cliente-list.html',
 })
 export class ClienteList {
@@ -19,6 +20,10 @@ export class ClienteList {
   private readonly service = inject(ClienteService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  readonly activos = computed(() => this.datos().filter(c => c.activo).length);
+  readonly seleccionado = signal<Cliente | null>(null);
+  readonly busqueda = signal('');
+  readonly filtrados = computed(() => { const texto = this.busqueda().trim().toLocaleLowerCase('es-PE'); return this.datos().filter(item => Object.values(item).filter(v => typeof v === 'string').join(' ').toLocaleLowerCase('es-PE').includes(texto)); });
   readonly datos = signal<Cliente[]>([]);
   readonly loading = signal(false);
   readonly eliminando = signal<number | null>(null);

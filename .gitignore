@@ -15,3 +15,15 @@ backups/
 tokens/
 *.token
 *.jwt
+
+# Fotografías locales cargadas por Administrador
+**/var/imagenes-productos/
+
+# Pruebas locales y datos de ensayo
+/polleria-backend/src/test/
+/polleria-frontend/src/**/*.spec.ts
+/polleria-frontend/src/app/testing/
+/scripts/compra-publica/
+/polleria-backend/scripts/keycloak-dev-users.py
+/polleria-backend/scripts/keycloak-fase19.py
+/scripts/production/keycloak-fase19.mjs

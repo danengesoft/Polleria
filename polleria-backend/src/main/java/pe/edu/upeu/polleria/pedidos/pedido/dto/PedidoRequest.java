@@ -14,7 +14,10 @@ public class PedidoRequest {
     @NotNull
     @Positive
     private Long clienteId;
+    @Positive
+    private Long mesaId;
     @NotNull
+
     private TipoPedido tipoPedido;
     @NotNull
     private MetodoPago metodoPago;

@@ -1,3 +1,4 @@
+<section><h2>Carta completa</h2><div class="carta-venta">@for(p of productos();track p.id){<article><h3>{{p.nombre}}</h3><p>{{p.precio|currency:'PEN'}}</p><button type="button" [disabled]="!p.disponible || guardando()" (click)="agregarDesdeCarta(p.id)">{{p.disponible?'Agregar':'No disponible'}}</button></article>}</div></section>
 <h1>Nuevo pedido</h1>
 @if (error()) {
   <p class="error" role="alert">{{ error() }}</p>
@@ -56,42 +57,7 @@
         </mat-select></mat-form-field
       >
     </div>
-    @if (tipoSeleccionado() === 'DELIVERY') {
-      <p class="muted">
-        La dirección corresponde a este pedido. Cambiar de cliente no reemplaza lo que escribiste.
-      </p>
-      <button
-        matButton
-        type="button"
-        [disabled]="guardando() || confirmando() || !form.controls.clienteId.value"
-        (click)="usarDireccionCliente()"
-      >
-        Usar dirección del cliente
-      </button>
-      <div class="header-fields">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic"
-          ><mat-label>Dirección de entrega</mat-label
-          ><textarea
-            matInput
-            formControlName="direccionEntrega"
-            maxlength="300"
-            rows="2"
-            required
-          ></textarea
-          ><mat-error>{{ validacion(form.controls.direccionEntrega) }}</mat-error></mat-form-field
-        >
-        <mat-form-field appearance="outline" subscriptSizing="dynamic"
-          ><mat-label>Referencia de entrega</mat-label
-          ><textarea
-            matInput
-            formControlName="referenciaEntrega"
-            maxlength="300"
-            rows="2"
-          ></textarea
-          ><mat-error>{{ validacion(form.controls.referenciaEntrega) }}</mat-error></mat-form-field
-        >
-      </div>
-    }
+    @if (form.controls.tipoPedido.value === 'MESA') {<app-mapa-mesas (seleccionar)="form.controls.mesaId.setValue($event)" />}
   </section>
   <section aria-labelledby="detalle">
     <h2 id="detalle">Detalle del pedido</h2>
@@ -103,7 +69,7 @@
     }
     @if (lineasForm.hasError('duplicados')) {
       <p class="error" role="alert">
-        Cada producto debe aparecer una sola vez. Ajusta su cantidad.
+        Cada presentación debe aparecer una sola vez. Ajusta su cantidad.
       </p>
     }
     <div formArrayName="detalles">
@@ -123,7 +89,7 @@
               (optionSelected)="seleccionarProducto(i, $event.option.value)"
             >
               @for (producto of opcionesPorLinea()[i]; track producto.id) {
-                <mat-option [value]="producto.id"
+                <mat-option [disabled]="!producto.disponible" [value]="producto.id"
                   >{{ producto.nombre }} · #{{ producto.id }} ·
                   {{ producto.precio | currency: 'PEN' : 'S/ ' : '1.2-2' }}</mat-option
                 >
@@ -136,6 +102,7 @@
           @if (linea.controls.productoId.touched && linea.controls.productoId.invalid) {
             <p class="error selection-error">Selecciona un producto disponible.</p>
           }
+          @if(presentacionesDe(linea.controls.productoId.value).length){<mat-form-field appearance="outline"><mat-label>Presentación</mat-label><mat-select formControlName="presentacionId"><mat-option [value]="0">Selecciona una presentación</mat-option>@for(pres of presentacionesDe(linea.controls.productoId.value);track pres.id){<mat-option [value]="pres.id">{{pres.nombre}} · {{pres.precio|currency:'PEN':'S/ ':'1.2-2'}}</mat-option>}</mat-select></mat-form-field>}
           <mat-form-field appearance="outline" subscriptSizing="dynamic"
             ><mat-label>Cantidad producto {{ i + 1 }}</mat-label
             ><input

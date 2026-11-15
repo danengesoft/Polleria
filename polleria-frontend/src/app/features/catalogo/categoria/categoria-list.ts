@@ -1,5 +1,6 @@
+import { RegistroDetalle } from '../../../shared/registro-detalle';
 import { AuthService } from '../../../core/auth/auth-service';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +12,7 @@ import { Categoria } from './categoria.model';
 
 @Component({
   selector: 'app-categoria-list',
-  imports: [RouterLink, MatButtonModule],
+  imports: [RegistroDetalle, RouterLink, MatButtonModule],
   templateUrl: './categoria-list.html',
 })
 export class CategoriaList {
@@ -19,6 +20,9 @@ export class CategoriaList {
   private readonly service = inject(CategoriaService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  readonly seleccionado = signal<Categoria | null>(null);
+  readonly busqueda = signal('');
+  readonly filtrados = computed(() => { const texto = this.busqueda().trim().toLocaleLowerCase('es-PE'); return this.datos().filter(item => Object.values(item).filter(v => typeof v === 'string').join(' ').toLocaleLowerCase('es-PE').includes(texto)); });
   readonly datos = signal<Categoria[]>([]);
   readonly loading = signal(false);
   readonly eliminando = signal<number | null>(null);
@@ -49,7 +53,7 @@ export class CategoriaList {
     if (this.eliminando() !== null) return;
     this.dialog
       .open(ConfirmarEliminacion, {
-        data: item.nombre,
+        data: item.nombre + ' · Se retirará de la web y de los listados activos. El historial de pedidos se conserva.',
         width: '26rem',
         maxWidth: 'calc(100vw - 2rem)',
       })
@@ -70,7 +74,7 @@ export class CategoriaList {
       .subscribe({
         next: () => {
           this.eliminando.set(null);
-          this.aviso.set('Registro eliminado.');
+          this.seleccionado.set(null); this.aviso.set('Registro eliminado de la web. El historial se conserva.');
           this.cargar();
         },
         error: (err) => {

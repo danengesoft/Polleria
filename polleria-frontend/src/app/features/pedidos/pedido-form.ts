@@ -1,3 +1,4 @@
+import { MapaMesas } from '../operacion/mapa-mesas';
 import { CurrencyPipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -25,14 +26,15 @@ export const cantidadEntera: ValidatorFn = (control) =>
     ? null
     : { cantidad: true };
 export const detallesValidos: ValidatorFn = (control) => {
-  const values: { productoId?: number }[] = control.value ?? [];
+  const values: { productoId?: number;presentacionId?:number }[] = control.value ?? [];
   if (!values.length) return { sinDetalles: true };
-  const ids = values.map((value) => value.productoId).filter((id) => id !== undefined && id > 0);
+  const ids = values.filter(v=>(v.productoId??0)>0).map(value=>value.productoId+':'+(value.presentacionId||0));
   return new Set(ids).size === ids.length ? null : { duplicados: true };
 };
 @Component({
   selector: 'app-pedido-form',
   imports: [
+    MapaMesas,
     ReactiveFormsModule,
     RouterLink,
     CurrencyPipe,
@@ -67,8 +69,9 @@ export class PedidoForm {
   readonly etiqueta = etiqueta;
   readonly validacion = mensajeValidacion;
   readonly form = this.fb.nonNullable.group({
+    mesaId: [0],
     clienteId: [0, [Validators.min(1)]],
-    tipoPedido: ['PRESENCIAL' as TipoPedido, [Validators.required]],
+    tipoPedido: ['PARA_LLEVAR' as TipoPedido, [Validators.required]],
     metodoPago: ['EFECTIVO' as MetodoPago, [Validators.required]],
     direccionEntrega: ['', [Validators.maxLength(300)]],
     referenciaEntrega: ['', [Validators.maxLength(300)]],
@@ -85,7 +88,7 @@ export class PedidoForm {
   });
   readonly preciosUnitarios = computed(() =>
     this.valoresDetalles().map(
-      (linea) => this.productos().find((p) => p.id === linea.productoId)?.precio ?? 0,
+      (linea) => {const p=this.productos().find(p=>p.id===linea.productoId);return p?.presentaciones?.find(x=>x.id===linea.presentacionId)?.precio??p?.precio??0;},
     ),
   );
   // Solo estimación de UX. No se incluye ningún importe en PedidoRequest.
@@ -104,7 +107,7 @@ export class PedidoForm {
       this.productos().filter(
         (p) =>
           p.nombre.toLowerCase().includes(linea.busqueda.toLowerCase()) &&
-          !this.valoresDetalles().some((otra, j) => j !== indice && otra.productoId === p.id),
+          ((p.presentaciones?.length||0)>1||!this.valoresDetalles().some((otra, j) => j !== indice && otra.productoId === p.id)),
       ),
     ),
   );
@@ -116,7 +119,7 @@ export class PedidoForm {
       .subscribe((tipo) => {
         this.form.controls.direccionEntrega.setValidators([
           Validators.maxLength(300),
-          ...(tipo === 'DELIVERY' ? [textoObligatorio] : []),
+
         ]);
         this.form.controls.direccionEntrega.updateValueAndValidity();
       });
@@ -124,6 +127,7 @@ export class PedidoForm {
   private crearLinea() {
     return this.fb.nonNullable.group({
       productoId: [0, [Validators.min(1)]],
+      presentacionId:[0],
       busqueda: [''],
       cantidad: [1, [Validators.required, cantidadEntera]],
     });
@@ -138,28 +142,29 @@ export class PedidoForm {
     if (!this.guardando() && !this.confirmando() && this.lineasForm.length > 1)
       this.lineasForm.removeAt(indice);
   }
+  agregarDesdeCarta(id:number){
+    if(this.guardando()||this.confirmando())return;
+    const existente=this.lineasForm.controls.find(l=>l.controls.productoId.value===id);
+    if(existente&&(this.productos().find(p=>p.id===id)?.presentaciones?.length||0)<=1){existente.controls.cantidad.setValue(existente.controls.cantidad.value+1);return;}
+    const vacia=this.lineasForm.controls.findIndex(l=>l.controls.productoId.value===0);
+    if(vacia>=0)this.seleccionarProducto(vacia,id);
+    else{this.agregarLinea();this.seleccionarProducto(this.lineasForm.length-1,id);}
+  }
   buscarProducto(indice: number) {
     this.lineasForm.at(indice).controls.productoId.setValue(0);
   }
   seleccionarProducto(indice: number, id: number) {
     const producto = this.productos().find((p) => p.id === id);
     if (
-      !producto ||
+      !producto || !producto.disponible ||
       this.lineasForm.controls.some(
-        (linea, j) => j !== indice && linea.controls.productoId.value === id,
+        (linea, j) => j !== indice && linea.controls.productoId.value === id && (producto.presentaciones?.length||0)<=1,
       )
     )
       return;
-    this.lineasForm.at(indice).patchValue({ productoId: id, busqueda: producto.nombre });
+    this.lineasForm.at(indice).patchValue({ productoId: id, busqueda: producto.nombre,presentacionId:producto.presentaciones?.filter(p=>p.disponible).length===1?producto.presentaciones.filter(p=>p.disponible)[0].id||0:0 });
   }
-  usarDireccionCliente() {
-    const cliente = this.clientes().find((c) => c.id === this.form.controls.clienteId.value);
-    if (cliente && this.form.controls.tipoPedido.value === 'DELIVERY')
-      this.form.patchValue({
-        direccionEntrega: cliente.direccionPrincipal ?? '',
-        referenciaEntrega: cliente.referencia ?? '',
-      });
-  }
+  presentacionesDe(id:number){return this.productos().find(p=>p.id===id)?.presentaciones?.filter(p=>p.disponible)||[];}
   cargarClientes() {
     this.clientesCargados.set(false);
     this.errorClientes.set('');
@@ -182,7 +187,7 @@ export class PedidoForm {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.productos.set(data.filter((p) => p.disponible));
+          this.productos.set(data);
           this.productosCargados.set(true);
         },
         error: (err) => this.errorProductos.set(mensajeHttp(err)),
@@ -200,25 +205,29 @@ export class PedidoForm {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
     const value = this.form.getRawValue();
+    if(value.tipoPedido==='MESA' && value.mesaId<=0){this.error.set('Selecciona una mesa disponible.');return;}
     if (!this.clientes().some((c) => c.id === value.clienteId)) {
       this.error.set('Selecciona un cliente existente.');
       return;
     }
-    if (value.detalles.some((linea) => !this.productos().some((p) => p.id === linea.productoId))) {
+    if (value.detalles.some((linea) => !this.productos().some((p) => p.id === linea.productoId && p.disponible))) {
       this.error.set('Selecciona productos disponibles de la lista.');
       return;
     }
+    if(value.detalles.some(l=>this.presentacionesDe(l.productoId).length>1&&!l.presentacionId)){this.error.set('Selecciona la presentación de cada producto.');return;}
     const request: PedidoRequest = {
       clienteId: value.clienteId,
+      ...(value.tipoPedido==='MESA'?{mesaId:value.mesaId}:{}),
       tipoPedido: value.tipoPedido,
       metodoPago: value.metodoPago,
       direccionEntrega:
-        value.tipoPedido === 'DELIVERY' ? value.direccionEntrega.trim() || null : null,
+        null,
       referenciaEntrega:
-        value.tipoPedido === 'DELIVERY' ? value.referenciaEntrega.trim() || null : null,
+        null,
       detalles: value.detalles.map((linea) => ({
         productoId: linea.productoId,
         cantidad: linea.cantidad,
+        ...(linea.presentacionId?{presentacionId:linea.presentacionId}:{}),
       })),
     };
     const cliente = this.clientes().find((c) => c.id === value.clienteId)!;
@@ -227,7 +236,7 @@ export class PedidoForm {
       mensaje: `${cliente.nombres} ${cliente.apellidos} · ${etiqueta(value.tipoPedido)} · ${etiqueta(value.metodoPago)}`,
       total: this.total(),
       lineas: value.detalles.map((linea, i) => ({
-        nombre: this.productos().find((p) => p.id === linea.productoId)!.nombre,
+        nombre: this.productos().find((p) => p.id === linea.productoId)!.nombre+(linea.presentacionId?' · '+this.presentacionesDe(linea.productoId).find(p=>p.id===linea.presentacionId)?.nombre:''),
         cantidad: linea.cantidad,
         subtotal: this.subtotales()[i],
       })),

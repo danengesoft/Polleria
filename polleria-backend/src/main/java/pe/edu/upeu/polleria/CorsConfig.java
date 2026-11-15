@@ -16,9 +16,12 @@ public class CorsConfig {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList());
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(List.of("Content-Type", "X-Trace-ID", "Authorization"));
+        cors.setAllowedHeaders(List.of("Content-Type", "X-Trace-ID", "Authorization", "X-Web-CSRF", "Idempotency-Key"));
         cors.setExposedHeaders(List.of("X-Trace-ID", "Location"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration web = new CorsConfiguration(cors);
+        web.setAllowCredentials(true);
+        source.registerCorsConfiguration("/api/v1/web/**", web);
         source.registerCorsConfiguration("/api/**", cors);
         return source;
     }

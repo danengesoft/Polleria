@@ -5,18 +5,5 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder><pattern>${LOG_PATTERN}</pattern></encoder>
     </appender>
-    <springProfile name="!prod">
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/polleria.log</file>
-        <encoder><pattern>${LOG_PATTERN}</pattern></encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/polleria-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>
-    </appender>
-    <root level="INFO"><appender-ref ref="CONSOLE"/><appender-ref ref="FILE"/></root>
-    </springProfile>
-    <springProfile name="prod">
-        <root level="INFO"><appender-ref ref="CONSOLE"/></root>
-    </springProfile>
+    <root level="INFO"><appender-ref ref="CONSOLE"/></root>
 </configuration>

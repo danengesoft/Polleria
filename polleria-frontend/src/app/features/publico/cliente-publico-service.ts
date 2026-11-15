@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { OPTIONAL_AUTH } from '../../core/interceptors/auth-interceptor';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { ApiService } from '../../core/services/api-service';
 import { Cliente } from '../clientes/cliente/cliente.model';
 import { PedidoRequest, PedidoResponse } from '../pedidos/pedido.model';
@@ -9,8 +10,8 @@ export type MiPedidoRequest = Omit<PedidoRequest, 'clienteId'>;
 export class ClientePublicoService {
   private readonly http = inject(HttpClient);
   private readonly api = inject(ApiService);
-  perfil() {
-    return this.http.get<Cliente>(this.api.buildUrl('/api/v1/clientes/me'));
+  perfil(opcional = false) {
+    return this.http.get<Cliente>(this.api.buildUrl('/api/v1/clientes/me'), { context: new HttpContext().set(OPTIONAL_AUTH, opcional) });
   }
   guardarPerfil(r: PerfilRequest, existe: boolean) {
     const url = this.api.buildUrl('/api/v1/clientes/me');

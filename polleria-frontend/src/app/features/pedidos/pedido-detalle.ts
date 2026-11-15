@@ -1,3 +1,4 @@
+import { AuthService } from '../../core/auth/auth-service';
 import { EstadoBadge } from '../../shared/estado-badge';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
@@ -16,6 +17,8 @@ import { ConfirmarPedido, ConfirmacionPedido } from './confirmar-pedido';
   styleUrl: './pedido.css',
 })
 export class PedidoDetalle {
+  readonly pagoActualizado = () => this.cargar();
+  readonly auth = inject(AuthService);
   private readonly service = inject(PedidoService);
   private readonly route = inject(ActivatedRoute);
   private readonly dialog = inject(MatDialog);
@@ -26,7 +29,7 @@ export class PedidoDetalle {
   readonly error = signal('');
   readonly aviso = signal('');
   readonly etiqueta = etiqueta;
-  readonly opciones = computed(() => (this.pedido() ? transiciones(this.pedido()!) : []));
+  readonly opciones = computed(() => (this.pedido() ? transiciones(this.pedido()!).filter(e => e === 'LISTO' ? this.auth.tieneRol('ADMINISTRADOR', 'OPERACIONES') : this.auth.tieneRol('ADMINISTRADOR', 'MESERO')) : []));
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
   constructor() {
     const creado: PedidoResponse | undefined = history.state?.['pedidoCreado'];
@@ -63,9 +66,10 @@ export class PedidoDetalle {
     const p = this.pedido();
     if (
       !p ||
+      !['MESA', 'PARA_LLEVAR'].includes(p.tipoPedido) ||
       this.cambiando() ||
       p.estadoPago !== 'PENDIENTE' ||
-      p.metodoPago === 'EFECTIVO' ||
+      !this.auth.tieneRol('CAJERO', 'ADMINISTRADOR') ||
       p.estado === 'CANCELADO'
     )
       return;

@@ -29,6 +29,7 @@ export class ClienteForm {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private correoOriginal = '';
   readonly id = signal<number | null>(null);
   readonly loading = signal(false);
   readonly guardando = signal(false);
@@ -42,7 +43,7 @@ export class ClienteForm {
       '',
       [textoObligatorio, Validators.maxLength(12), Validators.pattern(/^(\+51)?[0-9]{7,9}$/)],
     ],
-    correo: ['', [Validators.maxLength(254), Validators.email]],
+    correo: ['', [Validators.maxLength(254), Validators.email, (c: any) => !c.value || c.value.trim().toLowerCase() === this.correoOriginal || /^[^@\s]+@gmail\.com$/i.test(c.value.trim()) ? null : { gmail: true }]],
     direccionPrincipal: ['', [Validators.maxLength(300)]],
     referencia: ['', [Validators.maxLength(300)]],
     activo: [true, []],
@@ -64,6 +65,7 @@ export class ClienteForm {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (data) => {
+            this.correoOriginal = (data.correo ?? '').trim().toLowerCase();
             this.form.patchValue({
               ...data,
               correo: data.correo ?? '',

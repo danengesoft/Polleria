@@ -8,6 +8,7 @@ export class ProductoService {
   private readonly http = inject(HttpClient);
   private readonly api = inject(ApiService);
   private readonly resource = '/api/v1/productos';
+  cargarImagen(archivo: File) { const datos = new FormData(); datos.append('archivo', archivo); return this.http.post<{ imagenUrl: string }>(this.api.buildUrl(this.resource + '/imagenes'), datos); }
   listar(categoriaId?: number) {
     let params = new HttpParams();
     if (categoriaId !== undefined && categoriaId > 0)

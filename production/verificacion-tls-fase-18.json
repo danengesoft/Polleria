@@ -1,7 +1,0 @@
-{
-  "https200": true,
-  "certificadoAutofirmadoSoloLocal": true,
-  "confianzaExplicitaCA": true,
-  "redirectHttp": 308,
-  "nginxHttpsTemplate": true
-}

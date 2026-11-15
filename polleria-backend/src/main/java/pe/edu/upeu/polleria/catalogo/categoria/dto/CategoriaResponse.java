@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CategoriaResponse {
     private Long id;
+    private Boolean eliminable;
     private String nombre;
     private String descripcion;
     private Boolean activo;

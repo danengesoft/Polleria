@@ -1,26 +1,31 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { PedidoService } from '../pedidos/pedido-service';
-import { DeliveryService } from '../delivery/delivery-service';
-import { CompraService } from '../abastecimiento/compra-service';
-import { InventarioService } from '../abastecimiento/inventario-service';
-import { InsumoService } from '../abastecimiento/insumo-service';
 import { ReporteTabla, TablaReporte, Celda } from './reporte-tabla';
 import { mensajeHttp } from '../../shared/http-error';
 @Component({
   selector: 'app-reportes',
   imports: [FormsModule, ReporteTabla],
   templateUrl: './reportes.html',
-  styleUrl: './reportes.css',
+  styleUrls: ['./reportes.css', './reportes-premium.css'],
 })
 export class Reportes {
   private readonly pedidos = inject(PedidoService);
-  private readonly delivery = inject(DeliveryService);
-  private readonly compras = inject(CompraService);
-  private readonly inventario = inject(InventarioService);
-  private readonly insumos = inject(InsumoService);
   private pendientes = new Subscription();
+  readonly seccion = signal(-1);
+  busqueda = '';
+  readonly secciones = [
+    { nombre: 'Resumen de ventas', detalle: 'Totales y ticket promedio del periodo.' },
+    { nombre: 'Ventas por día', detalle: 'Consulta las ventas en orden cronológico.' },
+    { nombre: 'Métodos de pago', detalle: 'Ventas e importes por medio de pago.' },
+    { nombre: 'Productos más vendidos', detalle: 'Productos y cantidades vendidos en el periodo.' },
+    { nombre: 'Clientes con más compras efectivas', detalle: 'Compras efectivas por cliente.' },
+    { nombre: 'Pedidos', detalle: 'Pedidos por estado y modalidad.' },
+  ];
+  coincide(nombre: string) { return nombre.toLocaleLowerCase().includes(this.busqueda.trim().toLocaleLowerCase()); }
+  readonly maxVentas = computed(() => Math.max(1, ...this.dias().filas.map(f => Number(f[2]))));
+  barra(valor: string | number, filas: Celda[][], columna: number) { return Number(valor) / Math.max(1, ...filas.map(f => Number(f[columna]))) * 100; }
   fechaDesde = '';
   fechaHasta = '';
   top = 20;
@@ -36,13 +41,10 @@ export class Reportes {
   readonly clientes = this.tabla();
   readonly estados = this.tabla();
   readonly tipos = this.tabla();
-  readonly entregas = this.tabla();
-  readonly operacion = this.tabla();
-  readonly compraResumen = this.tabla();
-  readonly proveedores = this.tabla();
-  readonly comprados = this.tabla();
-  readonly movimientos = this.tabla();
-  readonly stock = this.tabla();
+  readonly resumenVista = computed(() => this.ventas().filas[0]);
+  readonly puntosVenta = computed(() => { const filas = this.dias().filas; const max = Math.max(1, ...filas.map(f => Number(f[2]))); return filas.map((f, i) => `${20 + (i / Math.max(1, filas.length - 1)) * 460},${170 - Number(f[2]) / max * 145}`).join(' '); });
+  readonly totalTipos = computed(() => this.tipos().filas.reduce((s, f) => s + Number(f[1]), 0));
+  porcentajeTipo(valor: string | number) { return this.totalTipos() ? Number(valor) / this.totalTipos() * 100 : 0; }
   constructor() {
     inject(DestroyRef).onDestroy(() => this.pendientes.unsubscribe());
     this.aplicar();
@@ -80,7 +82,7 @@ export class Reportes {
       ['Resumen', r.cantidadPedidos, r.totalMonetario, r.ticketPromedio],
     ]);
     this.cargar(this.dias, this.pedidos.ventasPorDia(f), (r) =>
-      r.map((x) => [x.fecha, x.cantidadVentas, x.totalVentas]),
+      [...r].sort((a, b) => a.fecha.localeCompare(b.fecha)).map((x) => [x.fecha, x.cantidadVentas, x.totalVentas]),
     );
     this.cargar(this.pagos, this.pedidos.metodosPago(f), (r) =>
       r.map((x) => [x.metodoPago, x.cantidadVentas, x.totalVentas]),
@@ -97,46 +99,10 @@ export class Reportes {
       r.map((x) => ['Cliente #' + x.clienteId, x.cantidadPedidos, x.totalComprado]),
     );
     this.cargar(this.estados, this.pedidos.porEstado(f), (r) =>
-      r.map((x) => [x.estado, x.cantidadPedidos]),
+      [...r.filter(x => ['PENDIENTE', 'LISTO', 'ENTREGADO'].includes(x.estado)).map(x => [x.estado, x.cantidadPedidos] as Celda[]), ...((r.filter(x => !['PENDIENTE', 'LISTO', 'ENTREGADO'].includes(x.estado)).reduce((n, x) => n + x.cantidadPedidos, 0)) ? [['Otros estados históricos', r.filter(x => !['PENDIENTE', 'LISTO', 'ENTREGADO'].includes(x.estado)).reduce((n, x) => n + x.cantidadPedidos, 0)] as Celda[]] : [])],
     );
     this.cargar(this.tipos, this.pedidos.porTipo(f), (r) =>
-      r.map((x) => [x.tipoPedido, x.cantidadPedidos]),
-    );
-    this.cargar(this.entregas, this.delivery.porEstado(f), (r) =>
-      r.map((x) => [x.estado, x.cantidadEntregas]),
-    );
-    this.cargar(this.operacion, this.delivery.resumen(), (r) => [
-      ...r.entregasAbiertas.map((x) => [x.estado, x.cantidadEntregas] as Celda[]),
-      ['Repartidores activos', r.repartidoresActivos],
-    ]);
-    this.cargar(this.compraResumen, this.compras.resumen(f), (r) => [
-      ['Resumen', r.cantidadCompras, r.totalComprado, r.compraPromedio],
-    ]);
-    this.cargar(this.proveedores, this.compras.porProveedor(f), (r) =>
-      r.map((x) => [
-        x.razonSocial + ' (#' + x.proveedorId + ')',
-        x.cantidadCompras,
-        x.totalComprado,
-      ]),
-    );
-    this.cargar(this.comprados, this.compras.insumosComprados(f), (r) =>
-      r.map((x) => [
-        x.nombreInsumo + ' (#' + x.insumoId + ')',
-        x.unidadMedida,
-        x.cantidadComprada,
-        x.importeComprado,
-      ]),
-    );
-    this.cargar(this.movimientos, this.inventario.porTipo(f), (r) =>
-      r.map((x) => [x.tipoMovimiento, x.cantidadMovimientos]),
-    );
-    this.cargar(this.stock, this.insumos.stockActual(), (r) =>
-      r.map((x) => [
-        x.nombre + ' (#' + x.id + ')',
-        x.unidadMedida,
-        x.stockActual,
-        x.activo ? 'Sí' : 'No',
-      ]),
+      [...r.filter(x => ['MESA', 'PARA_LLEVAR'].includes(x.tipoPedido)).map(x => [x.tipoPedido, x.cantidadPedidos] as Celda[]), ...((r.filter(x => !['MESA', 'PARA_LLEVAR'].includes(x.tipoPedido)).reduce((n, x) => n + x.cantidadPedidos, 0)) ? [['Modalidades anteriores (histórico)', r.filter(x => !['MESA', 'PARA_LLEVAR'].includes(x.tipoPedido)).reduce((n, x) => n + x.cantidadPedidos, 0)] as Celda[]] : [])],
     );
   }
 }

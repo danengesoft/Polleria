@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ClienteResponse {
     private Long id;
+    private Boolean eliminable;
     private String nombres;
     private String apellidos;
     private String telefono;

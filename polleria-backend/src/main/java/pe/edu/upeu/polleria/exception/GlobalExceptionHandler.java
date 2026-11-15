@@ -18,6 +18,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String,Object>> imagenGrande(Exception ex){return error(HttpStatus.PAYLOAD_TOO_LARGE,"La imagen no puede superar 20 MB");}
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> notFound(ResourceNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -69,6 +72,8 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_ACCEPTABLE, "Representación de respuesta no soportada");
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<Map<String,Object>> denied(Exception ex){return error(HttpStatus.FORBIDDEN,"Operación no permitida");}
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> unexpected(Exception ex) {
         log.error("Error no controlado", ex);

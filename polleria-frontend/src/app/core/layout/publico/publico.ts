@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { AppNavigation } from '../../../shared/navigation/app-navigation';
-
+import { RouterOutlet } from '@angular/router';
+import { ClienteShell } from './cliente-shell';
 @Component({
   selector: 'app-layout-publico',
-  imports: [RouterLink, RouterOutlet, AppNavigation],
+  imports: [RouterOutlet, ClienteShell],
   templateUrl: './publico.html',
   styleUrl: './publico.css',
 })

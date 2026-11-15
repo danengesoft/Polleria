@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @Setter
 @NoArgsConstructor
 public class Categoria {
+    @Convert(converter = org.hibernate.type.NumericBooleanConverter.class)
+    @Column(name="ELIMINADO",nullable=false,precision=1)
+    private Boolean eliminado=false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

@@ -41,14 +41,14 @@
       ><mat-error>{{ validacion(form.controls.telefono) }}</mat-error></mat-form-field
     >
     <mat-form-field appearance="outline"
-      ><mat-label>Correo</mat-label
+      ><mat-label>Correo Gmail (opcional)</mat-label
       ><input
         matInput
         type="email"
         autocomplete="email"
         formControlName="correo"
         maxlength="254"
-      /><mat-error>{{ validacion(form.controls.correo) }}</mat-error></mat-form-field
+      /><mat-hint>Al registrar un correo nuevo utiliza @gmail.com.</mat-hint><mat-error>{{ form.controls.correo.hasError('gmail') ? 'Utiliza un correo @gmail.com.' : validacion(form.controls.correo) }}</mat-error></mat-form-field
     >
     <mat-form-field appearance="outline"
       ><mat-label>Dirección principal</mat-label

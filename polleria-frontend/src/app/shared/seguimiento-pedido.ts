@@ -4,7 +4,7 @@ import { EstadoBadge } from './estado-badge';
 @Component({
   selector: 'app-seguimiento-pedido',
   imports: [EstadoBadge],
-  template: `<section aria-label="Seguimiento del pedido">
+  template: `<section aria-label="Seguimiento del pedido" [class.horizontal]="horizontal()">
     <h3>Estado de tu pedido</h3>
     @if (estado() === 'CANCELADO') {
       <app-estado valor="CANCELADO" />
@@ -16,73 +16,114 @@ import { EstadoBadge } from './estado-badge';
             [class.completo]="pasos().indexOf(paso) < pasos().indexOf(estado())"
             [attr.aria-current]="paso === estado() ? 'step' : null"
           >
-            {{ etiqueta(paso) }}
-            @if (paso === estado()) {
-              <span>Estado actual</span>
-            }
+            <span
+              class="step-mark"
+              aria-hidden="true"
+              [textContent]="pasos().indexOf(paso) &lt; pasos().indexOf(estado()) ? '✓' : pasos().indexOf(paso)+1"
+            ></span>
+            <div>
+              <strong>{{ etiqueta(paso) }}</strong>
+              @if (paso === estado()) {
+                <small>Estado actual</small>
+              }
+            </div>
           </li>
         }
       </ol>
     }
   </section>`,
   styles: `
+    @media(min-width:700px){section.horizontal{padding:15px 0;border:0;background:transparent}.horizontal h3{display:none}.horizontal ol{grid-template-columns:repeat(4,minmax(0,1fr))}.horizontal ol:has(li:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}.horizontal li{flex-direction:column;align-items:center;text-align:center;gap:12px;min-height:100px}.horizontal li:not(:last-child):before{height:2px;width:calc(100% - 55px);left:calc(50% + 28px);top:16px;bottom:auto}.horizontal li.completo:before{background:var(--accent)}}
     section {
-      margin-block: 1.5rem;
-      padding-block: 1rem;
-      border-block: 1px solid var(--line);
-    }
-    ol {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      padding: 0;
-      list-style: none;
-      counter-reset: paso;
-    }
-    li {
-      counter-increment: paso;
-      padding: 0.65rem 0.8rem;
+      margin: 24px 0;
+      padding: 20px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      font-size: 0.8rem;
-      color: var(--muted);
+      border-radius: 10px;
       background: var(--surface);
     }
-    li::before {
-      content: counter(paso) '. ';
-      font-weight: 700;
+    h3 {
+      font:
+        1.3rem Georgia,
+        serif;
+      color: var(--ink);
+      margin: 0 0 20px;
+    }
+    ol {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      display: grid;
+      gap: 0;
+    }
+    li {
+      display: flex;
+      align-items: start;
+      gap: 14px;
+      color: var(--muted);
+      min-height: 62px;
+      position: relative;
+    }
+    li:not(:last-child):before {
+      content: '';
+      position: absolute;
+      width: 1px;
+      left: 15px;
+      top: 30px;
+      bottom: 0;
+      background: var(--line);
+    }
+    .step-mark {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      background: var(--surface-soft);
+      position: relative;
+      z-index: 1;
     }
     li.actual {
-      color: var(--accent);
+      color: var(--ink);
+    }
+    li.actual .step-mark {
+      background: var(--accent);
       border-color: var(--accent);
-      background: var(--accent-soft);
-      font-weight: 700;
+      color: white;
     }
-    li.completo {
-      color: var(--success);
+    li.completo .step-mark {
+      background: #4c7534;
+      border-color: #658948;
+      color: white;
     }
-    li span {
+    li strong {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding-top: 4px;
     }
-    @media (max-width: 600px) {
-      ol {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    li small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      margin-top: 5px;
+    }
+    li:last-child {
+      min-height: 32px;
     }
   `,
 })
 export class SeguimientoPedido {
+  readonly horizontal=input(false);
   readonly estado = input.required<EstadoPedido>();
   readonly tipo = input.required<TipoPedido>();
   readonly etiqueta = etiqueta;
   readonly pasos = computed<EstadoPedido[]>(() => [
     'PENDIENTE',
-    'CONFIRMADO',
-    'EN_PREPARACION',
     'LISTO',
-    ...(this.tipo() === 'DELIVERY' ? ['DESPACHADO' as const] : []),
+    ...(this.tipo() === 'DELIVERY' ? ['EN_CAMINO' as const] : []),
     'ENTREGADO',
   ]);
 }

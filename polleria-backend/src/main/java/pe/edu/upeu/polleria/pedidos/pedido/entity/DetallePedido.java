@@ -25,6 +25,14 @@ public class DetallePedido {
     private String nombreProducto;
     @Column(name = "PRECIO_UNITARIO", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
+    @Column(name="PRESENTACION_ID")
+    private Long presentacionId;
+    @Column(name="NOMBRE_PRESENTACION",length=60)
+    private String nombrePresentacion;
+    @Column(name="PROMOCION_ID",length=36)
+    private String promocionId;
+    @Column(name="PRECIO_REGULAR",precision=10,scale=2)
+    private BigDecimal precioRegular;
     @Column(name = "CANTIDAD", nullable = false)
     private Integer cantidad;
     @Column(name = "SUBTOTAL", nullable = false, precision = 19, scale = 2)

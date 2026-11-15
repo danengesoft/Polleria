@@ -8,6 +8,8 @@ public interface PedidoService {
 
     PedidoResponse confirmarPago(Long id);
 
+    java.util.Map<String, Object> pagoPruebaInterno(Long id, String resultado);
+
     PedidoResponse crearMio(String sub, MiPedidoRequest request);
 
     List<PedidoResponse> listarMios(String sub);

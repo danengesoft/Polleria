@@ -134,3 +134,5 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+
+.carta-venta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem}.carta-venta article{border:1px solid var(--line);padding:.75rem;border-radius:var(--radius)}

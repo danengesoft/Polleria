@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductoRequest {
+    @jakarta.validation.Valid @Size(min=1,max=20)
+    private java.util.List<@NotNull @jakarta.validation.Valid PresentacionRequest> presentaciones;
     @NotBlank @Size(max = 120)
     private String nombre;
     @Size(max = 500)

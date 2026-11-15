@@ -9,4 +9,5 @@ export interface ClienteRequest {
 }
 export interface Cliente extends ClienteRequest {
   id: number;
+  eliminable?: boolean;
 }

@@ -10,7 +10,6 @@ import java.net.URI;
 import pe.edu.upeu.polleria.clientes.cliente.dto.*;
 import pe.edu.upeu.polleria.clientes.cliente.service.ClienteService;
 
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Mi perfil")
 @RestController
 @RequestMapping("/api/v1/clientes/me")
 @RequiredArgsConstructor

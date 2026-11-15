@@ -74,10 +74,13 @@ services:
   backend:
     image: polleria-backend:${IMAGE_TAG:?Set IMAGE_TAG}
     build: ./polleria-backend
+    volumes:
+      - imagenes-productos:/app/imagenes-productos
     restart: unless-stopped
     logging: *bounded-logs
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      POLLERIA_IMAGENES_DIR: /app/imagenes-productos
       ORACLE_JDBC_URL: jdbc:oracle:thin:@oracle:1521/FREEPDB1
       ORACLE_APP_USER: ${ORACLE_APP_USER:?Set ORACLE_APP_USER}
       ORACLE_APP_PASSWORD: ${ORACLE_APP_PASSWORD:?Set ORACLE_APP_PASSWORD}
@@ -126,6 +129,7 @@ services:
       timeout: 5s
       retries: 6
 volumes:
+  imagenes-productos:
   oracle-data:
   keycloak-data:
 networks:
