@@ -4,7 +4,7 @@ import { INTERNOS, OPERATIVOS } from './core/auth/auth-service';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  {path:'inicio',canActivate:[publicoGuard],title:'LA BRAVA | Pollos y Parrillas',loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
+  {path:'inicio',canActivate:[publicoGuard],title:'Polleria Neyos | Pollos y Parrillas',loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
   {path:'destacados',canActivate:[publicoGuard],title:'Destacados de la carta | Polleria Neyos',data:{seccion:'destacados'},loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
   {path:'promociones',canActivate:[publicoGuard],title:'Promociones | Polleria Neyos',data:{seccion:'promociones'},loadComponent:()=>import('./core/inicio/inicio-publico').then(m=>m.InicioPublico)},
   {path:'',pathMatch:'full',redirectTo:'inicio'},
@@ -24,21 +24,21 @@ export const routes: Routes = [
     loadComponent: () => import('./core/layout/interno/interno').then((m) => m.Interno),
     children: [
       {path:'ubicacion',redirectTo:'portada',pathMatch:'full'},
-      {path:'portada',canActivate:[rolGuard('ADMINISTRADOR')],title:'Local y página de inicio | LA BRAVA',loadComponent:()=>import('./features/contenido/banners').then(m=>m.Banners)},
+      {path:'portada',canActivate:[rolGuard('ADMINISTRADOR')],title:'Local y página de inicio | Polleria Neyos',loadComponent:()=>import('./features/contenido/banners').then(m=>m.Banners)},
       {path:'caja',canActivate:[rolGuard('CAJERO','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Caja)},
       {path:'operaciones',canActivate:[rolGuard('OPERACIONES','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Operaciones)},
       {path:'mesero',canActivate:[rolGuard('MESERO','ADMINISTRADOR')],loadComponent:()=>import('./features/operacion/paneles').then(m=>m.Mesero)},
       {
         path: 'reportes',
         canActivate: [rolGuard('ADMINISTRADOR')],
-        title: 'Reportes | LA BRAVA',
+        title: 'Reportes | Polleria Neyos',
         loadComponent: () => import('./features/reportes/reportes').then((m) => m.Reportes),
       },
       {
         path: '',
         pathMatch: 'full',
         canActivate:[inicioInternoGuard],
-        title: 'Portal interno | LA BRAVA',
+        title: 'Portal interno | Polleria Neyos',
         loadComponent: () => import('./core/inicio/inicio-interno').then((m) => m.InicioInterno),
       },
       {
@@ -98,19 +98,19 @@ export const routes: Routes = [
       {
         path: 'pedidos',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Pedidos | LA BRAVA',
+        title: 'Pedidos | Polleria Neyos',
         loadComponent: () => import('./features/pedidos/pedido-list').then((m) => m.PedidoList),
       },
       {
         path: 'pedidos/nuevo',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Nuevo pedido | LA BRAVA',
+        title: 'Nuevo pedido | Polleria Neyos',
         loadComponent: () => import('./features/pedidos/pedido-form').then((m) => m.PedidoForm),
       },
       {
         path: 'pedidos/:id',
         canActivate: [rolGuard(...OPERATIVOS)],
-        title: 'Detalle del pedido | LA BRAVA',
+        title: 'Detalle del pedido | Polleria Neyos',
         loadComponent: () =>
           import('./features/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),
       },
@@ -124,20 +124,24 @@ export const routes: Routes = [
     children: [
       {
         path: 'catalogo',
+        title: 'Catálogo | Polleria Neyos',
         loadComponent: () =>
           import('./features/publico/catalogo-publico').then((m) => m.CatalogoPublico),
       },
       {
         path: 'carrito',
+        title: 'Carrito | Polleria Neyos',
         loadComponent: () => import('./features/publico/carrito').then((m) => m.Carrito),
       },
       {
         path: 'perfil',
         canActivate: [authGuard, rolGuard('CLIENTE')],
+        title: 'Perfil | Polleria Neyos',
         loadComponent: () => import('./features/publico/perfil').then((m) => m.Perfil),
       },
       {
         path: 'checkout',
+        title: 'Checkout | Polleria Neyos',
         loadComponent: () => import('./features/publico/checkout').then((m) => m.Checkout),
       },
       {path:'seguimiento/:id',data:{web:true},loadComponent:()=>import('./features/publico/mi-pedido').then(m=>m.MiPedido)},

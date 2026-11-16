@@ -266,11 +266,11 @@ grep -rn "font-family" polleria-frontend/src
 ### 3.6 Cambiar textos
 
 - **Textos de una pantalla:** en su `.html`, o dentro del `template:` de su `.ts`.
-- **Nombre de la marca:** el proyecto usa **dos nombres**: "Polleria Neyos" y "LA BRAVA". Para
+- **Nombre de la marca:** el proyecto usa **dos nombres**: "Polleria Neyos" y "Polleria Neyos". Para
   unificarlo, búscalos en todo el frontend:
 
   ```bash
-  grep -rn "LA BRAVA\|La Brava\|Neyos" polleria-frontend/src
+  grep -rn "Polleria Neyos\|Polleria Neyos\|Neyos" polleria-frontend/src
   ```
 
 - **Título de la pestaña:** `src/index.html` y los `title:` de `app.routes.ts`.

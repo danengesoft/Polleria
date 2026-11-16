@@ -129,7 +129,7 @@ export class AuthService {
       window.addEventListener('message', recibir); signal?.addEventListener('abort', cancelar, { once: true });
       const reloj = setInterval(() => { if (ventana && cerrado() && !intercambiando) terminar(false, 'Se cerró la ventana de acceso.'); }, 400);
       const limite = setTimeout(() => { if (!intercambiando) terminar(false, 'El acceso venció. Intenta nuevamente.'); }, 180000);
-      void this.iniciarLogin(location.pathname + location.search, registro, url => { ventana = abrir(url); if (!ventana) this.error.set('Permite la ventana de acceso de La Brava y vuelve a intentarlo.'); }).then(() => { if (this.error()) terminar(false, this.error()); }).catch(() => terminar(false, 'No se pudo abrir el acceso.'));
+      void this.iniciarLogin(location.pathname + location.search, registro, url => { ventana = abrir(url); if (!ventana) this.error.set('Permite la ventana de acceso de Polleria y vuelve a intentarlo.'); }).then(() => { if (this.error()) terminar(false, this.error()); }).catch(() => terminar(false, 'No se pudo abrir el acceso.'));
     });
   }
   async completarLogin(code: string, state: string, signal?: AbortSignal): Promise<void> {
