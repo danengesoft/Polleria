@@ -1,0 +1,19 @@
+-- =====================================================================
+-- 99. LIMPIEZA (solo si necesitas empezar de cero)
+-- Conexión: SYSTEM / XEPDB1
+-- Borra TODO lo creado por estos scripts. No toca otros esquemas.
+-- Si algún DROP falla porque el objeto no existe, sigue con el siguiente.
+-- =====================================================================
+DROP USER POLLERIA_IMPORT CASCADE;
+DROP USER POLL_CAJERO CASCADE;
+DROP USER POLL_ANALISTA CASCADE;
+DROP USER POLL_AUDITOR CASCADE;
+DROP USER POLLERIA_ADMIN CASCADE;
+
+DROP ROLE ROL_POLLERIA_CAJERO;
+DROP ROLE ROL_POLLERIA_ANALISTA;
+DROP ROLE ROL_POLLERIA_AUDITOR;
+
+DROP TABLESPACE TBS_POLLERIA_DATOS INCLUDING CONTENTS AND DATAFILES;
+DROP TABLESPACE TBS_POLLERIA_HIST  INCLUDING CONTENTS AND DATAFILES;
+DROP TABLESPACE TBS_POLLERIA_IDX   INCLUDING CONTENTS AND DATAFILES;
